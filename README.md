@@ -1,4 +1,4 @@
-# Awakelion-Control-Group
+# RM2023-Control-Group
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://jihulab.com/awakelion-robot-lab/awakelion-control-group.git
+git remote add origin https://jihulab.com/awakelion-robot-lab/rm2023-control-group.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://jihulab.com/awakelion-robot-lab/awakelion-control-group/-/settings/integrations)
+- [ ] [Set up project integrations](https://jihulab.com/awakelion-robot-lab/rm2023-control-group/-/settings/integrations)
 
 ## Collaborate with your team
 

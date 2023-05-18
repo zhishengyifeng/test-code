@@ -392,8 +392,8 @@ void gimbal_task(void *parm)
 				}
 				else if(gimbal_mode == GIMBAL_SHOOT_BUFF)
 				{
-					gimbal.pid.yaw_spd_ref = pid_yaw.out;	 
-					gimbal.pid.pit_spd_ref = pid_pit.out;
+					gimbal.pid.yaw_spd_ref = pid_buff_yaw.out;	 
+					gimbal.pid.pit_spd_ref = pid_buff_pit.out;
 					gimbal.pid.yaw_spd_fdb = gimbal.sensor.yaw_palstance;	    
 					gimbal.pid.pit_spd_fdb = gimbal.sensor.pit_palstance;					
 				}

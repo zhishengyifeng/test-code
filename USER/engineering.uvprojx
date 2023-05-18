@@ -332,7 +332,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,ARM_MATH_CM4,__FPU_PRESENT=1,__TARGET_FPU_VFP,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\FWLIB\inc;..\USER;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\USER_CONF;..\BSP_CONF;..\TASK;..\FUNTION;..\PROTOCOL;.\include;..\BMI088\algorithm;..\BMI088\devices;..\BMI088\rm_lib</IncludePath>
+              <IncludePath>..\CORE;..\FWLIB\inc;..\USER;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\USER_CONF;..\BSP_CONF;..\TASK;..\FUNTION;..\PROTOCOL;.\include;..\BMI088\algorithm;..\BMI088\devices;..\BMI088\rm_lib;..\USB_LIB\STM32_USB_Device_Library\Class\cdc\inc;..\USB_LIB\STM32_USB_Device_Library\Core\inc;..\USB_LIB\STM32_USB_OTG_Driver\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -404,6 +404,16 @@
               <FileName>start_tack.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER_CONF\start_tack.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\usbd_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -725,6 +735,11 @@
               <FileType>5</FileType>
               <FilePath>..\USER_CONF\sys_config.h</FilePath>
             </File>
+            <File>
+              <FileName>st_usb_cdc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER_CONF\st_usb_cdc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -749,6 +764,11 @@
               <FileName>bsp_imu.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP_CONF\bsp_imu.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_usb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP_CONF\bsp_usb.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -909,6 +929,46 @@
               <FileName>AHRS.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\BMI088\algorithm\AHRS.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB_CDC</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_cdc_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_Device_Library\Class\cdc\src\usbd_cdc_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_Device_Library\Core\src\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_Device_Library\Core\src\usbd_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_req.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_Device_Library\Core\src\usbd_req.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_OTG_Driver\src\usb_dcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_LIB\STM32_USB_OTG_Driver\src\usb_dcd_int.c</FilePath>
             </File>
           </Files>
         </Group>

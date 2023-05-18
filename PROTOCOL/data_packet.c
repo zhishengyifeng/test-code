@@ -265,6 +265,7 @@ static void usart_send_data(USART_TypeDef* USARTx,uint8_t *pData, uint16_t Size)
   }
 }
 
+#include "bsp_usb.h"
 uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof)
 {
 #if (JUDGE_TX_FIFO_BUFLEN > PC_TX_FIFO_BUFLEN)
@@ -279,8 +280,13 @@ uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof)
   {
     fifo_s_gets(pfifo, tx_buf, fifo_count);//将数据转移到tx_buf
     
-    if (sof == UP_REG_ID)
-      usart_send_data(USART1, tx_buf, fifo_count);
+    if (sof == UP_REG_ID){
+			#ifdef USE_USB_OTG_FS
+				APP_FOPS.pIf_DataTx(tx_buf,fifo_count);
+			#else
+				usart_send_data(USART1, tx_buf, fifo_count);
+			#endif
+		}
     else if (sof == DN_REG_ID)
       usart_send_data(USART6, tx_buf, fifo_count);//通过寄存器发送数据
     else

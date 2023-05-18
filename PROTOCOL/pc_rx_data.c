@@ -23,26 +23,35 @@ static uint8_t   pc_rxdata_buf[PC_RX_FIFO_BUFLEN];
 
 void pc_rx_param_init(void)
 {
-    /* create the judge_rxdata_mutex mutex  */  
-  pc_rxdata_mutex = xSemaphoreCreateMutex();
-    
-  /* judge data fifo init */
-  fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, PC_RX_FIFO_BUFLEN, pc_rxdata_mutex); //添加judge_rxdata_fifo的互斥量
-	
-  
-  /* initial judge data dma receiver object */
-  pc_rx_obj.dma_stream = DMA2_Stream5;
-  pc_rx_obj.data_fifo = &pc_rxdata_fifo;
-  pc_rx_obj.buff_size = PC_RX_FIFO_BUFLEN;
-  pc_rx_obj.buff[0] = pc_rxbuf[0];
-  pc_rx_obj.buff[1] = pc_rxbuf[1];
-
-  /* initial judge data unpack object */
-  pc_unpack_obj.data_fifo = &pc_rxdata_fifo;
-  pc_unpack_obj.p_header = (frame_header_t *)pc_unpack_obj.protocol_packet;
-  pc_unpack_obj.index = 0;
-  pc_unpack_obj.data_len = 0;
-  pc_unpack_obj.unpack_step = STEP_HEADER_SOF;
+	#ifdef USE_USB_OTG_FS
+		/* create the judge_rxdata_mutex mutex  */  
+		pc_rxdata_mutex = xSemaphoreCreateMutex();  
+		/* judge data fifo init */
+		fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, PC_RX_FIFO_BUFLEN, pc_rxdata_mutex); //添加互斥量
+		/* initial judge data unpack object */
+		pc_unpack_obj.data_fifo = &pc_rxdata_fifo;
+		pc_unpack_obj.p_header = (frame_header_t *)pc_unpack_obj.protocol_packet;
+		pc_unpack_obj.index = 0;
+		pc_unpack_obj.data_len = 0;
+		pc_unpack_obj.unpack_step = STEP_HEADER_SOF; 	
+	#else
+		/* create the judge_rxdata_mutex mutex  */  
+		pc_rxdata_mutex = xSemaphoreCreateMutex();  
+		/* judge data fifo init */
+		fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, PC_RX_FIFO_BUFLEN, pc_rxdata_mutex); //添加互斥量
+		/* initial judge data dma receiver object */
+		pc_rx_obj.dma_stream = DMA2_Stream5;
+		pc_rx_obj.data_fifo = &pc_rxdata_fifo;
+		pc_rx_obj.buff_size = PC_RX_FIFO_BUFLEN;
+		pc_rx_obj.buff[0] = pc_rxbuf[0];
+		pc_rx_obj.buff[1] = pc_rxbuf[1];
+		/* initial judge data unpack object */
+		pc_unpack_obj.data_fifo = &pc_rxdata_fifo;
+		pc_unpack_obj.p_header = (frame_header_t *)pc_unpack_obj.protocol_packet;
+		pc_unpack_obj.index = 0;
+		pc_unpack_obj.data_len = 0;
+		pc_unpack_obj.unpack_step = STEP_HEADER_SOF;
+	#endif
 }
 
 

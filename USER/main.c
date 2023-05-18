@@ -48,15 +48,26 @@
 #include "kalman_filter.h"
 #include "BMI088driver.h"
 #include "bsp_dwt.h"
+#include "bsp_usb.h"
+#include "usbd_usr.h"
+#include "usbd_desc.h"
+#include "usbd_cdc_core.h"
 
 void flash_cali(void);
 void Config_SystemClock(uint32_t PLLM, uint32_t PLLN, uint32_t PLLP, uint32_t PLLQ);
+
+__ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 int main(void)
 {
 	//Config_SystemClock(6,168, 2,7);
 	SysTick_Init(168);//系统滴答定时器初始化
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);//中断分组设置
+	
+#ifdef USE_USB_OTG_FS 
+	USBD_Init(&USB_OTG_dev,USB_OTG_FS_CORE_ID,&USR_desc,&USBD_CDC_cb, &USR_cb);	 
+#endif            
+	
 	TIM_BASE_Init(10-1,8400-1);//配置定时器4为1ms中断一次，做来系统运行计数，便于之后实现一些延时操作
 	GPIO_INIT();//板载LED、归中按键、24V电源输出、板载陀螺仪SPI等引脚的初始化，具体看A板的原理图
   TIM8_DEVICE(20000-1,168-1);//舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
