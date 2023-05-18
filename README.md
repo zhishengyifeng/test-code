@@ -4,13 +4,14 @@
 23赛季步兵电控C板代码
 
 #### 拉取代码方法
+#### 拉取代码方法
 1. 随便打开一个文件夹，右键点击空白处
 
-   ![1 (1)](E:\hobby\AwakeLion\standard-robot\Assets\1 (1).png)
-
+   ![1 (1)](Assets/1 (1).png)
+   
 2. 然后选择点击git bash here打开命令行窗口
 
-   ![1 (2)](E:\hobby\AwakeLion\standard-robot\Assets\1 (2).png)
+   ![1 (2)](Assets/1 (2).png)
 
 3. 复制以下命令
 
