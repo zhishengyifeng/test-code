@@ -248,6 +248,7 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
             }
             else
             {
+							if(real_time_Cap_remain!=0)
                 pid_calc(power_pid, real_time_Cap_remain, real_time_Cap_can_store);
             }
             if (power_pid->out > 0)
