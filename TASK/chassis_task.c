@@ -19,7 +19,7 @@
 #include "judge_rx_data.h"
 #include "data_packet.h"
 #include "arm_math.h"
-float a1,b1,a2,b2,a3,b3,a4,b4;
+
 /*2022赛季规则
 
 初始状态			100 40
@@ -59,7 +59,7 @@ float chassis_pid[6] = {10.0f, 0.0, 0.0f, 10.0, 0.0f, 0};
 float chassis_pid[6] = {10.0f, 0.0, 0.0f, 10.0, 0.0f, 0};
 #elif((INFANTRY_NUM == INFANTRY_5))
 //float chassis_pid[6] = {0,0, 0, 0, 0, 0};
-float chassis_pid[6] = {10.0f, 0.0, 0.0f, 10.5, 0.0f, 0};
+float chassis_pid[6] = {10.0f, 0.0, 0.0f, 10.0, 0.0f, 0};
 #else
 		#error "INFANTRY_NUM define error!"
 #endif
@@ -73,7 +73,7 @@ float cx=0,cy=0,cw=0;//缓启动赋值变量
 uint8_t fast_flag = 0; //加速状态标志位
 int Speed_up = 1;//加速键标志位
 float cap_ratio;//电流值比例参数，根据当前电流值来调整电流输出上限
-
+float temp=0;/////////////////////////////////////////////////////////////////////////////
 void chassis_task(void *parm)
 {
   uint32_t Signal;
@@ -157,16 +157,10 @@ void chassis_task(void *parm)
 //					chassis.wheel_spd_ref[2]*=0.5f;
 //					chassis.wheel_spd_ref[3]*=0.5f;	
 //					}
-					
+					temp=chassis.CapData[1];
           for (int i = 0; i < 4; i++)
             chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
 
-					    a1 = chassis.wheel_spd_fdb[0];b1=chassis.wheel_spd_ref[0];
-					 a2 = -chassis.wheel_spd_fdb[1];b2=chassis.wheel_spd_ref[1];
-					 a3 = -chassis.wheel_spd_fdb[2];b3=chassis.wheel_spd_ref[2];
-					 a4 = chassis.wheel_spd_fdb[3];b4=chassis.wheel_spd_ref[3];
-					
-					
           if (!chassis_is_controllable())
             memset(chassis.current, 0, sizeof(chassis.current));
 
@@ -205,7 +199,7 @@ extern int Speed_up;
 void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
 {
     static  float max = 3000;
-    static float min = 1150;//1000;
+    static float min = 1000;
     static float parameter;            // 变速系数
     static float Cap_low = 14.0f;      // 何时停止加速
     float cap_flag = real_time_Cap_can_store - 18.0f; // 18~real_time_Cap_can_store这一段进行按比例赋值
@@ -217,27 +211,16 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
     {
         *power_yaw_speed = 0.01f;
     }
-
-    if (real_time_Cap_remain > 18.0f && real_time_Cap_remain < real_time_Cap_can_store)
+	
+	
+    if (real_time_Cap_remain > 18.0f)//&& real_time_Cap_remain <= real_time_Cap_can_store)
     {
-//        min = 1200 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;
-          min = 1350 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;
-		}
+        min = 1200 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;
+    }
     else
     {
-        min = 1150;//1000;
+        min = 1000;
     }
-		
-		
-		
-		
-//		 if (rm.vy == 0 || rm.vx == 0)//将此处改为0即可让遥控模拟键盘进行控制（方便测功率）
-//			{
-//				*power_vy = rm.vy;//遥控不进行功率限制
-//				*power_vx = rm.vx;
-//			}
-//		else
-//			{
         // 按加速键后Speed_up = 0,以3508的最快速度进行冲刺
         if (Speed_up == 1)
         {
@@ -247,8 +230,8 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
                 pid_calc(power_pid, real_time_Cap_remain + 0.5f, real_time_Cap_can_store);
             }
             else
-            {
-							if(real_time_Cap_remain!=0)
+            {   
+				if (real_time_Cap_remain!=0)
                 pid_calc(power_pid, real_time_Cap_remain, real_time_Cap_can_store);
             }
             if (power_pid->out > 0)
@@ -336,7 +319,7 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
                 *power_vx = 0;
             }
         }
-//			}
+
     if (SLOW_SPD) // 慢速
     {
         if (*power_vx > 0)
@@ -372,7 +355,7 @@ static void chassis_normal_handler(void)
   float nor_chassis_vx,nor_chassis_vy;
   //vx,vy,yaw_speed power control
   chassis_power_contorl(&pid_power,&nor_chassis_vx,&nor_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
-  
+
   int position_ref = 0;
   if (chassis_mode == CHASSIS_NORMAL_MODE)
   {
@@ -383,6 +366,7 @@ static void chassis_normal_handler(void)
   }
   chassis.vx=nor_chassis_vx;
   chassis.vy=nor_chassis_vy;
+
 //  yaw_speed=power_yaw_speed;
 //  /* 普通模式底盘-云台坐标系转换 */
 //  float normal_angle;
@@ -425,7 +409,7 @@ static void chassis_dodge_handler(void)
   /*小陀螺*/
   dodge_angle = gimbal.sensor.yaw_relative_angle;
 
-  if ((rm.vx != 0 || rm.vy != 0) &&(km.vx == 0 || km.vy == 0))//小陀螺时遥控方向降低速度
+  if (rm.vx != 0 || rm.vy != 0)//小陀螺时遥控方向降低速度
   {
     dodge_chassis_vx = rm.vx * 0.5f;
     dodge_chassis_vy = rm.vy * 0.5f;
