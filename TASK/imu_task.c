@@ -21,7 +21,6 @@
 #include "kalman_filter.h"
 
 #include "ahrs.h"
-#include "modeswitch_task.h"
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
@@ -192,26 +191,10 @@ void imu_task(void const *argu)
     INS_angle[2]=INS_angle[2]*RAD_TO_ANGLE;
 		
 		gimbal.sensor.yaw_gyro_angle = totalangle_transfer(INS_angle[0]);
-		
-		if(INFANTRY_NUM == INFANTRY_5 && (gimbal_mode == GIMBAL_TRACK_ARMOR))//5号云台结构不稳，不能放大太多倍
-		{
-			gimbal.sensor.yaw_palstance  = BMI088.Gyro[2]*100;
-		}
 		gimbal.sensor.yaw_palstance  = BMI088.Gyro[2]*100;
-//		gimbal.sensor.pit_gyro_angle = -INS_angle[1];
-//    gimbal.sensor.pit_palstance  = BMI088.Gyro[0]*100;
-/////////////////////////////////////////////////
-	if(INFANTRY_NUM == INFANTRY_5)//小步兵的电机和其他步兵是反的
-		{
-			gimbal.sensor.pit_gyro_angle = INS_angle[1];
-			 gimbal.sensor.pit_palstance  = -BMI088.Gyro[0]*100;
-		}
-		else
-		{
-			gimbal.sensor.pit_gyro_angle = -INS_angle[1];
-			 gimbal.sensor.pit_palstance  = BMI088.Gyro[0]*100;
-		}  
-/////////////////////////////////////////////////  
+		gimbal.sensor.pit_gyro_angle = -INS_angle[1];
+    gimbal.sensor.pit_palstance  = BMI088.Gyro[0]*100;
+
     
 		err_detector_hook(IMU_OFFLINE);
     imu_stack_surplus = uxTaskGetStackHighWaterMark(NULL);

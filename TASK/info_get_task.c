@@ -203,9 +203,10 @@ static void get_shoot_info(void)
   
   if(gimbal_mode == GIMBAL_SHOOT_BUFF) //如果打能量机关，由算法控制射击
   {
-    shoot.shoot_cmd = pc_recv_mesg.gimbal_control_data.buff_shoot;
-    shoot.c_shoot_cmd = 0;
-    shoot.para_mode					= SHOOTBUFF_MODE;
+//    shoot.shoot_cmd = pc_recv_mesg.gimbal_control_data.buff_shoot;
+//    shoot.c_shoot_cmd = 0;
+    //shoot.para_mode					= SHOOTBUFF_MODE;
+	 shoot.para_mode					= SHOOTNOR_MODE;// 测试一下找BUG
   }
 	else
 	{

@@ -60,46 +60,31 @@ WorldTime_RxTypedef PC_WorldTime;
 WorldTime_RxTypedef PC_KF_Time;
 uint32_t PC_FPS;
 uint32_t pc_last_times,pc_times;
-#ifdef USE_USB_OTG_FS
-extern fifo_s_t  pc_rxdata_fifo;
-extern uint8_t USB_USART_RX_BUF[64];
-extern uint32_t USB_USART_RX_STA;
-#endif
 void pc_rx_task(void *parm)
 {
 	uint32_t Signal;
 	BaseType_t STAUS;
   while(1)
   {
-		#ifdef USE_USB_OTG_FS
-			pc_times = HAL_GetTick() - pc_last_times;
-			pc_last_times = HAL_GetTick();
-			Get_FPS(&PC_WorldTime, &PC_FPS);
-			nowfps=(float)PC_FPS;
-			PC_KF_Time.WorldTime = xTaskGetTickCount();
-			fifo_s_puts(&pc_rxdata_fifo, USB_USART_RX_BUF, USB_USART_RX_STA);
-			unpack_fifo_data(&pc_unpack_obj, UP_REG_ID); 
-		#else
-			STAUS = xTaskNotifyWait((uint32_t) NULL, 
-															(uint32_t) PC_UART_IDLE_SIGNAL, 
-															(uint32_t *)&Signal, 
-															(TickType_t) portMAX_DELAY );
-			if(STAUS == pdTRUE)
+		//vAFunction();
+    STAUS = xTaskNotifyWait((uint32_t) NULL, 
+                            (uint32_t) PC_UART_IDLE_SIGNAL, 
+                            (uint32_t *)&Signal, 
+                            (TickType_t) portMAX_DELAY );
+    if(STAUS == pdTRUE)
+		{
+			if(Signal & PC_UART_IDLE_SIGNAL)
 			{
-				if(Signal & PC_UART_IDLE_SIGNAL)
-				{
-					pc_times = HAL_GetTick() - pc_last_times;
-					pc_last_times = HAL_GetTick();
-					Get_FPS(&PC_WorldTime, &PC_FPS);
-					nowfps=(float)PC_FPS;
-					PC_KF_Time.WorldTime = xTaskGetTickCount();
-					dma_buffer_to_unpack_buffer(&pc_rx_obj, UART_IDLE_IT);
-					unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);         
-				}
-			}
-		#endif
+				pc_times = HAL_GetTick() - pc_last_times;
+				pc_last_times = HAL_GetTick();
+				Get_FPS(&PC_WorldTime, &PC_FPS);
+				nowfps=(float)PC_FPS;
+				PC_KF_Time.WorldTime = xTaskGetTickCount();
+        dma_buffer_to_unpack_buffer(&pc_rx_obj, UART_IDLE_IT);
+        unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);         
+      }
+    }
     pc_rx_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
-		
   }
 }
 

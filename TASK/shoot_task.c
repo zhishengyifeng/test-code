@@ -32,8 +32,8 @@ uint16_t normal_speed;
   /*摩擦轮pid*/
   float fric_pid[3] = {24, 0, 0};
 	/* 摩擦轮转速 */
-	uint16_t speed_15 =	4329;
-	uint16_t speed_18 = 4800;//4430
+	uint16_t speed_15 =	4250;//4329;
+	uint16_t speed_18 = 4750;//4800;//4430
 	uint16_t speed_30 = 7500;//8200
 
   /*弹仓盖开关*/
@@ -67,17 +67,6 @@ uint16_t normal_speed;
 	uint16_t speed_15 =	4150;//4450，3800
 	uint16_t speed_18 = 4670;//4430
 	uint16_t speed_30 = 7500;//8200
-
-	  /*弹仓盖开关*/
-	float ccr_open  = 500;
-  float ccr_close = 2350;
-#elif((INFANTRY_NUM == INFANTRY_5))
-  /*摩擦轮pid*/
-  float fric_pid[3] = {24, 0, 0};
-	/* 摩擦轮转速 */
-	uint16_t speed_15 =	4000;//4450，3800
-	uint16_t speed_18 = 4500;//4430
-	uint16_t speed_30 = 8000;//8200
 
 	  /*弹仓盖开关*/
 	float ccr_open  = 500;
@@ -410,14 +399,10 @@ static void shoot_bullet_handler(void)
 		{
 			//这个是以相对固定的射频进行射击
 			if((judge_recv_mesg.shoot_data.bullet_freq < (judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10 + judge_recv_mesg.game_robot_state.robot_level*2)) && surplus_heat>20)
-//					shoot_delay = 1000/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)+judge_recv_mesg.game_robot_state.robot_level)+25;
-						shoot_delay = 500/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)+judge_recv_mesg.game_robot_state.robot_level)+25;
-
+					shoot_delay = 1000/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)+judge_recv_mesg.game_robot_state.robot_level)+25;
 			else
 			{
-//				shoot_delay = 1000/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)-judge_recv_mesg.game_robot_state.robot_level);
-				shoot_delay = 500/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)-judge_recv_mesg.game_robot_state.robot_level);
-
+				shoot_delay = 1000/((judge_recv_mesg.game_robot_state.shooter_id1_17mm_cooling_rate/10)-judge_recv_mesg.game_robot_state.robot_level);
 			}
 			
 			if (trig.c_sta == TRIG_INIT)
@@ -523,8 +508,21 @@ void shoot_param_init(void)
 
 }
 //动态射速
-void SpeedAdapt(void)
+float temp_speed=0;
+void SpeedAdapt(void) 
 {
+		switch(judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit){
+			case 15:
+				temp_speed=1;
+			break;
+			case 18:
+				temp_speed=1.5;
+			break;
+			case 30:
+				temp_speed=2;
+			break;
+		}
+	
 	
 		if(judge_recv_mesg.shoot_data.bullet_speed-((float)judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit-1)>0.5||judge_recv_mesg.shoot_data.bullet_speed-((float)judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit-1)<-0.5){
 		pid_calc(&pid_speedlimit, judge_recv_mesg.shoot_data.bullet_speed,(float)judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit-1);
@@ -533,8 +531,8 @@ void SpeedAdapt(void)
 		switch(judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit){
 			case 15:
 				speed_15 += pid_speedlimit.out;
-			break;
-			case 18:
+			break;			case 18:
+
 				speed_18 += pid_speedlimit.out;
 			break;
 			case 30:

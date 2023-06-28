@@ -38,19 +38,19 @@ ramp_t yaw_ramp;
 	float yaw_init_pid[6] = {17.5,0.01,5,80,0,0};
 
 	//普通参数
-	float pit_pid[6] = {36, 0.1, 50, 140.55, 0.1, 50};//{27.8022998317653,0,0.280631669201902,90,0,0};//55,0,120,50,0.01,70//40,0,120,50,0.01,70//{19.5,0,7.5,95,0.01,15}//多弹pid{19.5,0,7.5,105,0.01,15};
+	float pit_pid[6] = {100,0.14,40,65,0.2,0};//{27.8022998317653,0,0.280631669201902,90,0,0};//55,0,120,50,0.01,70//40,0,120,50,0.01,70//{19.5,0,7.5,95,0.01,15}//多弹pid{19.5,0,7.5,105,0.01,15};
 	float yaw_pid[6] = {21.0864706788671,0,0.219976397416724,85,0,0};//19.5,0.01,5,90,0,10 //7.. 28以前{17.5,0.01,5,80,0,0};//6.19{17.5,0.002,15,140,0,0};//6.16 //{15.5 ,0.005 ,7.5 ,150 ,0, 0};//5.27//
 
 	//自瞄参数
-	float pit_vision_pid[6] = {22,0,5,192,1,22};//{19.5,0.009,0.7,132,0.001,0.1};//{18,0.009,0,132,0,0};//{21,0.001,0,132,0,0};//{10,0,0,130,0,0};
+	float pit_vision_pid[6] = {22,0,5,192,1,22};//{18,0.009,0,132,0,0};//{21,0.001,0,132,0,0};//{10,0,0,130,0,0};
 	float yaw_vision_pid[6] = {25.5,0,0.6,125,0,0};//{7.5,0,0,125,0,0};//{21.5,0,0,96,0,0};//{10.5,0,0,90,0,0};//{15,0.001,0,40,0.01,0};//17.5,0,0,75,0,0//{19.5,0,60,75,0.05,20}//{10,0,20,110,0,10};//{20,0,5,40,0,7};//{31, 0, 10, 16, 0, 0};   
 
 	//神符参数
-	float pit_buff_pid[6] = {20,  0.3, 0,  140, 0, 5}//{25,  0.3, 0,  50, 0, 0};//{10, 0, 0 ,10, 0, 0};       
-	float yaw_buff_pid[6] = {20.2, 0.2, 0, 180, 0, 0//{20.2, 0.2, 0, 100, 0, 0};//{10, 0, 0 ,10, 0, 0};
+	float pit_buff_pid[6] = {25,0.1, 30,108,0.05,40};//{25,  0.3, 0,  50, 0, 0};//{10, 0, 0 ,10, 0, 0};       
+	float yaw_buff_pid[6] = {20,0,10,100,0,10};//{20.2, 0.2, 0, 180, 0, 0};//{20.2, 0.2, 0, 100, 0, 0};//{10, 0, 0 ,10, 0, 0};
 
 	//拨盘参数
-	float trig_pid[6] = {125, 0, 100, 10, 0, 0};//{0, 0, 0 , 0, 0, 0};
+	float trig_pid[6] = {125, 0.1, 100, 10, 0.1, 12};//{0, 0, 0 , 0, 0, 0};
 
 
 #elif (INFANTRY_NUM == INFANTRY_2)
@@ -115,50 +115,24 @@ ramp_t yaw_ramp;
 	//拨盘参数
 	float trig_pid[6] = {250, 0, 120, 10, 0, 0};//{0, 0, 0 , 0, 0, 0};
 	
-//#elif (INFANTRY_NUM == INFANTRY_5)//修改 INFANTRY_NUM 
-//	//归中参数
-//	float pit_init_pid[6] ={80,0.100000001,0,5,0,0};
-//	float yaw_init_pid[6] ={20,0,0,50,0,0};
+#elif (INFANTRY_NUM == INFANTRY_5)//修改 INFANTRY_NUM 
+	//归中参数
+	float pit_init_pid[6] ={80,0.100000001,0,5,0,0};
+	float yaw_init_pid[6] ={20,0,0,50,0,0};
 
-//	//普通参数
-//	float pit_pid[6]={80,0.100000001,0,5,0,0};
-//	float yaw_pid[6]={20,0,0,50,0,0};
+	//普通参数
+	float pit_pid[6]={80,0.100000001,0,5,0,0};
+	float yaw_pid[6]={20,0,0,50,0,0};
 
-//	//自瞄参数
-//	float pit_vision_pid[6] = {0,0.0,0,0,0,0};
-//	float yaw_vision_pid[6] = {0,0.0,0,0,0,0};
-//	//神符参数
-//	float pit_buff_pid[6] = {0,0.0,0,0,0,0};
-//	float yaw_buff_pid[6] = {0,0.0,0,0,0,0};
+	//自瞄参数
+	float pit_vision_pid[6] = {0,0.0,0,0,0,0};
+	float yaw_vision_pid[6] = {0,0.0,0,0,0,0};
+	//神符参数
+	float pit_buff_pid[6] = {0,0.0,0,0,0,0};
+	float yaw_buff_pid[6] = {0,0.0,0,0,0,0};
 
-//	//拨盘参数
-//	float trig_pid[6] = {250, 0, 120, 10, 0, 0};//{0, 0, 0 , 0, 0, 0}
-
-#elif (INFANTRY_NUM == INFANTRY_5)
-////电机方向
-//float pit_dir = 1.f;
-//float yaw_dir = 1.f;
-// 归中参数
-float pit_init_pid[6] = {25, 0, 0, 170, 0.1, 0};
-float yaw_init_pid[6] = {20, 0, 0, 50, 0, 0};
-
-// 普通参数（小陀螺与普通模式共用一套参数）
-float pit_pid[6] = {25,0.01,0,170,1,0};//{25,0.01,0,170,0.3,0};//{-50,0,0,-145,0,-15};//{-30, 0, 0, -70, 0, 0};
-float yaw_pid[6] = {20, 0, 0, 90, 0, 5};//{20, 0, 0, 50, 0, 0};
-
-// 自瞄参数
-float pit_vision_pid[6] = {30, 0, 0, 170, 0, 0}; //{10,0,0,130,0,0}
-												 // float yaw_vision_pid[6] = {10.5,0,3,75,0,0};//
-float yaw_vision_pid[6] = {13,0,5,75,0,8};//{32, 0, 5, 39, 0, 0};//{18, 0, 5, 75, 0, 0};
-//float pit_vision_pid[6] = {0, 0, 0, 0, 0, 0}; //{10,0,0,130,0,0}
-////												 // float yaw_vision_pid[6] = {10.5,0,3,75,0,0};//
-//float yaw_vision_pid[6] = {0,0,0,0,0,};//{32, 0, 5, 39, 0, 0};//{18, 0, 5, 75, 0, 0};
-// 神符参数
-float pit_buff_pid[6] = {0, 0, 0, 0, 0, 0}; //{10, 0, 0 ,10, 0, 0};
-float yaw_buff_pid[6] = {0, 0, 0, 0, 0, 0}; //{10, 0, 0 ,10, 0, 0};
-
-// 拨盘参数
-float trig_pid[6] = {130, 0, 10, 11, 0, 5}; //{0, 0, 0 , 0, 0, 0};
+	//拨盘参数
+	float trig_pid[6] = {250, 0, 120, 10, 0, 0};//{0, 0, 0 , 0, 0, 0}
 
 #endif
 
@@ -422,7 +396,7 @@ void gimbal_task(void *parm)
 				}
 				else
 				{
-					pid_calc(&pid_yaw_spd, gimbal.pid.yaw_spd_fdb, gimbal.pid.yaw_spd_ref);					
+					pid_calc(&pid_yaw_spd, gimbal.pid.yaw_spd_fdb, gimbal.pid.yaw_spd_ref);
 					pid_calc(&pid_pit_spd, gimbal.pid.pit_spd_fdb, gimbal.pid.pit_spd_ref); 
         }					
         
@@ -672,17 +646,8 @@ static void dodge_handler(void)
   }
   else if(gimbal.last_state == IS_ACTION && gimbal.state == NO_ACTION)
   {
-//    gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
-//////////////////////////////////////////////////////////////////////
-//		if(rc.mouse.x>0)
-//		{
-			gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle-3.5;//-3.5是抵消小陀螺时云台yaw轴停止运动时的回程
-//		}
-//		else
-//		{
-//			gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
-//		}
-//////////////////////////////////////////////////////////////////////
+    //gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
+	  gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle-2.5 ;
   }
   else
   {
@@ -749,18 +714,13 @@ static void track_aimor_handler(void)
 	{
 
 		//yaw_ctrl =  gimbal.sensor.yaw_gyro_angle;
-//		yaw_ctrl =  gimbal.sensor.yaw_gyro_angle +yaw_rec_real;//pc_recv_result[0];//yaw_msg_t.filtered_value;
-// 	  pit_ctrl =  gimbal.sensor.pit_relative_angle - pit_rec_real;//pc_recv_result[1];//pit_msg_t.filtered_value;
-////////////////////////////////////////////////////////				 
 		if(chassis_mode == CHASSIS_DODGE_MODE)
-			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + yaw_rec_real-6.5;//补偿小陀螺自瞄时底盘的反方向力
-		else
-			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + yaw_rec_real;	
-		if(INFANTRY_NUM == INFANTRY_5)//小步兵的电机和其他步兵是反的		
-			pit_ctrl =  gimbal.sensor.pit_relative_angle + pit_rec_real;		
-		else		
-			pit_ctrl =  gimbal.sensor.pit_relative_angle - pit_rec_real;
-/////////////////////////////////////////////////////////
+			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + yaw_rec_real-2.5;// 补偿小陀螺自瞄时底盘反方向的力
+        else
+		yaw_ctrl =  gimbal.sensor.yaw_gyro_angle +yaw_rec_real;//pc_recv_result[0];//yaw_msg_t.filtered_value;
+ 	  pit_ctrl =  gimbal.sensor.pit_relative_angle - pit_rec_real;//pc_recv_result[1];//pit_msg_t.filtered_value;
+    
+		
 		last_vision_status = 1;
 	}
 	/*视觉无效处理*/
