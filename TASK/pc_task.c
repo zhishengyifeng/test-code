@@ -72,13 +72,15 @@ void pc_rx_task(void *parm)
   while(1)
   {
 		#ifdef USE_USB_OTG_FS
-			pc_times = HAL_GetTick() - pc_last_times;
-			pc_last_times = HAL_GetTick();
-			Get_FPS(&PC_WorldTime, &PC_FPS);
-			nowfps=(float)PC_FPS;
-			PC_KF_Time.WorldTime = xTaskGetTickCount();
+      pc_last_times = HAL_GetTick();
+      PC_KF_Time.WorldTime = xTaskGetTickCount();
+
 			fifo_s_puts(&pc_rxdata_fifo, USB_USART_RX_BUF, USB_USART_RX_STA);
 			unpack_fifo_data(&pc_unpack_obj, UP_REG_ID); 
+      
+      Get_FPS(&PC_WorldTime, &PC_FPS);
+      nowfps=(float)PC_FPS;
+      pc_times = HAL_GetTick() - pc_last_times;   
 		#else
 			STAUS = xTaskNotifyWait((uint32_t) NULL, 
 															(uint32_t) PC_UART_IDLE_SIGNAL, 
@@ -88,13 +90,15 @@ void pc_rx_task(void *parm)
 			{
 				if(Signal & PC_UART_IDLE_SIGNAL)
 				{
-					pc_times = HAL_GetTick() - pc_last_times;
 					pc_last_times = HAL_GetTick();
-					Get_FPS(&PC_WorldTime, &PC_FPS);
-					nowfps=(float)PC_FPS;
 					PC_KF_Time.WorldTime = xTaskGetTickCount();
+
 					dma_buffer_to_unpack_buffer(&pc_rx_obj, UART_IDLE_IT);
-					unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);         
+					unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);
+
+          Get_FPS(&PC_WorldTime, &PC_FPS);
+          nowfps=(float)PC_FPS;
+          pc_times = HAL_GetTick() - pc_last_times;         
 				}
 			}
 		#endif

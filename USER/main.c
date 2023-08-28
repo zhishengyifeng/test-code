@@ -96,9 +96,6 @@ int main(void)
 	//Kalman
 	//Kalman_Init();
 	DWT_Init(168);
-	/*算法补偿角初始化*/
-//  pc_send_mesg.pc_need_information.pit_set = -0.6f;
-//	pc_send_mesg.pc_need_information.yaw_set = -0.5f;
 	/*从板载FLASH读出云台归中位置数据*/
 	flash_cali();
   while(BMI088_init()){};

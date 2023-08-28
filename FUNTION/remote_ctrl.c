@@ -117,8 +117,6 @@ static void gimbal_operation_func(int16_t pit_ctrl, int16_t yaw_ctrl)
 
 void remote_ctrl_gimbal_hook(void)
 {
-//  gimbal_operation_func(-rc.ch4, rc.ch3);
-	/////////////////////////////////////////////
 	if(INFANTRY_NUM == INFANTRY_5)
 		{
 			gimbal_operation_func(rc.ch4, rc.ch3);
@@ -127,7 +125,6 @@ void remote_ctrl_gimbal_hook(void)
 		{
 			gimbal_operation_func(-rc.ch4, rc.ch3);
 		}  
-	/////////////////////////////////////////////
 }
 
 

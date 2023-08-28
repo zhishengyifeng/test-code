@@ -97,47 +97,9 @@ static void get_chassis_info(void)
   /* get remote and keyboard chassis control information */
   keyboard_chassis_hook();
   remote_ctrl_chassis_hook();
-  
-  /* get chassis structure configuration parameter */
-  get_structure_param();//获取底盘机械结构的参数，用于之后底盘任务中的麦轮解算
 	
 }
 
-static void get_structure_param(void)
-{
-  if ((pc_recv_mesg.structure_data.chassis_config == CUSTOM_CONFIG)
-   && (pc_recv_mesg.structure_data.wheel_perimeter != 0)
-   && (pc_recv_mesg.structure_data.wheel_base      != 0)
-   && (pc_recv_mesg.structure_data.wheel_track     != 0))
-  {
-    glb_struct.chassis_config  = CUSTOM_CONFIG;
-    glb_struct.wheel_perimeter = pc_recv_mesg.structure_data.wheel_perimeter;
-    glb_struct.wheel_base      = pc_recv_mesg.structure_data.wheel_base;
-    glb_struct.wheel_track     = pc_recv_mesg.structure_data.wheel_track;
-  }
-  else
-  {
-    glb_struct.chassis_config  = DEFAULT_CONFIG;
-    glb_struct.wheel_perimeter = PERIMETER;
-    glb_struct.wheel_base      = WHEELBASE;
-    glb_struct.wheel_track     = WHEELTRACK;
-  }
-
-  if ((pc_recv_mesg.structure_data.gimbal_config == CUSTOM_CONFIG)
-   && (abs(pc_recv_mesg.structure_data.gimbal_x_offset) < pc_recv_mesg.structure_data.wheel_base/2)
-   && (abs(pc_recv_mesg.structure_data.gimbal_y_offset) < pc_recv_mesg.structure_data.wheel_track/2))
-  {
-    glb_struct.gimbal_config   = CUSTOM_CONFIG;
-    glb_struct.gimbal_x_offset = pc_recv_mesg.structure_data.gimbal_x_offset;
-    glb_struct.gimbal_y_offset = pc_recv_mesg.structure_data.gimbal_y_offset;
-  }
-  else
-  {
-    glb_struct.gimbal_config   = DEFAULT_CONFIG;
-    glb_struct.gimbal_x_offset = GIMBAL_X_OFFSET;
-    glb_struct.gimbal_y_offset = GIMBAL_Y_OFFSET;
-  }
-}
 int debug_yaw_spd = 1;
 int debug_pit_spd = -1;//左上为正是+号。左下为正为-号
 
@@ -146,29 +108,27 @@ static void get_gimbal_info(void)
   /* 转换成相对角度 */
   static float yaw_ecd_ratio = YAW_MOTO_POSITIVE_DIR*YAW_DECELE_RATIO/ENCODER_ANGLE_RATIO;
   static float pit_ecd_ratio = PIT_MOTO_POSITIVE_DIR*PIT_DECELE_RATIO/ENCODER_ANGLE_RATIO;
-	
-	static int i=0;
-		if(direction_change==1){//检测到换头指令
-		i++;
-		if(i==1){
-		gimbal.pid.yaw_angle_ref += 180;	
-		if(gimbal.yaw_center_offset>4096)
-		gimbal.yaw_center_offset-=4096;
-		else
-		gimbal.yaw_center_offset+=4096;
-	}
-		i=1;
-	}else
-		i=0;
-	
-  gimbal.sensor.yaw_relative_angle = yaw_ecd_ratio*get_relative_pos(moto_yaw.ecd, gimbal.yaw_center_offset);
+
+  static int i = 0;
+  if (direction_change == 1)
+  { // 检测到换头指令
+    i++;
+    if (i == 1)
+    {
+      gimbal.pid.yaw_angle_ref += 180;
+      if (gimbal.yaw_center_offset > 4096)
+        gimbal.yaw_center_offset -= 4096;
+      else
+        gimbal.yaw_center_offset += 4096;
+    }
+    i = 1;
+  }
+  else
+    i = 0;
+
+  gimbal.sensor.yaw_relative_angle = debug_pit_spd*yaw_ecd_ratio*get_relative_pos(moto_yaw.ecd, gimbal.yaw_center_offset);
   gimbal.sensor.pit_relative_angle = debug_pit_spd*pit_ecd_ratio*get_relative_pos(moto_pit.ecd, gimbal.pit_center_offset);
   	
-	 /* get gimbal relative palstance */
-  //the Z axis(yaw) of gimbal coordinate system corresponds to the IMU Z axis
-//  gimbal.sensor.yaw_palstance = yaw_spd * mpu_data.yaw_spd; // 16.384f; //unit: dps
-//  //the Y axis(pitch) of gimbal coordinate sys em corresponds to the IMU -Y axis
-//  gimbal.sensor.pit_palstance = pit_spd * mpu_data.pit_spd;
   /*获取遥控和键鼠的数据*/
   keyboard_gimbal_hook();
   remote_ctrl_gimbal_hook();

@@ -38,7 +38,6 @@ int SMALL_BUFF=0;
 int BIG_BUFF=0;
 int PC_DODGE=0;
 char Flag = 1; 
-char Flag_Done = 0;
 float yaw_set = 0.0f;
 float pit_set = 0.0f;//´ò·û²¹³¥±äÁ¿
 
@@ -115,7 +114,6 @@ void mode_switch_task(void *parm)
 						case RC_D: yaw_set = 0.2f;break;
 						default: break;
 					}
-					Flag_Done = 1;
 					time1 = HAL_GetTick();
 					Flag = 0;
 				}

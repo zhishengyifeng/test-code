@@ -16,64 +16,29 @@ typedef enum
 
 typedef enum
 {
-	red  = 1,
-	blue = 2,
+	red  = 0,
+	blue = 1,
 }enemy_color_t;
- 
 
-
-/** 
-  * @brief  gimbal information
-  */
-typedef __packed struct
-{
-  uint8_t ctrl_mode;          /* gimbal control mode */
-  float   pit_relative_angle; /* pitch angle(degree) relative to the gimbal center */
-  float   yaw_relative_angle; /* yaw angle(degree) relative to the gimbal center */
-  float   pit_absolute_angle; /* pitch angle(degree) relative to ground */
-  float   yaw_absolute_angle; /* yaw angle(degree) relative to ground */
-  float   pit_palstance;      /* pitch axis palstance(degree/s) */
-  float   yaw_palstance;      /* yaw axis palstance(degree/s) */
-} gimbal_info_t;
-
-/** 
-  * @brief  shoot information
-  */
-typedef __packed struct
-{
-  int16_t remain_bullets;  /* the member of remain bullets */
-  int16_t shoot_bullets;    /* the member of bullets that have been shot */
-  uint8_t fric_wheel_run;  /* friction run or not */
-} shoot_info_t;
-
-/** 
-  * @brief  gimbal calibrate command
-  */
-typedef __packed struct
-{
-	mode_t	main_mode;					//Ä£Ê½£º0×°¼×°å 1Éñ·û 2¿Õ
-	enemy_color_t	enemy_color;	//µĞ·½ÑÕÉ«:1red 2blue
-  uint8_t   is_left;          //·´Ğ¡ÍÓÂİ-´òÉÚ±øÄ£Ê½±êÖ¾Î»
-  uint8_t   motion_comp;      //ÔË¶¯²¹³¥
-  uint8_t   dodge_offset;     //Ğ¡ÍÓÂİ²¹³¥
-	float	bullet_spd;					  //×Óµ¯ËÙ¶È
-	float pit;
-	float	yaw;
-//	uint8_t offset_Angle;     //²¹³¥½Ç
-	float pit_set;
-	float yaw_set;  
-}pc_info_t;
-
+/**
+ * @brief  ç”µæ§->PCçš„æ•°æ®æ®µrobot_tx_data (13å­—èŠ‚) ï¼Œæ•°æ®å¸§é•¿ï¼š5 + 13 + 2 = 20 (å­—èŠ‚)
+ */
+#pragma pack(1)
 typedef struct
 {
-  /* data send */
-  gimbal_info_t     gimbal_information;
-  shoot_info_t      shoot_task_information;
-	pc_info_t						pc_need_information;
-} send_pc_t;
+  uint8_t robot_color : 1;  // é¢œè‰² (0/1)
+  uint8_t task_mode : 1;    // è¯†åˆ«æ¨¡å¼  ï¼ˆ0 è‡ªç„ / 1 å¤§å°ç¬¦ï¼‰
+  uint8_t visual_valid : 1; // è§†è§‰æœ‰æ•ˆä½ (0/1)
+  uint8_t direction : 2;    // æ‹“å±•è£…ç”²æ¿æ ‡å¿—ä½ (0-3)
+  uint8_t bullet_level : 3; // å¼¹é€Ÿç­‰çº§ 1 2 3çº§
+  float robot_pitch;        // æ¬§æ‹‰è§’(åº¦)
+  float robot_yaw;          // æ¬§æ‹‰è§’(åº¦)
+  float time_stamp;         // ç”µæ§æ—¶é—´æˆ³(ms)
+} robot_tx_data;
+#pragma pack()
 
 extern fifo_s_t  pc_txdata_fifo;
-extern send_pc_t pc_send_mesg;
+extern robot_tx_data pc_send_mesg;
 
 void pc_tx_param_init(void);
 void pc_send_data_packet_pack(void);

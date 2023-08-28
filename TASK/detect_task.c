@@ -134,7 +134,7 @@ void module_offline_callback(void)
       }break;        
       case PC_SYS_OFFLINE:
       {
-        pc_recv_mesg.gimbal_control_data.visual_valid = 0;//通讯意外中断时防止云台乱转
+        pc_recv_mesg.mode_Union.info.visual_valid = 0;//通讯意外中断时防止云台乱转
       }break;
 			case IMU_OFFLINE:
 			{	//IMU无法读取数据时，开发板蜂鸣器每秒叫一下

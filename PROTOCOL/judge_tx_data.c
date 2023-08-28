@@ -667,12 +667,14 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				sho=3;
 			if(shoot.fric_wheel_run == 0 && shoot.ball_storage_open == 1)
 				sho=4;
-			
-			if(pc_recv_mesg.gimbal_control_data.visual_valid == 1 ){
-			view=1;
-			}else
-			view=2;
-			
+
+			if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
+			{
+				view = 1;
+			}
+			else
+				view = 2;
+
 			if(cha!=last_chassis||gim!=last_gimbal||sho!=last_shoot||view!=last_view
 				||c<5||g<5||s<5||v<5){
 				
@@ -836,7 +838,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				}
 				else if (text_twist == 1 && gimbal_mode == GIMBAL_SHOOT_BUFF)//打能量机关，实时显示补偿
 				{
-					client_grapjic_draw_float(pc_recv_mesg.gimbal_control_data.yaw_set,pc_recv_mesg.gimbal_control_data.pit_set,Compensates,Change,layer2,Yellow,1600,890);	
+					client_grapjic_draw_float(pc_recv_mesg.aim_yaw,pc_recv_mesg.aim_pitch,Compensates,Change,layer2,Yellow,1600,890);	
 					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
 				}

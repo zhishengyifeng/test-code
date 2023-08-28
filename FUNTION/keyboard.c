@@ -98,18 +98,21 @@ void keyboard_global_hook(void)
   {
     get_mouse_status(&km.l_mouse_sta, rc.mouse.l);
     get_mouse_status(&km.r_mouse_sta, rc.mouse.r);
-		
-		static int i=1000;
-		
-		if(i>=1000&&direction_change==0){
-		if(rc.mouse.z<0){
-		i=0;
-		direction_change=1;
-		direction=-direction;
-		}
-	}else{
-		i++;
-	}
+
+    static int i = 1000;
+    if (i >= 1000 && direction_change == 0)
+    {
+        if (rc.mouse.z < 0)
+        {
+          i = 0;
+          direction_change = 1;
+          direction = -direction;
+        }
+    }
+    else
+    {
+        i++;
+    }
   }
 }
 

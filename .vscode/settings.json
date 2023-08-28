@@ -4,6 +4,8 @@
         "bsp_usb.h": "c",
         "stm32f4xx.h": "c",
         "st_usb_cdc.h": "c",
-        "kalman_filter.h": "c"
+        "kalman_filter.h": "c",
+        "gimbal_task.h": "c",
+        "task.h": "c"
     }
 }

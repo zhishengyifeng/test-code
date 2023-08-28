@@ -464,31 +464,12 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
   static float wheel_rpm_ratio;
 
   taskENTER_CRITICAL();
-  if (chassis_mode == CHASSIS_DODGE_MODE || chassis.dodge_ctrl)
-  {
-    chassis.rotate_x_offset = GIMBAL_X_OFFSET;
-    chassis.rotate_y_offset = 0;
-  }
-  else
-  {
-    if (rotation_center_gimbal)
-    {
-      chassis.rotate_x_offset = glb_struct.gimbal_x_offset;
-      chassis.rotate_y_offset = glb_struct.gimbal_y_offset;
-    }
-    else
-    {
-      chassis.rotate_x_offset = 0;
-      chassis.rotate_y_offset = 0;
-    }
-  }
   //@works
-  rotate_ratio_fr = ((glb_struct.wheel_base + glb_struct.wheel_track) / 2.0f - chassis.rotate_x_offset + chassis.rotate_y_offset) / RADIAN_COEF;
-  rotate_ratio_fl = ((glb_struct.wheel_base + glb_struct.wheel_track) / 2.0f - chassis.rotate_x_offset - chassis.rotate_y_offset) / RADIAN_COEF;
-  rotate_ratio_bl = ((glb_struct.wheel_base + glb_struct.wheel_track) / 2.0f + chassis.rotate_x_offset - chassis.rotate_y_offset) / RADIAN_COEF;
-  rotate_ratio_br = ((glb_struct.wheel_base + glb_struct.wheel_track) / 2.0f + chassis.rotate_x_offset + chassis.rotate_y_offset) / RADIAN_COEF;
-
-  wheel_rpm_ratio = 60.0f / (glb_struct.wheel_perimeter * CHASSIS_DECELE_RATIO);
+  rotate_ratio_fr = ((WHEELBASE + WHEELTRACK) / 2.0f - GIMBAL_X_OFFSET + GIMBAL_Y_OFFSET) / RADIAN_COEF;
+  rotate_ratio_fl = ((WHEELBASE + WHEELTRACK) / 2.0f - GIMBAL_X_OFFSET - GIMBAL_Y_OFFSET) / RADIAN_COEF;
+  rotate_ratio_bl = ((WHEELBASE + WHEELTRACK) / 2.0f + GIMBAL_X_OFFSET - GIMBAL_Y_OFFSET) / RADIAN_COEF;
+  rotate_ratio_br = ((WHEELBASE + WHEELTRACK) / 2.0f + GIMBAL_X_OFFSET + GIMBAL_Y_OFFSET) / RADIAN_COEF;
+  wheel_rpm_ratio = 60.0f / (PERIMETER * CHASSIS_DECELE_RATIO);
   taskEXIT_CRITICAL();
 
   VAL_LIMIT(vx, -MAX_CHASSIS_VX_SPEED, MAX_CHASSIS_VX_SPEED); // mm/s

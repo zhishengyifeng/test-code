@@ -544,7 +544,7 @@ static void nomarl_handler(void)
 { 
 	if(last_gimbal_mode != GIMBAL_NORMAL_MODE ) 
   {   
-    gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
+    	gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
 		if(last_gimbal_mode == GIMBAL_INIT || last_gimbal_mode == GIMBAL_SHOOT_BUFF )
 			gimbal.pid.yaw_angle_ref = 0;
 		else
@@ -666,90 +666,74 @@ static void dodge_handler(void)
   gimbal.last_state = remote_is_action();//获取上次输入的状态
 }  
 
-float yaw_a,pit_a;
-extern float pit_rec_real;
-extern float yaw_rec_real;
 extern WorldTime_RxTypedef PC_KF_Time;
-
 static void track_aimor_handler(void)
 {
-	/* 记录丢失角度 */
- static float lost_pit;
- static float lost_yaw;
+  /* 记录丢失角度 */
+  static float lost_pit;
+  static float lost_yaw;
   /*控制角度*/
- static float yaw_ctrl;
- static float pit_ctrl;
- static uint8_t  last_vision_status;
-	pid_yaw.iout = 0;//清空其他模式yaw角度环iout累加值
-	gimbal.yaw_offset_angle  = gimbal.sensor.yaw_gyro_angle;//备份陀螺仪数据，以免退出自瞄时冲突
+  static float yaw_ctrl;
+  static float pit_ctrl;
+  static uint8_t last_vision_status;
+  pid_yaw.iout = 0;										  // 清空其他模式yaw角度环iout累加值
+  gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle; // 备份陀螺仪数据，以免退出自瞄时冲突
   gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
-  gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle;//yaw轴用陀螺仪
-	
-	//	float Vision_Speed = target_speed_calc(&Vision_speed_Struct, PC_KF_Time.WorldTime, pc_recv_mesg.gimbal_control_data.yaw_ref);
+  gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle; // yaw轴用陀螺仪
 
-	/* 跟踪微分器 */
-	// PRE_LADRC_TD(&td_pit, pit_rec_real);
-	// PRE_LADRC_TD(&td_yaw, yaw_rec_real);
-	/* 卡尔曼滤波；
-	 * 0: 角度给定 
-	 * 1: 速度给定  */
-	//	float *pc_recv_result_pitch = kalman_filter_calc(&pc_kalman_filter_pitch,
-	//																										td_pit.v1,
-	//																										td_pit.v2);
-	//	float *pc_recv_result_yaw = kalman_filter_calc  (&pc_kalman_filter_yaw,
-	//																										td_yaw.v1,
-	//	
-	//																										td_yaw.v2);	
-	if(last_gimbal_mode != GIMBAL_TRACK_ARMOR)//进自瞄时，防止疯转冲突
-		{
-			  pit_ctrl = gimbal.sensor.pit_relative_angle;
-			  yaw_ctrl = gimbal.sensor.yaw_gyro_angle;
-			
-		}	
-  		
-		
-	
-	if (pc_recv_mesg.gimbal_control_data.visual_valid == 1)
+  // float Vision_Speed = target_speed_calc(&Vision_speed_Struct, PC_KF_Time.WorldTime, pc_recv_mesg.aim_yaw);
+
+  /* 跟踪微分器 */
+  // PRE_LADRC_TD(&td_pit, pc_recv_mesg.aim_pitch);
+  // PRE_LADRC_TD(&td_yaw, pc_recv_mesg.aim_yaw);
+  /* 卡尔曼滤波；
+   * 0: 角度给定
+   * 1: 速度给定  */
+  //	float *pc_recv_result_pitch = kalman_filter_calc(&pc_kalman_filter_pitch ,td_pit.v1 ,td_pit.v2);
+  //	float *pc_recv_result_yaw = kalman_filter_calc  (&pc_kalman_filter_yaw   ,td_yaw.v1 ,td_yaw.v2);
+  if (last_gimbal_mode != GIMBAL_TRACK_ARMOR) // 进自瞄时，防止疯转冲突
+  {
+	pit_ctrl = gimbal.sensor.pit_relative_angle;
+	yaw_ctrl = gimbal.sensor.yaw_gyro_angle;
+  }
+
+  if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
+  {
+
+	if (chassis_mode == CHASSIS_DODGE_MODE)
+			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw; // 补偿小陀螺自瞄时底盘的反方向力
+	else
+			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw;
+	if (INFANTRY_NUM == INFANTRY_5) // 连杆云台步兵的电机和电机直连步兵是反的
+			pit_ctrl = gimbal.sensor.pit_relative_angle + pc_recv_mesg.aim_pitch;
+	else
+			pit_ctrl = gimbal.sensor.pit_relative_angle - pc_recv_mesg.aim_pitch;
+	last_vision_status = 1;
+  }
+  /*视觉无效处理*/
+  else if (pc_recv_mesg.mode_Union.info.visual_valid == 0)
+  {
+	if (last_vision_status == 1)
 	{
-			 
-		if(chassis_mode == CHASSIS_DODGE_MODE)
-			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + yaw_rec_real-6.5;//补偿小陀螺自瞄时底盘的反方向力
-		else
-			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + yaw_rec_real;	
-		if(INFANTRY_NUM == INFANTRY_5)//连杆云台步兵的电机和电机直连步兵是反的	
-			pit_ctrl =  gimbal.sensor.pit_relative_angle + pit_rec_real;		
-		else		
-			pit_ctrl =  gimbal.sensor.pit_relative_angle - pit_rec_real;
-		last_vision_status = 1;
+			lost_yaw = gimbal.sensor.yaw_gyro_angle; // pc_recv_result[0];//yaw_msg_t.filtered_value;
+			lost_pit = pit_ctrl;					 //-pc_recv_result[1];//pit_msg_t.filtered_value;//丢失目标后云台不动
+			last_vision_status = 2;
+			yaw_ctrl = lost_yaw;
+			pit_ctrl = lost_pit;
 	}
-	/*视觉无效处理*/
-	 else if (pc_recv_mesg.gimbal_control_data.visual_valid == 0)		
-	  {
-			if (last_vision_status == 1)
-			{		
-				lost_yaw = gimbal.sensor.yaw_gyro_angle ;//pc_recv_result[0];//yaw_msg_t.filtered_value;			
-				lost_pit = pit_ctrl;//-pc_recv_result[1];//pit_msg_t.filtered_value;//丢失目标后云台不动
-				last_vision_status = 2;
-				yaw_ctrl = lost_yaw;
-				pit_ctrl = lost_pit;
-				
-			}
-			last_vision_status = 0;
-		}
-	 //PC通讯出现问题
-	if(pc_recv_mesg.gimbal_control_data.yaw_ref >= 180 || pc_recv_mesg.gimbal_control_data.yaw_ref <= -180)
-		yaw_ctrl = gimbal.sensor.yaw_gyro_angle;
-	if(pc_recv_mesg.gimbal_control_data.pit_ref >= 180 || pc_recv_mesg.gimbal_control_data.pit_ref <= -180)
-		pit_ctrl = gimbal.sensor.pit_relative_angle;
-	
-	gimbal.pid.yaw_angle_ref = yaw_ctrl;
-	gimbal.pid.pit_angle_ref = pit_ctrl;
+	last_vision_status = 0;
+  }
+  // PC通讯出现问题
+  if (pc_recv_mesg.aim_yaw >= 180 || pc_recv_mesg.aim_yaw <= -180)
+	yaw_ctrl = gimbal.sensor.yaw_gyro_angle;
+  if (pc_recv_mesg.aim_pitch >= 180 || pc_recv_mesg.aim_pitch <= -180)
+	pit_ctrl = gimbal.sensor.pit_relative_angle;
 
-	
-	yaw_a = yaw_ctrl;
-	pit_a = pit_ctrl;
-	/* 软件限制pitch轴角度 */
-		VAL_LIMIT(gimbal.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
+  gimbal.pid.yaw_angle_ref = yaw_ctrl;
+  gimbal.pid.pit_angle_ref = pit_ctrl;
+
+  /* 软件限制pitch轴角度 */
+  VAL_LIMIT(gimbal.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
 }
 
 
@@ -759,51 +743,50 @@ static void shoot_buff_ctrl_handler(void)
 	/*记录丢失角度*/
 	static float lost_pit;
 	static float lost_yaw;
-	
-	/*控制角度*/
-  static float yaw_ctrl;
-  static float pit_ctrl;
-	
-	static uint8_t  last_vision_status;
-	
-	/*获取反馈值*/
-	gimbal.yaw_offset_angle  = gimbal.sensor.yaw_gyro_angle; //备份陀螺仪数据，以免退出自瞄时冲突
-  gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
-  gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_relative_angle;
 
-  //卡尔曼滤波；
-	
-	//0: yaw轴给定 ;  
-  //1: pit轴给定 ;	
-//  float *pc_recv_result   = kalman_filter_calc(&pc_kalman_filter,   pc_recv_mesg.gimbal_control_data.yaw_ref,   pc_recv_mesg.gimbal_control_data.pit_ref);
- 
-	if(pc_recv_mesg.gimbal_control_data.visual_valid == 1)
+	/*控制角度*/
+	static float yaw_ctrl;
+	static float pit_ctrl;
+
+	static uint8_t last_vision_status;
+
+	/*获取反馈值*/
+	gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle; // 备份陀螺仪数据，以免退出自瞄时冲突
+	gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
+	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_relative_angle;
+
+	// 卡尔曼滤波；
+
+	// 0: yaw轴给定 ;
+	// 1: pit轴给定 ;
+	// float *pc_recv_result   = kalman_filter_calc(&pc_kalman_filter,   pc_recv_mesg.aim_yaw,   pc_recv_mesg.aim_pitch);
+
+	if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
 	{
-		last_vision_status = 1;		
-		yaw_ctrl =  pc_recv_mesg.gimbal_control_data.yaw_ref;
- 	  pit_ctrl = -pc_recv_mesg.gimbal_control_data.pit_ref;
-	}	
-  
-	/*视觉无效处理*/
-  else if(pc_recv_mesg.gimbal_control_data.visual_valid == 0)		
-	{
-    if (last_vision_status == 1)
-    {
-			lost_yaw =  pc_recv_mesg.gimbal_control_data.yaw_ref;			
-			lost_pit = -pc_recv_mesg.gimbal_control_data.pit_ref;//丢失目标后云台不动
-			last_vision_status = 2;
-    }
-		  yaw_ctrl = lost_yaw;		
-			pit_ctrl = lost_pit;
-		  
+		last_vision_status = 1;
+		yaw_ctrl = pc_recv_mesg.aim_yaw;
+		pit_ctrl = -pc_recv_mesg.aim_pitch;
 	}
-	
+
+	/*视觉无效处理*/
+	else if (pc_recv_mesg.mode_Union.info.visual_valid == 0)
+	{
+		if (last_vision_status == 1)
+		{
+			lost_yaw = pc_recv_mesg.aim_yaw;
+			lost_pit = -pc_recv_mesg.aim_pitch; // 丢失目标后云台不动
+			last_vision_status = 2;
+		}
+		yaw_ctrl = lost_yaw;
+		pit_ctrl = lost_pit;
+	}
+
 	gimbal.pid.yaw_angle_ref = yaw_ctrl;
 	gimbal.pid.pit_angle_ref = pit_ctrl;
-	
-  /*给定角度限制*/	
- 	VAL_LIMIT(gimbal.pid.yaw_angle_ref, -45, 45);
-	VAL_LIMIT(gimbal.pid.pit_angle_ref, -28, 18);//25,15
+
+	/*给定角度限制*/
+	VAL_LIMIT(gimbal.pid.yaw_angle_ref, -45, 45);
+	VAL_LIMIT(gimbal.pid.pit_angle_ref, -28, 18); // 25,15
 }
 
 
