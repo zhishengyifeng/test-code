@@ -1,10 +1,8 @@
 #include "imu_task.h"
 #include "gimbal_task.h"
-//#include "cmsis_os.h"
 #include "bsp_imu.h"
 #include "pid.h"
 #include "sys_config.h"
-//#include "bsp_io.h"
 #include "math.h"
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -19,8 +17,8 @@
 #include "dma.h"
 #include "detect_task.h"
 #include "kalman_filter.h"
-
 #include "ahrs.h"
+
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
@@ -113,18 +111,11 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 void imu_task(void const *argu)
 {
   
-  uint32_t imu_wake_time = osKernelSysTick();
+	uint32_t imu_wake_time = osKernelSysTick();
 
 	imu_Task_Handle = xTaskGetHandle(pcTaskGetName(NULL));
-//	SPI1_DMA();
-//	SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
-//	SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
-	
-	
-//  Quaternion_AHRS_InitIMU(BMI088.Accel[0],BMI088.Accel[1],BMI088.Accel[2],BMI088.gNorm);
+	imu_start_flag = 1;
 
-  imu_start_flag = 1;
-	
 	AHRS_init(INS_quat, INS_accel, INS_mag);
 	accel_fliter_1[0] = accel_fliter_2[0] = accel_fliter_3[0] = INS_accel[0];
 	accel_fliter_1[1] = accel_fliter_2[1] = accel_fliter_3[1] = INS_accel[1];
@@ -133,39 +124,10 @@ void imu_task(void const *argu)
 	
   while(1)
   {
-//		vAFunction();
-		
-//		imu_temp_keep();//IMU恒温处理
-
-//		//等待任务被唤醒
-//		while (ulTaskNotifyTake(pdTRUE, portMAX_DELAY) != pdPASS)
-//		{
-//		}
-//		if(DMA_GetFlagStatus(DMA2_Stream2,DMA_IT_TC)!=RESET)//等待通道2传输完成
-//		{
-//			DMA_ClearFlag(DMA2_Stream2,DMA_IT_TC);//清除通道2传输完成标志
-//			break; 
-//		}
-//		if(DMA_GetFlagStatus(DMA2_Stream3,DMA_IT_TC)!=RESET)//等待通道3传输完成
-//		{
-//			DMA_ClearFlag(DMA2_Stream3,DMA_IT_TC);//清除通道3传输完成标志
-//			break; 
-//		}
-
-    
-    BMI088_read(BMI088.Gyro, BMI088.Accel, &BMI088.Temperature);
-//		dt=DWT_GetDeltaT(&time);
-//		Quaternion_AHRS_UpdateIMU(BMI088.Gyro[0],BMI088.Gyro[1],BMI088.Gyro[2],\
-//															BMI088.Accel[0],BMI088.Accel[1],BMI088.Accel[2],0,0,0,dt);
-//    Get_EulerAngle(AHRS.q);
-//		EulerAngle[0]=AHRS.Pitch;
-//		EulerAngle[1]=AHRS.Roll;
-//		EulerAngle[2]=AHRS.Yaw;
-
+		//imu_temp_keep();//IMU恒温处理
+    	BMI088_read(BMI088.Gyro, BMI088.Accel, &BMI088.Temperature);
 		//rotate and zero drift 
 		imu_cali_slove(INS_gyro, INS_accel, INS_mag, &BMI088);
-
-
 		//accel low-pass filter
 		accel_fliter_1[0] = accel_fliter_2[0];
 		accel_fliter_2[0] = accel_fliter_3[0];
@@ -188,18 +150,23 @@ void imu_task(void const *argu)
 		
 		INS_angle[0]=INS_angle[0]*RAD_TO_ANGLE;
 		INS_angle[1]=INS_angle[1]*RAD_TO_ANGLE;
-    INS_angle[2]=INS_angle[2]*RAD_TO_ANGLE;
+    	INS_angle[2]=INS_angle[2]*RAD_TO_ANGLE;
 		
 		gimbal.sensor.yaw_gyro_angle = totalangle_transfer(INS_angle[0]);
 		gimbal.sensor.yaw_palstance  = BMI088.Gyro[2]*100;
-		gimbal.sensor.pit_gyro_angle = -INS_angle[1];
-    gimbal.sensor.pit_palstance  = BMI088.Gyro[0]*100;
-
-    
+		if(INFANTRY_NUM == INFANTRY_5)//连杆云台步兵的电机和电机直连步兵是反的
+		{
+			gimbal.sensor.pit_gyro_angle = INS_angle[1];
+			gimbal.sensor.pit_palstance  = -BMI088.Gyro[0]*100;
+		}
+		else
+		{
+			gimbal.sensor.pit_gyro_angle = -INS_angle[1];
+			gimbal.sensor.pit_palstance  = BMI088.Gyro[0]*100;
+    }
 		err_detector_hook(IMU_OFFLINE);
-    imu_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
-    
-    vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);
+		imu_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);
   }
 
 }
