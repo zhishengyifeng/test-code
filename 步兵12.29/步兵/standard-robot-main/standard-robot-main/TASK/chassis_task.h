@@ -23,6 +23,7 @@ typedef struct
   int16_t         current[4];
   int16_t         position_ref;
 	float  CapData[4];
+  float  power_data;
 }chassis_t;
 
 extern float yaw_speed;
