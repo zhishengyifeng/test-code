@@ -387,7 +387,7 @@ static void chassis_dodge_handler(void)
   }
   else
 		//键盘时则通过功率算法来控制速度，防止掉电容
-    	chassis_power_contorl(&x,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+    	chassis_power_contorl(&pid_power,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
 	chassis.vy = (dodge_chassis_vx * arm_sin_f32( PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32( PI / 180 * dodge_angle));
 	chassis.vx = (dodge_chassis_vx * arm_cos_f32( PI / 180 * dodge_angle) - dodge_chassis_vy * arm_sin_f32( PI / 180 * dodge_angle));
