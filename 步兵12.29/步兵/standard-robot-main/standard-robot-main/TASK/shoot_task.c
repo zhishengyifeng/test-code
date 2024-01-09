@@ -11,7 +11,7 @@
 #include "string.h"
 #include "sys_config.h"
 #include "math.h"
-#include "pid.h"
+#include "pid.h" 
 #include "bsp_can.h"
 #include "judge_rx_data.h"
 #include "pc_rx_data.h"
@@ -229,6 +229,12 @@ static void ball_storage_ctrl(void)
 int Angle=45;
 static void shoot_bullet_handler(void)
 {
+  /* 判断是否在卡弹状态*/
+  if(IF_trigger_stop(moto_trigger.speed_rpm))
+  shoot_break_state = TRIGGER_MOVE_BACK;
+  else
+  shoot_break_state = NOBREAK;
+
   if (shoot.shoot_cmd)//单发
   {
 		if(global_err.list[JUDGE_SYS_OFFLINE].err_exist == 1)//没连接裁判系统时
@@ -242,12 +248,15 @@ static void shoot_bullet_handler(void)
 			trig.one_time = HAL_GetTick();
 			single_shoot_angle = moto_trigger.total_angle + Angle;//发射（single_shoot_angle设为当前角度加上Angle）
 			trig.one_sta = TRIG_PRESS_DOWN;//发射按键已按下
-    }
+        }
 		/* 发射延时 */
     else if (trig.one_sta == TRIG_PRESS_DOWN)//若发射按键已按下便进行延时
     {		
       if (HAL_GetTick() - trig.one_time >= shoot_delay)
       {
+		if (shoot_break_state == NOBREAK)
+		trig.c_sta = TRIG_ONE_DONE;
+		if (shoot_break_state == TRIGGER_MOVE_BACK)
         trig.one_sta = TRIG_ONE_DONE;//延时完毕后，状态才为发射已完成
       }
     }
@@ -260,6 +269,13 @@ static void shoot_bullet_handler(void)
 		trig.c_sta = TRIG_INIT;//连发状态设为初始化
       shoot.shoot_bullets++;//发射子弹计数
     }
+	     /* 卡弹 */
+	if (trig.c_sta == TRIG_SHOOT_BREAK)
+	{
+		trig.one_time = HAL_GetTick();
+		single_shoot_angle = moto_trigger.total_angle - 2*Angle;
+		trig.c_sta = TRIG_PRESS_DOWN;
+	}
 		trig.angle_ref = single_shoot_angle;//拨盘目标角度设为single_shoot_angle
 		
   }
@@ -280,8 +296,12 @@ static void shoot_bullet_handler(void)
 			{
 				if (HAL_GetTick() - trig.one_time >= 200)  //延时
 				{
+					if (shoot_break_state == NOBREAK)
 					trig.c_sta = TRIG_ONE_DONE;
+					if (shoot_break_state == TRIGGER_MOVE_BACK)
+					trig.c_sta = TRIG_SHOOT_BREAK;
 				}
+				
 			}
 			/* 发射完成 */
 			if (trig.c_sta == TRIG_ONE_DONE)
@@ -289,6 +309,13 @@ static void shoot_bullet_handler(void)
 				single_shoot_angle = moto_trigger.total_angle;
 				trig.c_sta = TRIG_INIT;
 				shoot.shoot_bullets++;//发射子弹计数
+			}
+			/* 卡弹 */
+			if (trig.c_sta == TRIG_SHOOT_BREAK)
+			{
+				trig.one_time = HAL_GetTick();
+				single_shoot_angle = moto_trigger.total_angle - 2*Angle;
+				trig.c_sta = TRIG_PRESS_DOWN;
 			}
 			trig.angle_ref = single_shoot_angle;
         }
@@ -316,7 +343,10 @@ static void shoot_bullet_handler(void)
 			{
 				if (HAL_GetTick() - trig.one_time >= shoot_delay)  //延时
 				{
+					if (shoot_break_state == NOBREAK)
 					trig.c_sta = TRIG_ONE_DONE;
+					if (shoot_break_state == TRIGGER_MOVE_BACK)
+					trig.c_sta = TRIG_SHOOT_BREAK;
 				}
 			}
 			/* 发射完成 */
@@ -325,6 +355,13 @@ static void shoot_bullet_handler(void)
 				single_shoot_angle = moto_trigger.total_angle;
 				trig.c_sta = TRIG_INIT;
 				shoot.shoot_bullets++;//发射子弹计数
+			}
+			/* 卡弹 */
+			if (trig.c_sta == TRIG_SHOOT_BREAK)
+			{
+				trig.one_time = HAL_GetTick();
+				single_shoot_angle = moto_trigger.total_angle - 2*Angle;
+				trig.c_sta = TRIG_PRESS_DOWN;
 			}
 			trig.angle_ref = single_shoot_angle;
 				}
@@ -343,7 +380,10 @@ static void shoot_bullet_handler(void)
 			{
 				if (HAL_GetTick() - trig.one_time >= continue_time + extra_time)  //延时
 				{
+					if (shoot_break_state == NOBREAK)
 					trig.c_sta = TRIG_ONE_DONE;
+					if (shoot_break_state == TRIGGER_MOVE_BACK)
+					trig.c_sta = TRIG_SHOOT_BREAK;
 				}
 			}
 			/* 发射完成 */
@@ -353,6 +393,13 @@ static void shoot_bullet_handler(void)
 				trig.c_sta = TRIG_INIT;
 				shoot.shoot_bullets++;//发射子弹计数
 
+			}
+			/* 卡弹 */
+			if (trig.c_sta == TRIG_SHOOT_BREAK)
+			{
+				trig.one_time = HAL_GetTick();
+				single_shoot_angle = moto_trigger.total_angle - 2*Angle;
+				trig.c_sta = TRIG_PRESS_DOWN;
 			}
 			trig.angle_ref = single_shoot_angle;
 		}
