@@ -257,7 +257,7 @@ static void shoot_bullet_handler(void)
 		if (shoot_break_state == NOBREAK)
 		trig.c_sta = TRIG_ONE_DONE;
 		if (shoot_break_state == TRIGGER_MOVE_BACK)
-        trig.one_sta = TRIG_ONE_DONE;//延时完毕后，状态才为发射已完成
+        trig.one_sta = TRIG_SHOOT_BREAK;//延时完毕后，状态才为发射已完成
       }
     }
      
