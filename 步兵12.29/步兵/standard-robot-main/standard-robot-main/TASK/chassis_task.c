@@ -81,6 +81,7 @@ uint8_t fast_flag = 0; //加速状态标志位
 int Speed_up = 1;//加速键标志位
 float cap_ratio;//电流值比例参数，根据当前电流值来调整电流输出上限
 
+
 void chassis_task(void *parm)
 {
   uint32_t Signal;
@@ -178,13 +179,13 @@ void chassis_task(void *parm)
 void Cap_refresh(){	//不断刷新并记录当前电池所能给电容充的最大电压
 //电容的最大压值随着电池格数进行变化，因而需要不断刷新
 	static int i=0;
-	if(judge_recv_mesg.power_heat_data.chassis_power_buffer==60&&(chassis.CapData[0]-chassis.CapData[1]<2||chassis.CapData[1]>=20)){
+	if(judge_recv_mesg.power_heat_data.chassis_power_buffer==60&&(chassis.CapData[0]-chassis.CapData[1]<2||chassis.CapData[1]>=18)){
 	if(i!=10)i++;
 	}else
 		i=0;
 	if(i==10)cap_store=chassis.CapData[1];
 	if(chassis.CapData[1]>cap_store)cap_store=chassis.CapData[1];
-	if(cap_store<20.f)cap_store=20;
+	if(cap_store<18.f)cap_store=18;
 }; 
 
 
@@ -207,13 +208,13 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
         *power_yaw_speed = 0.01f;
     }
 
-    if (real_time_Cap_remain > 18.0f && real_time_Cap_remain < real_time_Cap_can_store)//当前电容在18和满电容之间
+    if (real_time_Cap_remain > 16.0f && real_time_Cap_remain < real_time_Cap_can_store)//当前电容在18和满电容之间
     {//核心   通过计算得出底盘x轴或y轴的最小速度
-          min = 1350 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;
+          min = 2350 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;//原数据1350
 		}
     else
     {   //当电容小于18时直接用这个
-        min = 1150;//1000;
+        min = 2150;//1150;
     }
 		
 		
@@ -386,7 +387,7 @@ static void chassis_dodge_handler(void)
   }
   else
 		//键盘时则通过功率算法来控制速度，防止掉电容
-    	chassis_power_contorl(&pid_power,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+    	chassis_power_contorl(&x,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
 	chassis.vy = (dodge_chassis_vx * arm_sin_f32( PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32( PI / 180 * dodge_angle));
 	chassis.vx = (dodge_chassis_vx * arm_cos_f32( PI / 180 * dodge_angle) - dodge_chassis_vy * arm_sin_f32( PI / 180 * dodge_angle));
