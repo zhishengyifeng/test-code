@@ -4,6 +4,7 @@
 
 #include "stm32f4xx.h"
 
+#define  IF_trigger_stop(speed)   ((speed>-100) && (speed<100))
 typedef enum
 {
   SHOT_DISABLE       = 0,
@@ -19,6 +20,7 @@ typedef enum
   TRIG_PRESS_DOWN = 1,
   TRIG_BOUNCE_UP  = 2,
   TRIG_ONE_DONE   = 3,
+  TRIG_SHOOT_BREAK =4,
 } trig_state_e;
 
 typedef enum
@@ -29,6 +31,12 @@ typedef enum
 	SHOOTBUFF_MODE		= 4,
 }shoot_para_e;
 
+typedef enum//¿¨µ¯×´Ì¬ÅĞ¶Ï
+{
+  NOBREAK=0,
+  TRIGGER_DELAY=1,
+  TRIGGER_MOVE_BACK =2,
+}shoot_break_state;
 
 typedef __packed struct
 {
