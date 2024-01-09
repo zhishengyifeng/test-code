@@ -212,7 +212,6 @@ static void turn_off_friction_wheel(void)
 	glb_cur.fric_cur[1] = pid_fric[1].out;
 }
 
-
 /*µ¯²Ö¸Ç¿ØÖÆ*/
 static void ball_storage_ctrl(void)
 {
