@@ -62,20 +62,12 @@ typedef struct
   int32_t  filter_rate;
 } moto_measure_t;
 
-typedef struct
-{
-  float pit_angle;
-  float yaw_angle;
-  int16_t pit_spd;
-  int16_t yaw_spd;
-}mpu_data_t;
 
 extern moto_measure_t moto_chassis[];
 extern moto_measure_t moto_pit;
 extern moto_measure_t moto_yaw;
 extern moto_measure_t moto_trigger;
 extern moto_measure_t moto_fric[2];
-extern mpu_data_t mpu_data;
 
 void encoder_data_handler(moto_measure_t* ptr, CanRxMsg *message);
 void get_moto_offset(moto_measure_t* ptr, CanRxMsg *message);

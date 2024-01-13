@@ -5,6 +5,8 @@
 
 #define DEBUG
 
+#define INFANTRY_1  1    //infantry步兵
+#define INFANTRY_2  2
 #define INFANTRY_3  3
 #define INFANTRY_4  4
 #define INFANTRY_5  5
@@ -28,18 +30,18 @@
 #define CHASSIS_RC_MAX_SPEED_R  480.0f
 
 /* 键盘模式  底盘 速度 限制 */
-/* 前后 速度 (mm/s) */
+/* 左右 速度 (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_X  4000.0f//经测试，4000左右效果最好，速度越快越容易原地打滑
 
-/* 左右 速度 (mm/s) */
+/* 前后 速度 (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_Y  4000.0f
 
 /**************************云台 配置*******************************/
 /* 遥控模式 云台速度控制 */
 /* pitch 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
+#define GIMBAL_RC_MOVE_RATIO_PIT 1.0f
 /* yaw 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_YAW 1.2f
+#define GIMBAL_RC_MOVE_RATIO_YAW 1.0f
 
 /* 键盘模式 云台速度控制 */
 /* pitch 轴 速度 */
@@ -64,29 +66,15 @@
 //#define WHEELTRACK             437//415
 ///*轴距（前后）*/
 //#define WHEELBASE              340//406
-#if (INFANTRY_NUM == INFANTRY_3||INFANTRY_NUM == INFANTRY_4)
 
 /* 麦轮半径(mm) */
 #define RADIUS                 77
 /* 麦轮周长(mm) */
 #define PERIMETER              483
-/*麦轮轮距（左右）*/
+/*轮距（左右）*/
 #define WHEELTRACK             392//415
-/*麦轮轴距（前后）*/
+/*轴距（前后）*/
 #define WHEELBASE              320//406
-
-#elif (INFANTRY_NUM == INFANTRY_5)
-
-/* 全向轮半径(mm) */
-#define RADIUS                 77
-/* 全向轮周长(mm) */
-#define PERIMETER              483
-/*全向轮距（左右）*/
-#define WHEELTRACK             392//415
-/*全向轴距（前后）*/
-#define WHEELBASE              320//406
-
-#endif
 
 /*云台偏移底盘中心X轴（前后）距离*/
 #define GIMBAL_X_OFFSET        0//130
@@ -116,7 +104,7 @@
 /* yaw轴 电机 的 减速比 */
 #define YAW_DECELE_RATIO       1.0f
 /* pitch轴 正方向参数 */
-#define PIT_MOTO_POSITIVE_DIR  1.0f
+#define PIT_MOTO_POSITIVE_DIR  -1.0f
 /* yaw轴 正方向参数 */
 #define YAW_MOTO_POSITIVE_DIR  1.0f
 /* 拨盘 电机正方向参数 */

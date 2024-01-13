@@ -96,8 +96,4 @@ void keyboard_gimbal_hook(void);
 
 
 
-void Software_Reset(void);
-
-
-
 #endif

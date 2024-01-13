@@ -7,22 +7,14 @@
 #include "gimbal_task.h"
 #include "shoot_task.h"
 #include "modeswitch_task.h"
-#include "judge_rx_data.h"
 
 extern int keyboard_flag;
 extern int KB_FRIC;
 extern int KB_BALL;
-extern int FRIC_SPD_UP;
-extern int FRIC_SPD_DOWN;
-extern int speed_15;
-extern int speed_18;
-extern int speed_30;
-extern int Fric_Spd_Ajt;
-extern int SOFT_RESET;
 extern int SMALL_BUFF;
 extern int BIG_BUFF;
 extern int PC_DODGE;
-extern int normal_speed;
+
 extern int direction;
 extern int direction_change;
 
@@ -106,18 +98,21 @@ void keyboard_global_hook(void)
   {
     get_mouse_status(&km.l_mouse_sta, rc.mouse.l);
     get_mouse_status(&km.r_mouse_sta, rc.mouse.r);
-		
-		static int i=1000;
-		
-		if(i>=1000&&direction_change==0){
-		if(rc.mouse.z<0){
-		i=0;
-		direction_change=1;
-		direction=-direction;
-		}
-	}else{
-		i++;
-	}
+
+    static int i = 1000;
+    if (i >= 1000 && direction_change == 0)
+    {
+        if (rc.mouse.z < 0)
+        {
+          i = 0;
+          direction_change = 1;
+          direction = -direction;
+        }
+    }
+    else
+    {
+        i++;
+    }
   }
 }
 
@@ -215,17 +210,13 @@ static void shoot_storage_ctrl(uint8_t storage_open)
 
 }
 
-/*控制射击速度*/
-static void kb_shoot_spd_ctrl(uint16_t Shoot_Spd_UP,uint16_t Shoot_Spd_DOWN)
+/*控制射击模式*/
+static void kb_shoot_mode_ctrl(uint8_t small_buff_mode,uint8_t big_buff_mode)
 {
-	if(Shoot_Spd_UP==1)
-	{
-		Fric_Spd_Ajt=2;
-    }
-	if(Shoot_Spd_DOWN==1)
-	{
-		Fric_Spd_Ajt=1;
-    }
+	if(small_buff_mode || big_buff_mode)
+		shoot.para_mode = SHOOTBUFF_MODE;	
+	else
+		shoot.para_mode =SHOOTNOR_MODE;
 }
 
 /*控制pit,yaw速度*/
@@ -235,20 +226,19 @@ static void gimbal_speed_ctrl(int16_t pit_ref_spd, int16_t yaw_ref_spd)
 	//鼠标往左yaw_ref_spd为正
 //	km.pit_v =  pit_ref_spd * 0.015;
 ////////////////////////////////////
-
+	if(INFANTRY_NUM == INFANTRY_5)//小步兵的电机和陀螺仪相反
+		{
 			km.pit_v =  -pit_ref_spd * 0.015;
-		
+		}
+		else
+		{
+			km.pit_v =  pit_ref_spd * 0.015;
+		}   
 ////////////////////////////////////
 	km.yaw_v = -yaw_ref_spd * yaw_speed;
 
 }
 
-/*实现软件复位*/
-static void sofe_reset(uint16_t Soft_Reset)
-{
-	if(Soft_Reset==1)
-	Software_Reset();
-}
 void keyboard_chassis_hook(void)
 {
   if(km.kb_enable)
@@ -275,13 +265,7 @@ void keyboard_shoot_hook(void)
 		if(keyboard_flag==1){//松手标志位
     firc_ctrl(KB_FRIC);
     shoot_storage_ctrl(KB_BALL);
-	kb_shoot_spd_ctrl(FRIC_SPD_UP,FRIC_SPD_DOWN);
-	/////////////////////////////////////////////		
-			FRIC_SPD_UP=0;//将摩擦轮加速标志位置0，防止一直加
-			FRIC_SPD_DOWN=0;
-			//Fric_Spd_Ajt=3;
-	/////////////////////////////////////////////
-	sofe_reset(SOFT_RESET);
+    kb_shoot_mode_ctrl(SMALL_BUFF,BIG_BUFF);
 		}
 		
 	}
@@ -304,9 +288,6 @@ void keyboard_gimbal_hook(void)
     gimbal.track_ctrl = 0;
   }
 }
-void Software_Reset(void)
-{
-    NVIC_SystemReset();
-}
+
 
 

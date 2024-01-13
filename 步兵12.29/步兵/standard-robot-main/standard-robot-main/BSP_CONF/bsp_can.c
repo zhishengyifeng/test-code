@@ -14,15 +14,7 @@ moto_measure_t moto_pit;               //pit轴      6020
 moto_measure_t moto_yaw;               //yaw轴      6020
 moto_measure_t moto_trigger;           //拨盘       2006
 moto_measure_t moto_fric[2];           //摩擦轮     3508
-mpu_data_t mpu_data;
 
-float bmi160_yaw_angle,bmi160_yaw_acc,bmi160_pit_acc;
-
-float angle;
-float *p_angle = &angle;//p_angle指针保存变量angle的地址
-
-float *yaw;
-int16_t *gz,*gy;
 static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan,CanRxMsg *message)
 {
 	if(_hcan == CAN1)
@@ -89,34 +81,7 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan,CanRxMsg *message)
         //处理电机数据函数
         moto_fric[i].msg_cnt++ <= 50 ? get_moto_offset(&moto_fric[i], message) : encoder_data_handler(&moto_fric[i], message);
         err_detector_hook(FRI_MOTO1_OFFLINE + i);
-      }break;
-			
-      case CAN_MPU_ID://陀螺仪接收CAN数据及解算
-      {
-
-        uint8_t *px = rx2_message.Data;
-        for(int i = 0; i < 4; i++)
-        {
-          *((uint8_t*)p_angle + i) = *(px + i);
-        }
-
-//        gimbal.sensor.yaw_gyro_angle = angle;
-//        bmi160_yaw_angle=angle;
-//				gimbal.sensor.yaw_palstance = (int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-//				bmi160_yaw_acc=(int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-//				bmi160_yaw_acc/= 16.384f;
-//        gimbal.sensor.yaw_palstance /= 16.384f;
-//								
-//        gimbal.sensor.pit_palstance = -(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-//        gimbal.sensor.pit_palstance /=-16.384f;//左上为正是+号。左下为正为-号
-//				bmi160_pit_acc=(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-//				bmi160_pit_acc /=16.384f;
-//        err_detector_hook(IMU_OFFLINE);
-			}break;
-
-			
-
-      
+      }break; 
       default:
       {
       }break;
