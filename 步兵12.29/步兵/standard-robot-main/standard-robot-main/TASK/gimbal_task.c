@@ -87,7 +87,7 @@ float yaw_vision_pid[6] = {20,0,5,78,0,5};
 float pit_buff_pid[6] = {27,0.13,5,100,0.1,0}; 
 float yaw_buff_pid[6] = {30,0.1,5,80,0,5}; 
 // ²¦ÅÌ²ÎÊý
-float trig_pid[6] = {250, 0.01, 30, 10, 0.01, 10}; 
+float trig_pid[6] = {250, 0, 120, 10, 0, 0}; 
 #endif
 
 	

@@ -145,13 +145,13 @@ void EXTI0_IRQHandler(void)
 		delay_ms(10);//按键消抖处理
 		if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)==Bit_RESET)
 		{
-			cali_param.yaw_offset = moto_yaw.ecd;//记录yaw轴偏移
-			cali_param.pitch_offset = moto_pit.ecd;//记录pit轴偏移
-      cali_param.cali_state = CALI_DONE;//将校准状态设置为 CALI_DONE，表示校准完成。
-			BSP_FLASH_WRITE((uint8_t *)&cali_param,sizeof(cali_sys_t));//调用 BSP_FLASH_WRITE 函数将 cali_param 结构体的数据写入FLASH存储器。
+			cali_param.yaw_offset = moto_yaw.ecd;
+			cali_param.pitch_offset = moto_pit.ecd;
+      cali_param.cali_state = CALI_DONE;
+			key_state = BSP_FLASH_WRITE((uint8_t *)&cali_param,sizeof(cali_sys_t));
 		}
 	}
-	EXTI_ClearITPendingBit(EXTI_Line0);    //清除中断标志位
+	EXTI_ClearITPendingBit(EXTI_Line0);    
 }
 
 

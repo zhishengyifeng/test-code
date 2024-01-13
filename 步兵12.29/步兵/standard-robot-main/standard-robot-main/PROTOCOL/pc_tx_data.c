@@ -67,12 +67,8 @@ void get_infantry_info(void)
   爆发优先 2级 		15m/s     冷却优先 2级    18m/s     弹速优先 2级    30m/s
   爆发优先 3级 		15m/s     冷却优先 3级    18m/s	    弹速优先 3级    30m/s
 */
-  
-  if(judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit==15)
-    pc_send_mesg.bullet_level=1;
-  if(judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit==18)
-    pc_send_mesg.bullet_level=2;
-  if(judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit==30)
+   
+	//新规则不对射速进行限制默认30
     pc_send_mesg.bullet_level=3;
 
   /* get gimable ctrl mode */
