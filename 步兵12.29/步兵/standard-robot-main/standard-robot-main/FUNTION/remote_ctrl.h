@@ -15,7 +15,8 @@
 #define RC_CTRL_FRIC_WHEEL 				((glb_sw.last_sw1 == RC_MI) && (rc.sw1 == RC_UP))
 #define RC_CTRL_BALL_STOR	 				((rc.sw2 == RC_MI) && (rc.sw1 ==RC_MI) && (rc.iw <= IW_UP) )
 #define RC_CTRL_BALL_STOR_CLOSE	 	((rc.sw2 == RC_MI) && (rc.sw1 ==RC_MI) && (rc.iw >= IW_DN) )
-
+#define RC_VISION_SINGLE_SHOOT          ((rc.sw1 == RC_UP) && (rc.sw2 == RC_UP)&&(rc.iw >= IW_DN))
+#define RC_VISION_CONTINUE_SHOOT        ((rc.sw1 == RC_UP) && (rc.sw2 == RC_UP)&&(rc.iw <= IW_UP))
 enum
 {
   RC_UP = 1,
