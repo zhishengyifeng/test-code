@@ -268,7 +268,7 @@ void get_gimbal_mode(void)
 
 void get_chassis_mode(void)
 {
-	if(judge_recv_mesg.game_robot_state.mains_power_chassis_output==0||chassis_mode == CHASSIS_RELEASE)//防止复活小陀螺
+	if(judge_recv_mesg.game_robot_state.power_management_chassis_output==0||chassis_mode == CHASSIS_RELEASE)//防止复活小陀螺
 	PC_DODGE=0;
 	
 	if(chassis.CapData[1]<14.5f)//电容电压低关闭小陀螺,缓冲电压区13-14.5V
