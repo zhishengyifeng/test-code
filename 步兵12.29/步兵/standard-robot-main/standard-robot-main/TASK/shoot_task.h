@@ -72,15 +72,16 @@ extern shoot_t   shoot;
 extern trigger_t trig;
 
 void shoot_task(void *parm);
-static void shoot_para_ctrl(void);
+
 void shoot_param_init(void);
 void get_last_shoot_mode(void);
 static void shoot_bullet_handler(void);
+static void shoot_para_ctrl(void);
 static void fric_wheel_ctrl(void);
-//static void turn_on_friction_wheel(int16_t lspd,int16_t rspd);
 static void turn_on_friction_wheel(int16_t lspd,int16_t rspd);
 static void turn_off_friction_wheel(void);
 static void ball_storage_ctrl(void);
+void shooter_17mm_cooling_rate_choose(void);
 
 static void SpeedAdapt(void);
 //static void shootHeat_Limit(void);

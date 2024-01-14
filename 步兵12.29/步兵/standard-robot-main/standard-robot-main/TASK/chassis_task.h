@@ -25,6 +25,7 @@ typedef struct
 	float  CapData[4];
 }chassis_t;
 
+void Exp_Calculate_grade(void);
 extern float yaw_speed;
 extern chassis_t chassis;
 extern float cap_volt_limit;

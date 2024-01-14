@@ -1,5 +1,4 @@
 #include "chassis_task.h"
-
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -19,19 +18,27 @@
 #include "judge_rx_data.h"
 #include "data_packet.h"
 #include "arm_math.h"
+
+#include "Exp_Calculate_grade.h"
+
 float a1,b1,a2,b2,a3,b3,a4,b4;
-/*2023赛季规则
+/*2024赛季规则
 
-初始状态			100 40
 
-功率优先
-        1级		150 60
-        2级		200 80
-        3级		250 100
-血量优先
-        1级		200 45
-        2级		300 50
-        3级		400 55
+//经验等级十级,底盘功率提升	
+	
+
+  		 功率优先	PF				血量优先HpF			
+1				60									45	
+2				65									50	
+3				70									55	
+4				75									60	
+5				80									65	
+6				85									70	
+7				90									75	
+8				95									80	
+9				100									90	
+10			100									100		
 
 */
 
@@ -178,7 +185,7 @@ void chassis_task(void *parm)
 void Cap_refresh(){	//不断刷新并记录当前电池所能给电容充的最大电压
 //电容的最大压值随着电池格数进行变化，因而需要不断刷新
 	static int i=0;
-	if(judge_recv_mesg.power_heat_data.chassis_power_buffer==60&&(chassis.CapData[0]-chassis.CapData[1]<2||chassis.CapData[1]>=20)){
+	if(judge_recv_mesg.power_heat_data.buffer_energy==60&&(chassis.CapData[0]-chassis.CapData[1]<2||chassis.CapData[1]>=20)){
 	if(i!=10)i++;
 	}else
 		i=0;
@@ -232,7 +239,6 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
         }
         else if (real_time_Cap_remain < Cap_low)
             Speed_up = 1; // 一旦检测到电容低则自动关闭加速
-
         
         if (km.vy > 0 || rm.vy > 0)
         {
@@ -342,7 +348,7 @@ static void chassis_normal_handler(void)
 {
   float nor_chassis_vx,nor_chassis_vy;
   //计算底盘x、y轴上的速度
-  chassis_power_contorl(&pid_power,&nor_chassis_vx,&nor_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+  chassis_power_contorl(&pid_power,&nor_chassis_vx,&nor_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)Calculate_grade.chassis_power_limit);
   
   int position_ref = 0;
   if (chassis_mode == CHASSIS_NORMAL_MODE)
@@ -360,15 +366,15 @@ static void chassis_normal_handler(void)
 static void chassis_dodge_handler(void)
 {
 	float chassis_vx_dodge,chassis_vy_dodge;
-    float dodge_angle;
+  float dodge_angle;
 	float dodge_min=150;
 	float dodge_max=500;
 	float dodge_chassis_vx,dodge_chassis_vy;
 	static int dodge_cap=0;
-	
+
 	if(last_chassis_mode!=CHASSIS_DODGE_MODE){
         //刚刚进入小陀螺时，旋转速度通过计算得到
-	chassis.vw=dodge_min+((float)judge_recv_mesg.game_robot_state.chassis_power_limit-45)/45*150;
+	chassis.vw=dodge_min+((float)Calculate_grade.chassis_power_limit-45)/45*150;
 	
 	if(cap_store-chassis.CapData[1]<0.5)dodge_cap=chassis.CapData[1]-0.5;//防止充放平衡
 		else 
@@ -386,7 +392,7 @@ static void chassis_dodge_handler(void)
   }
   else
 		//键盘时则通过功率算法来控制速度，防止掉电容
-    	chassis_power_contorl(&pid_power,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+    	chassis_power_contorl(&pid_power,&dodge_chassis_vx,&dodge_chassis_vy,&yaw_speed,chassis.CapData[1],cap_store,(float)Calculate_grade.chassis_power_limit);
 
 	chassis.vy = (dodge_chassis_vx * arm_sin_f32( PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32( PI / 180 * dodge_angle));
 	chassis.vx = (dodge_chassis_vx * arm_cos_f32( PI / 180 * dodge_angle) - dodge_chassis_vy * arm_sin_f32( PI / 180 * dodge_angle));
