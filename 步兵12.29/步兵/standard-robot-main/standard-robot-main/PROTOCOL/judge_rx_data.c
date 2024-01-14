@@ -4,7 +4,6 @@
 #include "judge_task.h"
 
 
-
 /*裁判系统的数据接收 --裁判系统发送数据，stm32接收；
   发送对应的命令码cmd_id,然后读取相应信息*/
 	
@@ -86,7 +85,7 @@ void judgement_data_handler(uint8_t *p_frame)
     }
     break;
 		
-	  case GAME_RESULT_ID:                                              //比赛结束后发送
+	  case GAME_RESULT_ID:                                              //0x0002比赛结束后发送
       memcpy(&judge_recv_mesg.game_result, data_addr, data_length);   //比赛结果
     break;
 		
@@ -94,19 +93,19 @@ void judgement_data_handler(uint8_t *p_frame)
       memcpy(&judge_recv_mesg.game_robot_HP, data_addr, data_length); //比赛机器人血量信息
     break;
 		
-    case DART_STATE_ID:                                               //0x004，飞镖发射时发送
-			 memcpy(&judge_recv_mesg.dart_state, data_addr, data_length);
-		break;
+//    case DART_STATE_ID:                                               //0x004，飞镖发射时发送    被删除//
+//			 memcpy(&judge_recv_mesg.dart_state, data_addr, data_length);
+//		break;
 		
-		case ICRA_BUFF_DEBUFF_ZONE_STATE_ID:                              //人工智能挑战赛加成或惩罚
-			 memcpy(&judge_recv_mesg.ICRA_buff_debuff_zone_state, data_addr, data_length);
-		break;
+//		case ICRA_BUFF_DEBUFF_ZONE_STATE_ID:                              //人工智能挑战赛加成或惩罚  被删除//
+//			 memcpy(&judge_recv_mesg.ICRA_buff_debuff_zone_state, data_addr, data_length);
+//		break;
 		
-    case EVENT_DATA_ID:                                               //1HZ周期发送
+    case EVENT_DATA_ID:                                               //0x0101   1HZ周期发送
       memcpy(&judge_recv_mesg.event_data, data_addr, data_length);    //场地事件数据
     break; 
 		
-    case SUPPLY_PROJECTILE_ACTION_ID:                                 //102，场地补给站动作标识符，动作发生后发送
+    case SUPPLY_PROJECTILE_ACTION_ID:                                 //0x0102，场地补给站动作标识符，补给站弹丸释放时触发发送
       memcpy(&judge_recv_mesg.supply_projectile_action, data_addr, data_length);
     break;
 		
@@ -134,8 +133,8 @@ void judgement_data_handler(uint8_t *p_frame)
 			memcpy(&judge_recv_mesg.buff, data_addr, data_length);
 		break;
 		
-		case AERIAL_ROBOT_ENERGY_ID:                                      //205，空中机器人能量状态数据，10HZ周期发送，只有空中主控发送
-			memcpy(&judge_recv_mesg.aerial_robot_energy, data_addr, data_length);
+		case AERIAL_ROBOT_SUPPORT_ID:                                      //205，空中机器人支援状态数据，10HZ周期发送，只有空中主控发送
+			memcpy(&judge_recv_mesg.air_support_data, data_addr, data_length);
 		break;
 		
 		case ROBOT_HURT_ID:                                               //206 伤害状态数据，伤害发生后发送
@@ -146,47 +145,76 @@ void judgement_data_handler(uint8_t *p_frame)
 			memcpy(&judge_recv_mesg.shoot_data, data_addr, data_length);
 		break;
 		
-		case BULLET_REMAINING_ID:                                         //208，弹丸剩余量，仅哨兵、空中ICRA机器人，1HZ发送
-			memcpy(&judge_recv_mesg.bullet_remaining, data_addr, data_length);
+		case BULLET_ALLOWABLE_ID:                                         //208，允许发弹量，空中机器人，哨兵机器人以及ICRA机器人
+			memcpy(&judge_recv_mesg.bullet_allowable, data_addr, data_length);
 		break;
 		
 		case RFID_STATE_ID:                                               //209，机器人RFID状态，1HZ发送
 			memcpy(&judge_recv_mesg.rfid_state, data_addr, data_length);
 		break;
 		
-		case DAT_CLIENT_CMD_ID:                                           //20A，飞镖机器人客户端指令数据，10HZ周期发送
+		case DART_CLIENT_CMD_ID:                                          //20A，飞镖机器人客户端指令数据，10HZ周期发送
 			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
 		break;
 		
-//	  case STUDENT_INTERACTIVE_HEADER_DATA_ID:                         //301 机器人间交互数据，发送方触发发送
-//	  {
-//		  if(data_length <= 119)                                         //数据段头结构长度+交互数据长度
-//		  {
-//			  memcpy(&judge_recv_mesg.student_interactive_header_data, data_addr, data_length);
-//			  interover_data_overflow = 0;
-//		  }
-//			else
-//			{
-//				interover_data_overflow = 1;
-//			}
-//		}break;	
-
+		case GAME_ROBOT_ALL_POS_ID:                                       //20B，地面机器人位置数据，1HZ发送
+			memcpy(&judge_recv_mesg.ground_robot_position, data_addr, data_length);
+		break;
+		
+		case GIME_ROBOT_RADAR_MARK_ID:                              		  //20C，雷达标记进度数据
+			memcpy(&judge_recv_mesg.radar_mark_data, data_addr, data_length);
+		break;
+		
+		case GAME_SENTRY_DECISION_SYNC_ID:                                //20D，地面机器人位置数据，1HZ发送
+			memcpy(&judge_recv_mesg.sentry_info, data_addr, data_length);
+		break;
+		
+		case GAME_RADAR_DECISION_SYNC_ID:                                 //20E，地面机器人位置数据，1HZ发送
+			memcpy(&judge_recv_mesg.radar_info, data_addr, data_length);
+		break;
+		
+		
+		
+	  case STUDENT_INTERACTIVE_HEADER_DATA_ID:                         //301 机器人间交互数据，发送方触发发送				不确定是不是rx
+	  {
+		  if(data_length <= 119)                                         //数据段头结构长度+交互数据长度 113+2+2+2
+		  {
+			  memcpy(&judge_recv_mesg.robot_interaction_data, data_addr, data_length);
+			  interover_data_overflow = 0;
+		  }
+			else
+			{
+				interover_data_overflow = 1;					//判断是否有超出的数据超出置1
+			}			
+		}break;	
+		
+//		case GAME_RADAR_DECISION_SYNC_ID:                                 //20E，地面机器人位置数据，1HZ发送
+//			memcpy(&judge_recv_mesg.radar_info, data_addr, data_length);
+//		break;
+//		
+//		case GAME_RADAR_DECISION_SYNC_ID:                                 //20E，地面机器人位置数据，1HZ发送
+//			memcpy(&judge_recv_mesg.radar_info, data_addr, data_length);
+//		break;
+		
 		case CUSTOM_CONTROLLER_INTERACTION_DATA_ID:                                        //302，自定义控制器交互数据接口，通过客户端触发发送，上限 30HZ
-			memcpy(&judge_recv_mesg.robot_interactive_data, data_addr, data_length);
+			memcpy(&judge_recv_mesg.custom_robot_data, data_addr, data_length);
 		break;
 		
 		case CLIENT_MINIMAP_INTERACTIVE_DATDA_ID:                                          //303，客户端小地图交互数据，触发发送
-			memcpy(&judge_recv_mesg.minimap_interactive_data, data_addr, data_length);
+			memcpy(&judge_recv_mesg.map_command, data_addr, data_length);
 		break;
 		
 		case KEYBOARD_AND_MOUSE_INFORMATION_ID:                                            //304，键盘、鼠标信息，通过图传串口发送
 			memcpy(&judge_recv_mesg.mouse_keyboard_informationt, data_addr, data_length);
     break;
 		
+		case CUSTOM_CONTROLLER_INTERACTIVE_DATE_ID:                                        //306，模拟键盘、鼠标信息，通过图传串口发送
+			memcpy(&judge_recv_mesg.custom_client_data, data_addr, data_length);
+    break;		
+		
 		default:
     {
 		}
     break;
   }
-  
 }

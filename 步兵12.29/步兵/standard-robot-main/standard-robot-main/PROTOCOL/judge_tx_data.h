@@ -6,16 +6,16 @@
 #include "data_packet.h"
 
 #define JUDGE_TX_FIFO_BUFLEN 500//用于给发送邮箱的初始化
-#define STUDENT_DATA_LENGTH   sizeof(ext_student_interactive_data_t_t)//交互数据的长度 
+#define STUDENT_DATA_LENGTH   sizeof(robot_interaction_data_t_t)//交互数据的长度 
 
-//机器人间交互数据包
+//机器人间交互数据包  
 typedef __packed struct
 {
 	uint16_t data_cmd_id;//内容ID、发送者ID、接受者ID和交互数据
 	uint16_t sender_ID;
 	uint16_t receiver_ID;
-	uint8_t data[113];//最大113
-}ext_student_interactive_data_t_t;
+	uint8_t  data[113];//最大113
+}robot_interaction_data_t_t;
 
 //学生交互id
 typedef enum
@@ -86,78 +86,74 @@ typedef enum
 }Content_ID;
 
 //客户端删除图形
-typedef __packed struct
+typedef __packed struct									//新增
 {
-	uint16_t data_cmd_id;//内容ID、发送者ID、接受者ID和图形设置
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	uint8_t operate_tpye;
+	uint8_t delete_type;
 	uint8_t layer;
-}ext_client_custom_graphic_delete_t;
-
-//图形数据配置，具体查看裁判系统串口协议附录
-typedef __packed struct
-{
-	uint8_t graphic_name[3];
-	uint32_t operate_tpye:3;// 类型说明符 位域名：位域长度,后面的位域长度表示该位域占了多少个位
-	uint32_t graphic_tpye:3;
-	uint32_t layer:4;
-	uint32_t color:4;
-	uint32_t start_angle:9;
-	uint32_t end_angle:9;
-	uint32_t width:10;
-	uint32_t start_x:11;
+}interaction_layer_delete_t;
+//图形数据配置   客户端绘制一个图形
+typedef __packed struct											//新增 和原来的graphic_date_sturct差不多
+{ // 类型说明符 位域名：位域长度,后面的位域长度表示该位域占了多少个位
+	uint8_t  figure_name[3]; 			
+	uint32_t operate_tpye:3; 
+	uint32_t figure_tpye:3; 
+	uint32_t layer:4; 
+	uint32_t color:4; 
+	uint32_t details_a:9;
+	uint32_t details_b:9;
+	uint32_t width:10; 
+	uint32_t start_x:11; 
 	uint32_t start_y:11; 
-	uint32_t radius:10;
-	uint32_t end_x:11;
-	uint32_t end_y:11;
-}graphic_data_struct_t;
-
-//客户端绘制一个图形
+	uint32_t details_c:10; 
+	uint32_t details_d:11; 
+	uint32_t details_e:11; 
+}interaction_figure_t;
+//客户端绘制两个图形0102
 typedef __packed struct
 {
-	uint16_t data_cmd_id;//内容ID、发送者ID、接受者ID和图形设置
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	graphic_data_struct_t grapic_data_struct;
-}ext_client_custom_graphic_single_t;
-
-//客户端绘制二个图形
+ interaction_figure_t interaction_figure[2];
+}interaction_figure_2_t;
+//客户端绘制五个图形0103
 typedef __packed struct
 {
-	uint16_t data_cmd_id;
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	graphic_data_struct_t grapic_data_struct[2];
-}ext_client_custom_graphic_double_t;
-
-//客户端绘制五个图形
+ interaction_figure_t interaction_figure[5];
+}interaction_figure_3_t;
+//客户端绘制七个图形0104
 typedef __packed struct
 {
-	uint16_t data_cmd_id;
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	graphic_data_struct_t grapic_data_struct[5];
-}ext_client_custom_graphic_five_t;
-
-//客户端绘制七个图形
-typedef __packed struct
-{
-	uint16_t data_cmd_id;
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	graphic_data_struct_t grapic_data_struct[7];
-}ext_client_custom_graphic_seven_t;
-
+ interaction_figure_t interaction_figure[7];
+}interaction_figure_4_t;
 //客户端绘制字符
 typedef __packed struct
 {
-	uint16_t data_cmd_id;
-	uint16_t sender_ID;
-	uint16_t receiver_ID;
-	graphic_data_struct_t grapic_data_struct;
+	interaction_figure_t grapic_data_struct;   //原来官方的是graphic_data_struct_t grapic_data_struct但查看后发现要写图形数据配置文件，故改称interaction_figure_t
 	uint8_t data[30];//需要发送的字符内容
-}ext_client_custom_character_t;
+} ext_client_custom_character_t;
+//机器人发送位置信息  0305
+typedef __packed struct
+{
+uint16_t target_robot_id;
+float target_position_x;
+float target_position_y;
+}map_robot_data_t;
+//发送路径坐标数据0307
+typedef __packed struct
+{
+uint8_t intention;
+uint16_t start_position_x;
+uint16_t start_position_y;
+int8_t delta_x[49];
+int8_t delta_y[49];
+uint16_t sender_id;
+}map_data_t;
+//发送自定义消息0308
+typedef __packed struct
+{ 
+uint16_t sender_id;
+uint16_t receiver_id;
+uint16_t user_data[30];
+} custom_info_t;
+
 
 //图形设置
 typedef enum
@@ -250,18 +246,18 @@ typedef enum
 typedef struct
 {
 	//0x0200~0x02FF发送的内容
-  ext_student_interactive_data_t_t	  					ext_student_interactive_data;
-	ext_client_custom_graphic_five_t							ext_client_custom_graphic_long_line;
+  robot_interaction_data_t_t	  								ext_student_interactive_data;           //更新
+	interaction_figure_3_t												ext_client_custom_graphic_long_line;
 	ext_client_custom_character_t									ext_client_custom_character_text;
 	//0x0100~0x0110发送的内容
-	ext_client_custom_graphic_delete_t						ext_client_custom_graphic_delete;
-	ext_client_custom_graphic_single_t						ext_client_custom_graphic_single;
-	ext_client_custom_graphic_double_t						ext_client_custom_graphic_double;
-	ext_client_custom_graphic_five_t							ext_client_custom_graphic_five;
-	ext_client_custom_graphic_five_t 							ext_client_custom_graphic_short_line2;
-	ext_client_custom_graphic_five_t  						ext_client_custom_graphic_short_line3;
-	ext_client_custom_graphic_five_t							ext_client_custom_graphic_car_line;
-	ext_client_custom_graphic_seven_t							ext_client_custom_graphic_seven;
+	interaction_layer_delete_t										ext_client_custom_graphic_delete;				//客户端删除图层
+	interaction_figure_t													ext_client_custom_graphic_single;				//好像没有绘制单个图形，直接把设置当成画第一个图形
+	interaction_figure_2_t												ext_client_custom_graphic_double;
+	interaction_figure_3_t												ext_client_custom_graphic_five;
+	interaction_figure_3_t 												ext_client_custom_graphic_short_line2;
+	interaction_figure_3_t  											ext_client_custom_graphic_short_line3;
+	interaction_figure_3_t												ext_client_custom_graphic_car_line;
+	interaction_figure_4_t												ext_client_custom_graphic_seven;
 	ext_client_custom_character_t									ext_client_custom_character;
 	ext_client_custom_character_t									ext_client_custom_character_chassis;//底盘状态
 	ext_client_custom_character_t									ext_client_custom_character_shoot;//射击状态
