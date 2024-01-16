@@ -70,7 +70,7 @@ float yaw_vision_pid[6] = {13,0,5,75,0,8};
 float pit_buff_pid[6] = {0, 0, 0, 0, 0, 0}; 
 float yaw_buff_pid[6] = {0, 0, 0, 0, 0, 0}; 
 // 拨盘参数
-float trig_pid[6] = {130, 0, 10, 11, 0, 5};
+float trig_pid[6] = {250, 0, 40, 11, 0, 5};
 
 #elif (INFANTRY_NUM == INFANTRY_5)
 float pit_init_pid[6] = {55, 0.015, 30, 50, 0, 0};
@@ -609,6 +609,8 @@ extern WorldTime_RxTypedef PC_KF_Time;
 
 static void track_aimor_handler(void)
 {
+	/*激励信号*/
+ float MyF=0.5,Myt=0,MyCnt=0;
 	/* 记录丢失角度 */
  static float lost_pit;
  static float lost_yaw;
@@ -620,7 +622,6 @@ static void track_aimor_handler(void)
 	gimbal.yaw_offset_angle  = gimbal.sensor.yaw_gyro_angle;//备份陀螺仪数据，以免退出自瞄时冲突
   gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
   gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle;//yaw轴用陀螺仪
-	
 	//	float Vision_Speed = target_speed_calc(&Vision_speed_Struct, PC_KF_Time.WorldTime, pc_recv_mesg.gimbal_control_data.yaw_ref);
 
 	/* 跟踪微分器 */
@@ -635,7 +636,19 @@ static void track_aimor_handler(void)
 	//	float *pc_recv_result_yaw = kalman_filter_calc  (&pc_kalman_filter_yaw,
 	//																										td_yaw.v1,
 	//	
-	//																										td_yaw.v2);	
+	//
+	/*发送激励信号代替小电脑发的信号（读值用于系统辨识）*/
+	      if(MyF<8)
+        {
+                MyCnt=100*arm_sin_f32(2*3.14f*MyF*Myt);//MyCnt即为信号值
+
+                Myt+=0.002;
+                if(Myt>(1/MyF*10))
+                {                    //这段是使后续频率增大
+                    MyF=MyF+0.7; 
+                    Myt=0;
+                }
+        } 												
 	if(last_gimbal_mode != GIMBAL_TRACK_ARMOR)//进自瞄时，防止疯转冲突
 		{
 			  pit_ctrl = gimbal.sensor.pit_relative_angle;
@@ -652,10 +665,8 @@ static void track_aimor_handler(void)
 			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw; // 补偿小陀螺自瞄时底盘的反方向力
 	else
 			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw;
-	if (INFANTRY_NUM == INFANTRY_5) // 连杆云台步兵的电机和电机直连步兵是反的
+			 /* 连杆云台步兵的电机和电机直连步兵是反的*/
 			pit_ctrl = gimbal.sensor.pit_relative_angle + pc_recv_mesg.aim_pitch;
-	else
-			pit_ctrl = gimbal.sensor.pit_relative_angle - pc_recv_mesg.aim_pitch;
 	last_vision_status = 1;
   }
 	/*视觉无效处理*/
@@ -680,6 +691,10 @@ static void track_aimor_handler(void)
 
   gimbal.pid.yaw_angle_ref = yaw_ctrl;
   gimbal.pid.pit_angle_ref = pit_ctrl;
+
+    /*切换激励信号把上述自瞄信号给定注释，想调哪个轴，开哪个轴，另一个轴置0*/
+	gimbal.pid.yaw_angle_ref = 0;
+	gimbal.pid.pit_angle_ref = MyCnt;
 //		gimbal.pid.yaw_angle_ref = 0;
 //		gimbal.pid.pit_angle_ref = 0;
 	

@@ -49,7 +49,7 @@ void can_msg_send_task(void *parm)
 			
 			send_cap_power_can((judge_recv_mesg.game_robot_state.chassis_power_limit-pid_chassis_power_buffer.out)*100);//发给功率控制板的值
 		}else
-			send_cap_power_can(3900);//没接入裁判系统或则检录模式的时候给定39W
+			send_cap_power_can(6000);//没接入裁判系统或则检录模式的时候给定39W
 
 		
 			if(Signal & GIMBAL_MOTOR_MSG_SIGNAL)//发送云台电流

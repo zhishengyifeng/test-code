@@ -9,7 +9,7 @@
 #define INFANTRY_4  4
 #define INFANTRY_5  5
 
-#define  INFANTRY_NUM  INFANTRY_5 //可以修改步兵号数
+#define  INFANTRY_NUM  INFANTRY_4 //可以修改步兵号数
 
 
 #define DEBUG

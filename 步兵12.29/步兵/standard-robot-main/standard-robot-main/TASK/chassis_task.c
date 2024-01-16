@@ -63,10 +63,10 @@ float chassis_spd_pid[4][3] = {{10.5, 0.0f, 0},\
                                
 #elif(INFANTRY_NUM == INFANTRY_5)
 float chassis_pid[3] = {10.0f, 0.0, 0.0f};
-float chassis_spd_pid[4][3] = {{10.5, 0.0f, 0},\
-								{10, 0.0f, 0},\
-								{10, 0.0f, 0},\
-								{10, 0.0f, 0}};
+float chassis_spd_pid[4][3] = {{9.8, 0.0f, 0},\
+								{10.5, 0.0f, 0},\
+								{10.7, 0.0f, 0},\
+								{9.5, 0.0f, 0}};
 #else
 		#error "INFANTRY_NUM define error!"
 #endif
