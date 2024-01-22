@@ -16,7 +16,9 @@
 
 3. 复制以下命令
 
-		git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
+   	git clone https://github.com/AwakeLion-Robot-Lab/control-group-standard-robot.git
+   	或
+   	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
 
 4. 注意不要使用Ctrl+V粘贴，否则会出现错误
    正确粘贴快捷键是Shift+Ins,或者右键点击再选Paste
@@ -28,11 +30,13 @@
 #### git命令使用说明
 1. git clone 拉取远程仓库的代码到本地，如：
 
-      	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
+      	git clone https://github.com/AwakeLion-Robot-Lab/control-group-standard-robot.git
+     	或
+     	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
      
 2. 切换至新分支xxx（相当于复制了remote的仓库到本地的xxx分支上）
 
-     	git checkout -b xxx 
+     	git checkout -b xxx /git switch -c xxx(右边的命令更好记|switch然后change)
 
 
 3. 修改完成后，查看自己对代码做出的改变
@@ -55,13 +59,13 @@
 
 
 #### git开发流程
-1. 从GitLab拉取代码
+1. 从GitLab/Github拉取代码
 
     	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
 
 2. 新建my-feature分支，并由main分支切换到my-feature分支，执行以下这一条命令即可          (通常我们把开发分支命名为develop)
 
-			git checkout -b my-feature
+			git checkout -b my-feature/git switch -c xxx(右边的命令更好记|switch然后change)
 
 3. 在自己电脑上用Keil,Vscode或Qt修改代码或者添加文件
 
