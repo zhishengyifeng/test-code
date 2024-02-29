@@ -2,7 +2,7 @@
 ..\obj\judge_task.o: ..\TASK\judge_task.h
 ..\obj\judge_task.o: ..\USER\stm32f4xx.h
 ..\obj\judge_task.o: ..\CORE\core_cm4.h
-..\obj\judge_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\judge_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\judge_task.o: ..\CORE\core_cmInstr.h
 ..\obj\judge_task.o: ..\CORE\core_cmFunc.h
 ..\obj\judge_task.o: ..\CORE\core_cmSimd.h
@@ -38,7 +38,7 @@
 ..\obj\judge_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\judge_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\judge_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\judge_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\judge_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\judge_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\judge_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\judge_task.o: ..\FreeRTOS\include\deprecated_definitions.h

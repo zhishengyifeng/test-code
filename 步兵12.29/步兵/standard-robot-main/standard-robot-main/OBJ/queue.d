@@ -1,9 +1,9 @@
 ..\obj\queue.o: ..\FreeRTOS\queue.c
-..\obj\queue.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\queue.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\queue.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\queue.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\queue.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\queue.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\queue.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\queue.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\queue.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\queue.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\queue.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\queue.o: ..\USER\stm32f4xx.h

@@ -2,7 +2,7 @@
 ..\obj\bsp_usb.o: ..\BSP_CONF\bsp_usb.h
 ..\obj\bsp_usb.o: ..\USER\stm32f4xx.h
 ..\obj\bsp_usb.o: ..\CORE\core_cm4.h
-..\obj\bsp_usb.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\bsp_usb.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\bsp_usb.o: ..\CORE\core_cmInstr.h
 ..\obj\bsp_usb.o: ..\CORE\core_cmFunc.h
 ..\obj\bsp_usb.o: ..\CORE\core_cmSimd.h

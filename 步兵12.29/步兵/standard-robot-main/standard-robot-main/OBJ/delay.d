@@ -2,7 +2,7 @@
 ..\obj\delay.o: ..\USER_CONF\delay.h
 ..\obj\delay.o: ..\USER\stm32f4xx.h
 ..\obj\delay.o: ..\CORE\core_cm4.h
-..\obj\delay.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\delay.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\delay.o: ..\CORE\core_cmInstr.h
 ..\obj\delay.o: ..\CORE\core_cmFunc.h
 ..\obj\delay.o: ..\CORE\core_cmSimd.h

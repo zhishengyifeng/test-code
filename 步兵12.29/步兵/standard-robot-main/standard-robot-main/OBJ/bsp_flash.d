@@ -2,7 +2,7 @@
 ..\obj\bsp_flash.o: ..\BSP_CONF\bsp_flash.h
 ..\obj\bsp_flash.o: ..\USER\stm32f4xx.h
 ..\obj\bsp_flash.o: ..\CORE\core_cm4.h
-..\obj\bsp_flash.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\bsp_flash.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\bsp_flash.o: ..\CORE\core_cmInstr.h
 ..\obj\bsp_flash.o: ..\CORE\core_cmFunc.h
 ..\obj\bsp_flash.o: ..\CORE\core_cmSimd.h
@@ -35,4 +35,4 @@
 ..\obj\bsp_flash.o: ..\FWLIB\inc\stm32f4xx_dac.h
 ..\obj\bsp_flash.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\bsp_flash.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
-..\obj\bsp_flash.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\bsp_flash.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

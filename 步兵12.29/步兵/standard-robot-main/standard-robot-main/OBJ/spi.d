@@ -2,7 +2,7 @@
 ..\obj\spi.o: ..\USER_CONF\spi.h
 ..\obj\spi.o: ..\USER\stm32f4xx.h
 ..\obj\spi.o: ..\CORE\core_cm4.h
-..\obj\spi.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\spi.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\spi.o: ..\CORE\core_cmInstr.h
 ..\obj\spi.o: ..\CORE\core_cmFunc.h
 ..\obj\spi.o: ..\CORE\core_cmSimd.h

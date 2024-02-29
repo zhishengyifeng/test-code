@@ -2,7 +2,7 @@
 ..\obj\remote_ctrl.o: ..\FUNTION\remote_ctrl.h
 ..\obj\remote_ctrl.o: ..\USER\stm32f4xx.h
 ..\obj\remote_ctrl.o: ..\CORE\core_cm4.h
-..\obj\remote_ctrl.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\remote_ctrl.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\remote_ctrl.o: ..\CORE\core_cmInstr.h
 ..\obj\remote_ctrl.o: ..\CORE\core_cmFunc.h
 ..\obj\remote_ctrl.o: ..\CORE\core_cmSimd.h
@@ -36,8 +36,8 @@
 ..\obj\remote_ctrl.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\remote_ctrl.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
 ..\obj\remote_ctrl.o: ..\USER_CONF\rc.h
-..\obj\remote_ctrl.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\remote_ctrl.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\remote_ctrl.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\remote_ctrl.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\remote_ctrl.o: ..\USER_CONF\sys_config.h
 ..\obj\remote_ctrl.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\remote_ctrl.o: ..\TASK\shoot_task.h

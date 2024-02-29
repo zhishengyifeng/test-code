@@ -2,7 +2,7 @@
 ..\obj\chassis_task.o: ..\TASK\chassis_task.h
 ..\obj\chassis_task.o: ..\USER\stm32f4xx.h
 ..\obj\chassis_task.o: ..\CORE\core_cm4.h
-..\obj\chassis_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\chassis_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\chassis_task.o: ..\CORE\core_cmInstr.h
 ..\obj\chassis_task.o: ..\CORE\core_cmFunc.h
 ..\obj\chassis_task.o: ..\CORE\core_cmSimd.h
@@ -39,7 +39,7 @@
 ..\obj\chassis_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\chassis_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\chassis_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\chassis_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\chassis_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\chassis_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\chassis_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\chassis_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -48,14 +48,14 @@
 ..\obj\chassis_task.o: ..\FreeRTOS\include\task.h
 ..\obj\chassis_task.o: ..\FreeRTOS\include\list.h
 ..\obj\chassis_task.o: ..\TASK\modeswitch_task.h
-..\obj\chassis_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\chassis_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\chassis_task.o: ..\TASK\comm_task.h
 ..\obj\chassis_task.o: ..\TASK\gimbal_task.h
 ..\obj\chassis_task.o: ..\FUNTION\ramp.h
 ..\obj\chassis_task.o: ..\TASK\info_get_task.h
 ..\obj\chassis_task.o: ..\TASK\detect_task.h
 ..\obj\chassis_task.o: ..\USER_CONF\sys_config.h
-..\obj\chassis_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\chassis_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\chassis_task.o: ..\PROTOCOL\pc_rx_data.h
 ..\obj\chassis_task.o: ..\PROTOCOL\data_packet.h
 ..\obj\chassis_task.o: ..\PROTOCOL\protocol.h
@@ -69,4 +69,5 @@
 ..\obj\chassis_task.o: ..\PROTOCOL\judge_rx_data.h
 ..\obj\chassis_task.o: .\include\arm_math.h
 ..\obj\chassis_task.o: ..\CORE\core_cm4.h
-..\obj\chassis_task.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\math.h
+..\obj\chassis_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\chassis_task.o: ..\FUNTION\power_control.h

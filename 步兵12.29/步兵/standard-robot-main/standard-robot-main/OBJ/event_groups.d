@@ -1,8 +1,8 @@
 ..\obj\event_groups.o: ..\FreeRTOS\event_groups.c
-..\obj\event_groups.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\event_groups.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\event_groups.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\event_groups.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\event_groups.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\event_groups.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\event_groups.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\event_groups.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\event_groups.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\event_groups.o: ..\USER\stm32f4xx.h

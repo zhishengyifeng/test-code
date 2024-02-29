@@ -2,7 +2,7 @@
 ..\obj\data_fifo.o: ..\PROTOCOL\data_fifo.h
 ..\obj\data_fifo.o: ..\USER\stm32f4xx.h
 ..\obj\data_fifo.o: ..\CORE\core_cm4.h
-..\obj\data_fifo.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\data_fifo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\data_fifo.o: ..\CORE\core_cmInstr.h
 ..\obj\data_fifo.o: ..\CORE\core_cmFunc.h
 ..\obj\data_fifo.o: ..\CORE\core_cmSimd.h
@@ -38,7 +38,7 @@
 ..\obj\data_fifo.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\data_fifo.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\data_fifo.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\data_fifo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\portable.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -46,5 +46,5 @@
 ..\obj\data_fifo.o: ..\FreeRTOS\include\mpu_wrappers.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\semphr.h
 ..\obj\data_fifo.o: ..\FreeRTOS\include\queue.h
-..\obj\data_fifo.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\data_fifo.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\data_fifo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\data_fifo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

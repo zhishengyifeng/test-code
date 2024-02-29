@@ -2,7 +2,7 @@
 ..\obj\keyboard.o: ..\FUNTION\keyboard.h
 ..\obj\keyboard.o: ..\USER\stm32f4xx.h
 ..\obj\keyboard.o: ..\CORE\core_cm4.h
-..\obj\keyboard.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\keyboard.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\keyboard.o: ..\CORE\core_cmInstr.h
 ..\obj\keyboard.o: ..\CORE\core_cmFunc.h
 ..\obj\keyboard.o: ..\CORE\core_cmSimd.h
@@ -45,14 +45,14 @@
 ..\obj\keyboard.o: ..\TASK\gimbal_task.h
 ..\obj\keyboard.o: ..\TASK\shoot_task.h
 ..\obj\keyboard.o: ..\TASK\modeswitch_task.h
-..\obj\keyboard.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\keyboard.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\keyboard.o: ..\PROTOCOL\judge_rx_data.h
 ..\obj\keyboard.o: ..\PROTOCOL\data_packet.h
 ..\obj\keyboard.o: ..\PROTOCOL\protocol.h
 ..\obj\keyboard.o: ..\PROTOCOL\data_fifo.h
 ..\obj\keyboard.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\keyboard.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\keyboard.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\keyboard.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\keyboard.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\keyboard.o: ..\FreeRTOS\include\portable.h
 ..\obj\keyboard.o: ..\FreeRTOS\include\deprecated_definitions.h

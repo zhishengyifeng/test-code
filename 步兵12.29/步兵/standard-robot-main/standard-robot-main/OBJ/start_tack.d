@@ -1,8 +1,8 @@
 ..\obj\start_tack.o: ..\USER_CONF\start_tack.c
 ..\obj\start_tack.o: ..\USER_CONF\start_task.h
 ..\obj\start_tack.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\start_tack.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\start_tack.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\start_tack.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\start_tack.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\start_tack.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\start_tack.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\start_tack.o: ..\USER\stm32f4xx.h
@@ -52,7 +52,7 @@
 ..\obj\start_tack.o: ..\TASK\comm_task.h
 ..\obj\start_tack.o: ..\TASK\shoot_task.h
 ..\obj\start_tack.o: ..\TASK\modeswitch_task.h
-..\obj\start_tack.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
+..\obj\start_tack.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\start_tack.o: ..\TASK\info_get_task.h
 ..\obj\start_tack.o: ..\TASK\detect_task.h
 ..\obj\start_tack.o: ..\TASK\gimbal_task.h

@@ -3,9 +3,9 @@
 ..\obj\ahrs_middleware.o: ..\BMI088\algorithm\AHRS.h
 ..\obj\ahrs_middleware.o: .\include\arm_math.h
 ..\obj\ahrs_middleware.o: ..\CORE\core_cm4.h
-..\obj\ahrs_middleware.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\ahrs_middleware.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\ahrs_middleware.o: ..\CORE\core_cmInstr.h
 ..\obj\ahrs_middleware.o: ..\CORE\core_cmFunc.h
 ..\obj\ahrs_middleware.o: ..\CORE\core_cmSimd.h
-..\obj\ahrs_middleware.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\string.h
-..\obj\ahrs_middleware.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\math.h
+..\obj\ahrs_middleware.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\ahrs_middleware.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

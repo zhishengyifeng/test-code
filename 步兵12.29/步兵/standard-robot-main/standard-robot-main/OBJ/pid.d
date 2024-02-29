@@ -2,7 +2,7 @@
 ..\obj\pid.o: ..\FUNTION\pid.h
 ..\obj\pid.o: ..\USER\stm32f4xx.h
 ..\obj\pid.o: ..\CORE\core_cm4.h
-..\obj\pid.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\pid.o: ..\CORE\core_cmInstr.h
 ..\obj\pid.o: ..\CORE\core_cmFunc.h
 ..\obj\pid.o: ..\CORE\core_cmSimd.h
@@ -36,4 +36,4 @@
 ..\obj\pid.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\pid.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
 ..\obj\pid.o: ..\FUNTION\fuzzy_pid.h
-..\obj\pid.o: D:\keil5\新建文件夹\ARM\ARMCC\Bin\..\include\math.h
+..\obj\pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
