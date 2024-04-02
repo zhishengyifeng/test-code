@@ -142,6 +142,7 @@ pid_t pid_chassis_angle = {0};
 pid_t pid_trigger = {0};
 pid_t pid_trigger_spd = {0};
 pid_t pid_fric[2] = {0};
+pid_t pid_Spd_limit = {0};
 pid_t pid_heat_limit = {0};
 pid_t pid_power = {0};
 pid_t pid_heat_time = {0};

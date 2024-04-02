@@ -8,7 +8,6 @@
 //#define TWIST_ANGLE    45
 #define CHASSIS_PERIOD 10
 #define TWIST_PERIOD   1200//1300
-
 typedef struct
 {
   uint8_t         dodge_ctrl;

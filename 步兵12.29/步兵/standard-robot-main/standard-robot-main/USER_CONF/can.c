@@ -74,7 +74,7 @@ void CAN2_DEVICE(uint8_t mode, uint8_t sjw, uint8_t bs1, uint8_t bs2, uint16_t p
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 

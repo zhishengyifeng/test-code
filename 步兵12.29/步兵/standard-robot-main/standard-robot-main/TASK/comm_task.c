@@ -52,19 +52,19 @@ void can_msg_send_task(void *parm)
 			//			send_cap_power_can(15000);//没接入裁判系统或则检录模式的时候给定39W
 
 			if (Signal & GIMBAL_MOTOR_MSG_SIGNAL) // 发送云台电流
-				send_gimbal_cur(glb_cur.gimbal_cur[1], glb_cur.gimbal_cur[0], glb_cur.gimbal_cur[2]);
+				send_gimbal_cur(glb_cur.gimbal_cur[1], glb_cur.gimbal_cur[0]);
 
 			if (Signal & CHASSIS_MOTOR_MSG_SIGNAL) // 发送底盘电流
 				send_chassis_cur(glb_cur.chassis_cur[0], glb_cur.chassis_cur[1], glb_cur.chassis_cur[2], glb_cur.chassis_cur[3]);
 
-			if (Signal & SHOT_MOTOR_MSG_SIGNAL) // 发送摩擦轮电流
-				send_fric_cur(glb_cur.fric_cur[0], glb_cur.fric_cur[1]);
+			if (Signal & SHOT_MOTOR_MSG_SIGNAL) // 发送发射机构电流
+				send_fric_cur(glb_cur.fric_cur[0], glb_cur.fric_cur[1], glb_cur.trigger_cur);
 
 			if (Signal & MODE_SWITCH_MSG_SIGNAL) // 发送电流全为0
 			{
-				send_gimbal_cur(glb_cur.gimbal_cur[1], glb_cur.gimbal_cur[0], glb_cur.gimbal_cur[2]);
+				send_gimbal_cur(glb_cur.gimbal_cur[1], glb_cur.gimbal_cur[0]);
 				send_chassis_cur(glb_cur.chassis_cur[0], glb_cur.chassis_cur[1], glb_cur.chassis_cur[2], glb_cur.chassis_cur[3]);
-				send_fric_cur(glb_cur.fric_cur[0], glb_cur.fric_cur[1]);
+				send_fric_cur(glb_cur.fric_cur[0], glb_cur.fric_cur[1], glb_cur.trigger_cur);
 			}
 		}
 		can_stack_surplus = uxTaskGetStackHighWaterMark(NULL);

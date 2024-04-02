@@ -91,7 +91,7 @@ static void abs_limit(float *x, int32_t limit)
 void LADRC_Init(LADRC_NUM *LADRC_TYPE1, float h, float r, float wc, float w0, float b0, int32_t max_out)
 {
 	LADRC_TYPE1->h = h;			   // 定时时间及时间步长
-	LADRC_TYPE1->r = r;			   // 跟踪速度参数
+	LADRC_TYPE1->r = r; 			   // 跟踪速度参数
 	LADRC_TYPE1->wc = wc;		   // 观测器带宽
 	LADRC_TYPE1->w0 = w0;		   // 状态误差反馈率带宽
 	LADRC_TYPE1->b0 = b0;		   // 系统参数

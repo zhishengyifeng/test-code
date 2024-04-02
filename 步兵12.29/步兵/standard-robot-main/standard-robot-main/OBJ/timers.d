@@ -1,8 +1,8 @@
 ..\obj\timers.o: ..\FreeRTOS\timers.c
-..\obj\timers.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\timers.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\timers.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\timers.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\timers.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\timers.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\timers.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\timers.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\timers.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\timers.o: ..\USER\stm32f4xx.h

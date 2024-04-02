@@ -2,7 +2,7 @@
 ..\obj\st_usb_cdc.o: ..\USER_CONF\st_usb_cdc.h
 ..\obj\st_usb_cdc.o: ..\USER\stm32f4xx.h
 ..\obj\st_usb_cdc.o: ..\CORE\core_cm4.h
-..\obj\st_usb_cdc.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\st_usb_cdc.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\st_usb_cdc.o: ..\CORE\core_cmInstr.h
 ..\obj\st_usb_cdc.o: ..\CORE\core_cmFunc.h
 ..\obj\st_usb_cdc.o: ..\CORE\core_cmSimd.h

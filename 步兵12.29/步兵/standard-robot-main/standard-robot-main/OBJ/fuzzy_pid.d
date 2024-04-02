@@ -3,7 +3,7 @@
 ..\obj\fuzzy_pid.o: ..\FUNTION\pid.h
 ..\obj\fuzzy_pid.o: ..\USER\stm32f4xx.h
 ..\obj\fuzzy_pid.o: ..\CORE\core_cm4.h
-..\obj\fuzzy_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\fuzzy_pid.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\fuzzy_pid.o: ..\CORE\core_cmInstr.h
 ..\obj\fuzzy_pid.o: ..\CORE\core_cmFunc.h
 ..\obj\fuzzy_pid.o: ..\CORE\core_cmSimd.h
@@ -36,9 +36,9 @@
 ..\obj\fuzzy_pid.o: ..\FWLIB\inc\stm32f4xx_dac.h
 ..\obj\fuzzy_pid.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\fuzzy_pid.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
-..\obj\fuzzy_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\fuzzy_pid.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\fuzzy_pid.o: ..\USER_CONF\sys_config.h
-..\obj\fuzzy_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\fuzzy_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\fuzzy_pid.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\fuzzy_pid.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\fuzzy_pid.o: ..\TASK\gimbal_task.h
 ..\obj\fuzzy_pid.o: ..\FUNTION\ramp.h

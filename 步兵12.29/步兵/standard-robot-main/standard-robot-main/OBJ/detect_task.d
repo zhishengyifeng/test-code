@@ -2,7 +2,7 @@
 ..\obj\detect_task.o: ..\TASK\detect_task.h
 ..\obj\detect_task.o: ..\USER\stm32f4xx.h
 ..\obj\detect_task.o: ..\CORE\core_cm4.h
-..\obj\detect_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\detect_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\detect_task.o: ..\CORE\core_cmInstr.h
 ..\obj\detect_task.o: ..\CORE\core_cmFunc.h
 ..\obj\detect_task.o: ..\CORE\core_cmSimd.h
@@ -38,7 +38,7 @@
 ..\obj\detect_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\detect_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\detect_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -47,7 +47,7 @@
 ..\obj\detect_task.o: ..\FreeRTOS\include\task.h
 ..\obj\detect_task.o: ..\FreeRTOS\include\list.h
 ..\obj\detect_task.o: ..\TASK\modeswitch_task.h
-..\obj\detect_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\detect_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\detect_task.o: ..\PROTOCOL\pc_rx_data.h
 ..\obj\detect_task.o: ..\PROTOCOL\data_packet.h
 ..\obj\detect_task.o: ..\PROTOCOL\protocol.h

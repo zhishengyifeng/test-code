@@ -140,15 +140,21 @@ void imu_task(void const *argu)
 		INS_angle_final[1] = INS_angle[1] * RAD_TO_ANGLE;
 		INS_angle_final[2] = INS_angle[2] * RAD_TO_ANGLE;
 
-		gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];
-
-		gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;
 		/////////////////////////////////////////////////
-		gimbal.sensor.pit_gyro_angle = INS_angle_final[1];
-		if (INFANTRY_NUM == INFANTRY_5) // 步兵五即小全向的pit电机与普通麦轮步兵装配不同
-			gimbal.sensor.pit_palstance = BMI088.Gyro[0] * 100;
-		else
-			gimbal.sensor.pit_palstance = -BMI088.Gyro[0] * 100;
+//		if (INFANTRY_NUM == INFANTRY_5) // 步兵五即小全向的pit电机、陀螺仪普通麦轮步兵装配不同
+//		{
+//			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
+//			gimbal.sensor.pit_gyro_angle = INS_angle_final[2];		//陀螺仪角度	
+//			gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;     //加速度
+//			gimbal.sensor.pit_palstance = BMI088.Gyro[1] * 100;    //加速度
+//		}
+//		else
+//		{
+			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
+			gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度			
+			gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;		//加速度
+			gimbal.sensor.pit_palstance = BMI088.Gyro[1] * 100;	//加速度
+//		}
 		/////////////////////////////////////////////////
 
 		err_detector_hook(IMU_OFFLINE);

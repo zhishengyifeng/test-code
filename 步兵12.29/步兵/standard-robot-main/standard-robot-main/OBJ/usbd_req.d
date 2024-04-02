@@ -5,7 +5,7 @@
 ..\obj\usbd_req.o: ..\USER\usb_conf.h
 ..\obj\usbd_req.o: ..\USER\stm32f4xx.h
 ..\obj\usbd_req.o: ..\CORE\core_cm4.h
-..\obj\usbd_req.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\usbd_req.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\usbd_req.o: ..\CORE\core_cmInstr.h
 ..\obj\usbd_req.o: ..\CORE\core_cmFunc.h
 ..\obj\usbd_req.o: ..\CORE\core_cmSimd.h

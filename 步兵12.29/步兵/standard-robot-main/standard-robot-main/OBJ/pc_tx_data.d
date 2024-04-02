@@ -2,7 +2,7 @@
 ..\obj\pc_tx_data.o: ..\PROTOCOL\pc_tx_data.h
 ..\obj\pc_tx_data.o: ..\USER\stm32f4xx.h
 ..\obj\pc_tx_data.o: ..\CORE\core_cm4.h
-..\obj\pc_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\pc_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\pc_tx_data.o: ..\CORE\core_cmInstr.h
 ..\obj\pc_tx_data.o: ..\CORE\core_cmFunc.h
 ..\obj\pc_tx_data.o: ..\CORE\core_cmSimd.h
@@ -41,7 +41,7 @@
 ..\obj\pc_tx_data.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\pc_tx_data.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\pc_tx_data.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\pc_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\pc_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\pc_tx_data.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\pc_tx_data.o: ..\FreeRTOS\include\portable.h
 ..\obj\pc_tx_data.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -52,7 +52,7 @@
 ..\obj\pc_tx_data.o: ..\PROTOCOL\pc_rx_data.h
 ..\obj\pc_tx_data.o: ..\PROTOCOL\judge_rx_data.h
 ..\obj\pc_tx_data.o: ..\TASK\modeswitch_task.h
-..\obj\pc_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\pc_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\pc_tx_data.o: ..\TASK\gimbal_task.h
 ..\obj\pc_tx_data.o: ..\FUNTION\ramp.h
 ..\obj\pc_tx_data.o: ..\FUNTION\keyboard.h

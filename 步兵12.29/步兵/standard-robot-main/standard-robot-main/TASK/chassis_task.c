@@ -47,15 +47,8 @@ chassis_t chassis;
 
 // 前三个旋转pid 后三个速度pid
 
-#if (INFANTRY_NUM == INFANTRY_3)
-
-float chassis_pid[3] = {10.0f, 0.0, 0.0f};
-float chassis_spd_pid[4][3] = {{10.5, 0.0f, 0},
-							   {10.5, 0.0f, 0},
-							   {10.5, 0.0f, 0},
-							   {10.5, 0.0f, 0}};
 ////////////////////
-#elif (INFANTRY_NUM == INFANTRY_4)
+#if (INFANTRY_NUM == INFANTRY_4)
 float chassis_pid[3] = {10.0f, 0.0, 0.0f};
 float chassis_spd_pid[4][3] = {{10.5, 0.0f, 0},
 							   {10.5, 0.0f, 0},
@@ -76,15 +69,21 @@ float chassis_spd_pid[4][3] = {{10, 0.0f, 0},
 #error "INFANTRY_NUM define error!"
 #endif
 
+#define POWER_NEW//新功率算法，若要用老功率算法就注释掉这一行
+								 
+float	power_new_pid[3] = {350.0f, 1.0f, 0.0f}; //新功率算法PID（代替下边的cap_vol_pid）
 float cap_vol_pid[3] = {1.0f, 0, 0.0f};		   // 超级电容电压控制PID
 float chassis_power_buffer_pid[3] = {1, 0, 0}; // 缓冲焦耳控制PID
+#ifndef POWER_NEW
 float chassis_vw_pid[3] = {0.1, 0, 0.1};	   // 小陀螺转速控制PID
+#else
+float chassis_vw_pid[3] = {0.0f, 0.3f, 0.0f};	   // 小陀螺转速控制PID
+#endif
 
 float cap_store = 24;		  // 电容存储大小(给定初值为24)
 float cx = 0, cy = 0, cw = 0; // 缓启动赋值变量
 uint8_t fast_flag = 0;		  // 加速状态标志位
 int Speed_up = 0;			  // 加速键标志位
-float cap_ratio;			  // 电流值比例参数，根据当前电流值来调整电流输出上限
 
 void chassis_task(void *parm)
 {
@@ -105,16 +104,11 @@ void chassis_task(void *parm)
 				/*底盘vw旋转的pid*/
 				PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
 				PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
-				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 500, 50, DONE);
-
-				if (Speed_up && chassis.CapData[1] != 0)
-					cap_ratio = 1 - ((cap_store - chassis.CapData[1]) / (cap_store - 10));
-				else
-					cap_ratio = 1;
+				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 600, 600, DONE);
 
 				/*底盘vx,vy平移的pid*/
 				for (int i = 0; i < 4; i++)
-					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 15000 * cap_ratio, 1384 * cap_ratio, DONE);
+					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16000, 1500, DONE);
 
 				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // 云台归中之后底盘才能动
 				{
@@ -173,7 +167,6 @@ void chassis_task(void *parm)
 				}
 				else
 					memset(glb_cur.chassis_cur, 0, sizeof(glb_cur.chassis_cur));
-
 				xTaskGenericNotify((TaskHandle_t)can_msg_send_Task_Handle,
 								   (uint32_t)CHASSIS_MOTOR_MSG_SIGNAL,
 								   (eNotifyAction)eSetBits,
@@ -190,7 +183,7 @@ void Cap_refresh()
 	// 不断刷新并记录当前电池所能给电容充的最大电压
 	// 电容的最大压值随着电池格数进行变化，因而需要不断刷新
 	static int i = 0;
-	if (judge_recv_mesg.power_heat_data.chassis_power_buffer == 60 && (chassis.CapData[0] - chassis.CapData[1] < 2 || chassis.CapData[1] >= 20))
+	if (judge_recv_mesg.power_heat_data.buffer_energy == 60 && (chassis.CapData[0] - chassis.CapData[1] < 2 || chassis.CapData[1] >= 20))
 	{
 		if (i != 10)
 			i++;
@@ -206,6 +199,8 @@ void Cap_refresh()
 };
 
 extern int Speed_up;
+#ifndef POWER_NEW
+//老功率算法--电容pid
 // 底盘功率控制函数，通过电容总值，电容当前值，底盘功率限制值，计算出底盘x、y轴上的速度
 void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, float *power_yaw_speed, float real_time_Cap_remain, float real_time_Cap_can_store, float judge_power_limit)
 {
@@ -334,8 +329,7 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 		else if (*power_vy < 0)
 			*power_vy = -1000;
 	}
-	//    else if (FAST_SPD && fast_flag) // 快速
-	else if (fast_flag && rc.ch2 == 660) // 快速
+	else if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // 快速
 	{
 		Speed_up = 0;
 	}
@@ -353,29 +347,7 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 		fast_flag = 0;
 	}
 }
-// 普通模式
-static void chassis_normal_handler(void)
-{
-	float nor_chassis_vx, nor_chassis_vy;
-	// 计算底盘x、y轴上的速度
-	chassis_power_contorl(&pid_power, &nor_chassis_vx, &nor_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
-	int position_ref = 0;
-	if (chassis_mode == CHASSIS_NORMAL_MODE)
-	{
-		if (input_flag == 1)
-		// w轴方向跟着云台动
-		{
-			chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, position_ref));
-		}
-		else
-		{
-			chassis.vw = 0;
-		}
-	}
-	chassis.vx = nor_chassis_vx;
-	chassis.vy = nor_chassis_vy;
-}
 // 小陀螺模式
 static void chassis_dodge_handler(void)
 {
@@ -421,6 +393,192 @@ static void chassis_dodge_handler(void)
 		chassis.vw = dodge_max;
 }
 
+#else
+//新功率算法
+void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
+{
+    static  float max = 3300;
+    static float min = 1150;//1000;
+    static float Cap_low = 11.0f;      // 何时停止加速
+		float Ref_temp = 0;//功率换启动临时变量
+    float cap_flag = real_time_Cap_can_store - 18.0f; // 18~real_time_Cap_can_store这一段进行按比例赋值
+
+    *power_yaw_speed = 0.01f;
+
+
+		if (real_time_Cap_remain < Cap_low)
+				Speed_up = 1; // 一旦检测到电容低则自动关闭加速
+		
+		if(!SLOW_SPD)
+		{
+			Charge_factor = 1.0f;
+		}
+		else//降速给底盘充电
+		{
+			Charge_factor = 0.6f;// 1-0.6=40% 的电量给电容充电
+		}
+		
+		if(km.vy != 0 || rm.vy != 0 || km.vx != 0 || rm.vx != 0)//底盘输入不为0,才进行pid运算（防止底盘静止时，pid->out积满）
+		{
+				if (Speed_up == 1)//不加速				
+				{
+					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
+					{
+						if((judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor - ob_total_power > Deta_Power)//功率相差过大
+						{
+							Ref_temp = ob_total_power + Deta_Power;							
+							pid_calc(power_pid,ob_total_power,Ref_temp);
+						}
+						else
+							pid_calc(power_pid,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor);
+					}
+					else//没接裁判系统
+						pid_calc(power_pid,ob_total_power,(Debug_Power+5)*Charge_factor);//没有连接裁判系统，小车底盘期望功率达到45w			
+				}
+				else if (Speed_up == 0)//按下加速功率多100w(加速优先级大于减速)
+				{
+					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
+					{
+							pid_calc(power_pid,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit+105));
+					}
+					else//没接裁判系统
+					{
+							pid_calc(power_pid,ob_total_power,105+Debug_Power);//没有连接裁判系统，小车底盘期望功率达到150w
+					}
+				}		
+			
+		}
+
+		if (km.vy > 0 || rm.vy > 0)
+		{
+			 *power_vy = (min + power_pid->out);
+			 VAL_LIMIT(*power_vy, min * 0.7f, max);
+		}
+		else if (km.vy < 0 || rm.vy < 0)
+		{
+			 *power_vy = -(min + power_pid->out);
+			 VAL_LIMIT(*power_vy, -max, -min * 0.7f);
+		}
+		else
+			*power_vy = 0;
+
+		if (km.vx > 0 || rm.vx > 0)
+		{
+				*power_vx = (min + power_pid->out);
+			 VAL_LIMIT(*power_vx, min, max);
+		}
+		else if (km.vx < 0 || rm.vx < 0)
+		{
+			*power_vx = -(min + power_pid->out);
+			VAL_LIMIT(*power_vx, -max, -min);
+		}
+		else
+			*power_vx = 0;
+		
+		
+	if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // 快速
+	{
+		Speed_up = 0;
+	}
+	else // 正常速度
+	{
+		Speed_up = 1;
+	}
+
+	if ((real_time_Cap_remain > Cap_low )&& (!FAST_SPD))
+	{
+		fast_flag = 1;
+	} // 防止加速过程中反复开关加速模式（抽搐）
+	if (real_time_Cap_remain < Cap_low)
+	{
+		fast_flag = 0;
+	}
+}
+
+// 小陀螺模式
+static void chassis_dodge_handler(void)
+{
+	float chassis_vx_dodge, chassis_vy_dodge;
+	float dodge_angle;
+	float dodge_min = 150;
+	float dodge_max = 600;
+	float dodge_chassis_vx, dodge_chassis_vy;
+	static int dodge_cap = 0;
+
+	if (last_chassis_mode != CHASSIS_DODGE_MODE)
+	{
+		PID_Clear(&pid_chassis_vw);
+	}
+
+	/*小陀螺*/
+	dodge_angle = gimbal.sensor.yaw_relative_angle;
+	//
+	if ((rm.vx != 0 || rm.vy != 0) && (km.vx == 0 || km.vy == 0)) // 小陀螺时遥控方向降低速度
+	{
+		dodge_chassis_vx = rm.vx * 0.5f;
+		dodge_chassis_vy = rm.vy * 0.5f;
+	}
+	else
+		// 键盘时则通过功率算法来控制速度，防止掉电容
+		chassis_power_contorl(&pid_power, &dodge_chassis_vx, &dodge_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+
+	chassis.vy = (dodge_chassis_vx * arm_sin_f32(PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32(PI / 180 * dodge_angle));
+	chassis.vx = (dodge_chassis_vx * arm_cos_f32(PI / 180 * dodge_angle) - dodge_chassis_vy * arm_sin_f32(PI / 180 * dodge_angle));
+
+	if (Speed_up == 1)//不加速				
+	{
+		if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
+		{
+			pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor);
+		}
+		else//没接裁判系统
+			pid_calc(&pid_chassis_vw,ob_total_power,(Debug_Power+5)*Charge_factor);//没有连接裁判系统，小车底盘期望功率达到45w
+	}
+	else if (Speed_up == 0)//按下加速功率多100w
+	{
+		if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
+		{
+			pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit+105));
+		}
+		else//没接裁判系统
+		{
+			pid_calc(&pid_chassis_vw,ob_total_power,105+Debug_Power);//没有连接裁判系统，小车底盘期望功率达到150w
+		}
+	}	
+
+	chassis.vw = dodge_min+pid_chassis_vw.out;
+	if (chassis.vw < dodge_min)
+		chassis.vw = dodge_min;
+	if (chassis.vw > dodge_max)
+		chassis.vw = dodge_max;
+}
+#endif
+
+// 普通模式
+static void chassis_normal_handler(void)
+{
+	float nor_chassis_vx, nor_chassis_vy;
+	// 计算底盘x、y轴上的速度
+	chassis_power_contorl(&pid_power, &nor_chassis_vx, &nor_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
+
+	int position_ref = 0;
+	if (chassis_mode == CHASSIS_NORMAL_MODE)
+	{
+		if (input_flag == 1)
+		// w轴方向跟着云台动
+		{
+			chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, position_ref));
+		}
+		else
+		{
+			chassis.vw = 0;
+		}
+	}
+	chassis.vx = nor_chassis_vx;
+	chassis.vy = nor_chassis_vy;
+}
+
+
 // 停止模式
 static void chassis_stop_handler(void)
 {
@@ -440,7 +598,11 @@ void chassis_param_init(void)
 
 	/*底盘vw旋转的pid*/
 	PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, INIT);
-	PID_Struct_Init(&pid_power, cap_vol_pid[0], cap_vol_pid[1], cap_vol_pid[2], 100, 20, INIT);
+	#ifndef POWER_NEW
+	PID_Struct_Init(&pid_power, cap_vol_pid[0], cap_vol_pid[1], cap_vol_pid[2], 100, 20, INIT);//老功率算法
+	#else
+  PID_Struct_Init(&pid_power, power_new_pid[0], power_new_pid[1], power_new_pid[2], 3000, 2000, INIT);//新功率算法
+	#endif
 	/*底盘vx,vy平移的pid*/
 	/////////////////
 	for (int i = 0; i < 4; i++)
@@ -525,3 +687,4 @@ void buffer(float *a, float b, float high_parameter, float low_parameter)
 			*a -= low_parameter;
 	}
 }
+

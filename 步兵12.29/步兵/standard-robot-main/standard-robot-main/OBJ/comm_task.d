@@ -2,7 +2,7 @@
 ..\obj\comm_task.o: ..\TASK\comm_task.h
 ..\obj\comm_task.o: ..\USER\stm32f4xx.h
 ..\obj\comm_task.o: ..\CORE\core_cm4.h
-..\obj\comm_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\comm_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\comm_task.o: ..\CORE\core_cmInstr.h
 ..\obj\comm_task.o: ..\CORE\core_cmFunc.h
 ..\obj\comm_task.o: ..\CORE\core_cmSimd.h
@@ -42,7 +42,7 @@
 ..\obj\comm_task.o: ..\PROTOCOL\data_fifo.h
 ..\obj\comm_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\comm_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\comm_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\comm_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\comm_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\comm_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\comm_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -55,7 +55,7 @@
 ..\obj\comm_task.o: ..\TASK\judge_task.h
 ..\obj\comm_task.o: ..\BSP_CONF\bsp_can.h
 ..\obj\comm_task.o: ..\TASK\modeswitch_task.h
-..\obj\comm_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\comm_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\comm_task.o: ..\TASK\chassis_task.h
 ..\obj\comm_task.o: ..\FUNTION\pid.h
 ..\obj\comm_task.o: ..\TASK\gimbal_task.h

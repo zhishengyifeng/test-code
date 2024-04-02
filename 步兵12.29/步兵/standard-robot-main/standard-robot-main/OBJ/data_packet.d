@@ -2,7 +2,7 @@
 ..\obj\data_packet.o: ..\PROTOCOL\data_packet.h
 ..\obj\data_packet.o: ..\USER\stm32f4xx.h
 ..\obj\data_packet.o: ..\CORE\core_cm4.h
-..\obj\data_packet.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\data_packet.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\data_packet.o: ..\CORE\core_cmInstr.h
 ..\obj\data_packet.o: ..\CORE\core_cmFunc.h
 ..\obj\data_packet.o: ..\CORE\core_cmSimd.h
@@ -40,7 +40,7 @@
 ..\obj\data_packet.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\data_packet.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\data_packet.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\data_packet.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\portable.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -48,7 +48,7 @@
 ..\obj\data_packet.o: ..\FreeRTOS\include\mpu_wrappers.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\semphr.h
 ..\obj\data_packet.o: ..\FreeRTOS\include\queue.h
-..\obj\data_packet.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\data_packet.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\data_packet.o: ..\PROTOCOL\judge_tx_data.h
 ..\obj\data_packet.o: ..\PROTOCOL\judge_rx_data.h
 ..\obj\data_packet.o: ..\PROTOCOL\pc_tx_data.h

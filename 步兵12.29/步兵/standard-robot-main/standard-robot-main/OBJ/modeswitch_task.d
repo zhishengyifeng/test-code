@@ -2,7 +2,7 @@
 ..\obj\modeswitch_task.o: ..\TASK\modeswitch_task.h
 ..\obj\modeswitch_task.o: ..\USER\stm32f4xx.h
 ..\obj\modeswitch_task.o: ..\CORE\core_cm4.h
-..\obj\modeswitch_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\modeswitch_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\modeswitch_task.o: ..\CORE\core_cmInstr.h
 ..\obj\modeswitch_task.o: ..\CORE\core_cmFunc.h
 ..\obj\modeswitch_task.o: ..\CORE\core_cmSimd.h
@@ -35,11 +35,11 @@
 ..\obj\modeswitch_task.o: ..\FWLIB\inc\stm32f4xx_dac.h
 ..\obj\modeswitch_task.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\modeswitch_task.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
-..\obj\modeswitch_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\modeswitch_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\modeswitch_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\modeswitch_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\modeswitch_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\modeswitch_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\modeswitch_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\modeswitch_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\modeswitch_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\modeswitch_task.o: ..\FreeRTOS\include\deprecated_definitions.h

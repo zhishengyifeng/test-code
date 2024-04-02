@@ -30,7 +30,7 @@ typedef struct
   uint8_t task_mode : 1;    // 璇嗗埆妯″紡  锛�0 鑷瀯 / 1 澶у皬绗︼級
   uint8_t visual_valid : 1; // 瑙嗚鏈夋晥浣� (0/1)
   uint8_t direction : 2;    // 鎷撳睍瑁呯敳鏉挎爣蹇椾綅 (0-3)
-  uint8_t bullet_level : 3; // 寮归€熺瓑绾� 1 2 3绾�
+  uint8_t bullet_speed : 3; // 寮归€熺瓑绾� 1 2 3绾�
   float robot_pitch;        // 娆ф媺瑙�(搴�)
   float robot_yaw;          // 娆ф媺瑙�(搴�)
   float time_stamp;         // 鐢垫帶鏃堕棿鎴�(ms)

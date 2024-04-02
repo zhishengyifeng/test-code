@@ -10,7 +10,6 @@
 
 #define INFANTRY_NUM INFANTRY_5 // 可以修改步兵号数
 
-#define DODGE_MODE 1
 /**********************遥控 设置配置***************************/
 /* 摇杆最大值 */
 #define RC_RESOLUTION 660.0f
@@ -30,6 +29,45 @@
 /* 左右 速度 (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_Y 4000.0f
 
+
+/************************ 底盘硬件 配置 ****************************/
+
+
+#if (INFANTRY_NUM == INFANTRY_5)
+
+/* 全向轮半径(mm) */
+#define RADIUS 77.0f
+/* 全向轮周长(mm) */
+#define PERIMETER 483.0f
+/*全向轮距（左右）*/
+#define WHEELTRACK 275.5f // 415
+/*全向轴距（前后）*/
+#define WHEELBASE 275.5f	 // 406
+
+/**************************云台 配置*******************************/
+/* 遥控模式 云台速度控制 */
+/* pitch 轴 速度 */
+#define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
+/* yaw 轴 速度 */
+#define GIMBAL_RC_MOVE_RATIO_YAW 1.6f
+
+/* 键盘模式 云台速度控制 */
+/* pitch 轴 速度 */
+#define GIMBAL_PC_MOVE_RATIO_PIT -0.6f
+/* yaw 轴 速度 */
+#define GIMBAL_PC_MOVE_RATIO_YAW -1.0f
+
+#else 
+
+/* 麦轮半径(mm) */
+#define RADIUS 77.0f
+/* 麦轮周长(mm) */
+#define PERIMETER 483.0f
+/*麦轮轮距（左右）*/
+#define WHEELTRACK 392.0f // 415
+/*麦轮轴距（前后）*/
+#define WHEELBASE 320.0f // 406
+
 /**************************云台 配置*******************************/
 /* 遥控模式 云台速度控制 */
 /* pitch 轴 速度 */
@@ -42,45 +80,6 @@
 #define GIMBAL_PC_MOVE_RATIO_PIT -0.6f
 /* yaw 轴 速度 */
 #define GIMBAL_PC_MOVE_RATIO_YAW 0.6f
-
-/**************************射击 配置********************************/
-/* 射速 */
-#define DEFAULT_FRIC_WHEEL_SPEED 2000 // maximum value is 2500
-/* 拨盘电机单发 */
-#define TRIGGER_MOTOR_SPEED -2000 // 1500
-/* 拨盘电机连发 */
-#define C_TRIGGER_MOTOR_SPEED -3000 // 新步
-/************************ 底盘硬件 配置 ****************************/
-
-///* 麦轮半径(mm) */
-// #define RADIUS                 76
-///* 麦轮周长(mm) */
-// #define PERIMETER              478
-///*轮距（左右）*/
-// #define WHEELTRACK             437//415
-///*轴距（前后）*/
-// #define WHEELBASE              340//406
-#if (INFANTRY_NUM == INFANTRY_3 || INFANTRY_NUM == INFANTRY_4)
-
-/* 麦轮半径(mm) */
-#define RADIUS 77
-/* 麦轮周长(mm) */
-#define PERIMETER 483
-/*麦轮轮距（左右）*/
-#define WHEELTRACK 392 // 415
-/*麦轮轴距（前后）*/
-#define WHEELBASE 320 // 406
-
-#elif (INFANTRY_NUM == INFANTRY_5)
-
-/* 全向轮半径(mm) */
-#define RADIUS 77
-/* 全向轮周长(mm) */
-#define PERIMETER 483
-/*全向轮距（左右）*/
-#define WHEELTRACK 275.5 // 415
-/*全向轴距（前后）*/
-#define WHEELBASE 275.5	 // 406
 
 #endif
 
@@ -121,11 +120,12 @@
 /*********************** 系统 交互接口 配置 ****************************/
 
 /* CAN 相关 */
-#define CHASSIS_CAN CAN1
-#define GIMBAL_CAN CAN1
-#define POWER_CAN CAN1
+#define CHASSIS_CAN CAN1//底盘轮子
+#define YAW_CAN CAN1	//yaw
+#define POWER_CAN CAN1	//功控板超电
 
-#define FRIC_CAN CAN2
+#define PITCH_CAN CAN2	//pitch
+#define FRIC_CAN CAN2	//发射机构（拨盘、摩擦轮）
 /* UART 相关 */
 /**
  * @attention
@@ -135,12 +135,6 @@
 #define DBUS_HUART huart1	  // 遥控接收器
 #define JUDGE_HUART huart3	  // 裁判系统接口
 #define COMPUTER_HUART huart6 // MINI电脑接口
-
-/* 云台 相关 */
-// #define PIT_ANGLE_MAX      15//18//15
-// #define PIT_ANGLE_MIN      -25//20//-25
-#define YAW_ANGLE_MAX 50
-#define YAW_ANGLE_MIN -50
 
 /* 监测任务 相关 */
 #define DEFAULT_TUNE 0 // 音调

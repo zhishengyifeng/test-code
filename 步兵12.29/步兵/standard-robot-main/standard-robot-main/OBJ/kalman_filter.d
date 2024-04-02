@@ -2,7 +2,7 @@
 ..\obj\kalman_filter.o: ..\FUNTION\kalman_filter.h
 ..\obj\kalman_filter.o: ..\USER\stm32f4xx.h
 ..\obj\kalman_filter.o: ..\CORE\core_cm4.h
-..\obj\kalman_filter.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\kalman_filter.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\kalman_filter.o: ..\CORE\core_cmInstr.h
 ..\obj\kalman_filter.o: ..\CORE\core_cmFunc.h
 ..\obj\kalman_filter.o: ..\CORE\core_cmSimd.h
@@ -37,10 +37,10 @@
 ..\obj\kalman_filter.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
 ..\obj\kalman_filter.o: .\include\arm_math.h
 ..\obj\kalman_filter.o: ..\CORE\core_cm4.h
-..\obj\kalman_filter.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
-..\obj\kalman_filter.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\kalman_filter.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\kalman_filter.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\kalman_filter.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\kalman_filter.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\kalman_filter.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\kalman_filter.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\kalman_filter.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\kalman_filter.o: ..\FreeRTOS\include\projdefs.h

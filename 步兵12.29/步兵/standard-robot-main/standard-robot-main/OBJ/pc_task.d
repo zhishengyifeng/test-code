@@ -2,7 +2,7 @@
 ..\obj\pc_task.o: ..\TASK\pc_task.h
 ..\obj\pc_task.o: ..\USER\stm32f4xx.h
 ..\obj\pc_task.o: ..\CORE\core_cm4.h
-..\obj\pc_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\pc_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\pc_task.o: ..\CORE\core_cmInstr.h
 ..\obj\pc_task.o: ..\CORE\core_cmFunc.h
 ..\obj\pc_task.o: ..\CORE\core_cmSimd.h
@@ -38,7 +38,7 @@
 ..\obj\pc_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\pc_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\pc_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\pc_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\pc_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\pc_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\pc_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\pc_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -58,5 +58,5 @@
 ..\obj\pc_task.o: ..\FUNTION\kalman_filter.h
 ..\obj\pc_task.o: .\include\arm_math.h
 ..\obj\pc_task.o: ..\CORE\core_cm4.h
-..\obj\pc_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
-..\obj\pc_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\pc_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\pc_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

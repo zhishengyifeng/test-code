@@ -18,26 +18,29 @@ typedef enum
   CAN_3508_M4_ID       = 0x204,
 	
 	
-	CAN_GIMBAL_ALL_ID    = 0x1ff,
-	CAN_YAW_MOTOR_ID     = 0x205,
-	CAN_PIT_MOTOR_ID     = 0x206,
-	CAN_TRIGGER_MOTOR_ID = 0x207,
+	CAN_GIMBAL_ALL_ID    = 0x1ff,//°üÀ¨pitch yaw
+	CAN_YAW_MOTOR_ID     = 0x205,//yaw
+//	CAN_PIT_MOTOR_ID     = 0x206,//pitch
+//	CAN_TRIGGER_MOTOR_ID = 0x207,//trigger
 
 
 
 	CAN_CAP_ID           = 0x210,
-  CAN_SUPER_CAP_ID		 = 0x211,
+  CAN_SUPER_CAP_ID		 = 0x211,//
 
 } can1_msg_id_e;
 
 typedef enum
 {
-	CAN_FRIC_ALL_ID      = 0x200,
-  CAN_FRIC_M1_ID       = 0x201,
-  CAN_FRIC_M2_ID       = 0x202,   
+	CAN_FRIC_ALL_ID      = 0x200,//°üÀ¨ Ä¦²ÁÂÖ & ²¦ÅÌ
+	CAN_FRIC_M1_ID       = 0x201,
+	CAN_FRIC_M2_ID       = 0x202,   
+	CAN_TRIGGER_MOTOR_ID = 0x203,//trigger
+	
+	CAN_PIT_MOTOR_ID     = 0x206,//pitch
 
-	CAN_BULLET_RATE	 		 = 0x300,
-	CAN_MPU_ID           = 0x401,
+//	CAN_BULLET_RATE	 	 = 0x300,
+//	CAN_MPU_ID           = 0x401,
 	
 } can2_msg_id_e;
 
@@ -80,9 +83,9 @@ extern mpu_data_t mpu_data;
 void encoder_data_handler(moto_measure_t* ptr, CanRxMsg *message);
 void get_moto_offset(moto_measure_t* ptr, CanRxMsg *message);
 
-void send_gimbal_cur(int16_t pit_iq,int16_t yaw_iq, int16_t trigger_iq);
+void send_gimbal_cur(int16_t pit_iq,int16_t yaw_iq);
 void send_chassis_cur(int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4);
-void send_fric_cur(int16_t iq3, int16_t iq4);
+void send_fric_cur(int16_t iq1, int16_t iq2, int16_t iq3);
 void send_cap_power_can(uint16_t power);
 #endif 
 

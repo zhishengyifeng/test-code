@@ -72,11 +72,11 @@ int main(void)
 	TIM_BASE_Init(10 - 1, 8400 - 1); // 配置定时器4为1ms中断一次，做来系统詗诵屑剖阌谥笫迪忠恍┭邮辈僮?
 	GPIO_INIT();					 // 板载LED、归中按键、24V电源输出、板载陀螺仪SPI等引脚的初始化，具体看A板的原理图
 	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
-	TIM1_DEVICE(2500 - 1, 168 - 1);	 // 摩擦轮
+//	TIM1_DEVICE(2500 - 1, 168 - 1);	 // 摩擦轮
 //	TIM12_DEVICE(400-1,90-1);//蜂鸣器，PWM频率在2700HZ时声音最大，且占空比需要设置成5％的高电平，此处设置为2500HZ
 //	TIM10_DEVICE(5000 - 1, 0);												 // 提供一路PWM使得加热电阻升温，用于恒温加热IMU
-	CAN1_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_10tq, CAN_BS2_3tq, 3); // CAN1配置
-	CAN2_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_10tq, CAN_BS2_3tq, 3);
+	CAN1_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3); // CAN1配置
+	CAN2_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3);
 	USART3_DEVICE(); // 用于遥控通信，采用的是DMA加空闲中断的方式接收数据
 	USART1_DEVICE(); // 用于PC通信数据，采用的是DMA加空闲中断的方式接收数据
 	USART6_DEVICE(); // 用于裁判系统通信，采用的是DMA加空闲中断的方式接收数据

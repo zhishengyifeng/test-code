@@ -12,17 +12,7 @@ void get_buffer(float *chassis_power_buffer);		   // 获取缓冲焦耳
 void get_chassis_max_power(uint16_t *max_power_limit); // 获取限定功率
 
 uint8_t cap_state = 0;
-
-// deubg
-// float test_inti = 0;
-// float test_limit = 0;
-// float test_power_init = 0;
-// float test_power_give_0 = 0;
-// float test_power_give_1 = 0;
-// float test_power_give_2 = 0;
-// float test_power_give_3 = 0;
-// float ob_cap_store;
-uint16_t adebug = 40;
+float Charge_factor = 1;// 1-Charge_factor = 电容充电百分比
 
 float Chassis_Power_Control(chassis_t *chassis_power_control)
 {
@@ -62,11 +52,11 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 		cap_state = 0;
 	}
 
-	if (cap_percent > 5) // 电容电量>5%
+	if (cap_percent > 68) // 电容电量>68%
 	{
 		if (cap_state == 0) // 关闭电容加速
 		{
-			chassis_max_power = input_power + 5; // 给定底盘的最大给定功率略大于限制功率，防止电容一直满电导致功率浪费（没接裁判系统，不加速，小车底盘功率限制55w）
+			chassis_max_power = (input_power + 5)*Charge_factor; // 给定底盘的最大给定功率略大于限制功率，防止电容一直满电导致功率浪费
 		}
 		else // 开启电容加速
 		{
@@ -75,7 +65,7 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 	}
 	else // 电容电量不足，底盘最大给定功率 = 限制功率
 	{
-		chassis_max_power = input_power;
+		chassis_max_power = input_power*Charge_factor;
 	}
 
 	for (uint8_t i = 0; i < 4; i++) // 计算每个轮子原本将要达到的功率
@@ -92,10 +82,6 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 	}
 	total_give = initial_total_power;
 
-	// debug
-	//	test_power_init = initial_give_power[0];
-	//	test_inti = initial_total_power;
-	//	test_limit = chassis_max_power;
 
 	if (initial_total_power > chassis_max_power) // 底盘将要超功率--进行功率控制， 若没超，则继续pid运算至超功率
 	{
@@ -109,7 +95,7 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 			{
 				continue;
 			}
-			// 根据当前转速，计算出能让电机达到期望功率的tao
+			//根据当前转速，计算出能让电机达到期望功率的tao
 			float a = k2;
 			float b = toque_coefficient * chassis_power_control->wheel_spd_fdb[i];
 			float c = k1 * chassis_power_control->wheel_spd_fdb[i] * chassis_power_control->wheel_spd_fdb[i] - scaled_give_power[i] + constant;
@@ -137,32 +123,13 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 		}
 	}
 
-	// debug观测量--观测四个3508电机的功率
-	//	test_power_give_0 = chassis_power_control->current[0] * toque_coefficient * chassis_power_control->wheel_spd_fdb[0] +
-	//								k1 * chassis_power_control->wheel_spd_fdb[0] * chassis_power_control->wheel_spd_fdb[0] +
-	//								k2 * chassis_power_control->current[0] * chassis_power_control->current[0]+ constant;
-	//
-	//	test_power_give_1 = chassis_power_control->current[1] * toque_coefficient * chassis_power_control->wheel_spd_fdb[1] +
-	//								k1 * chassis_power_control->wheel_spd_fdb[1] * chassis_power_control->wheel_spd_fdb[1] +
-	//								k2 * chassis_power_control->current[1] * chassis_power_control->current[1]+ constant;
-	//
-	//	test_power_give_2 = chassis_power_control->current[2] * toque_coefficient * chassis_power_control->wheel_spd_fdb[2] +
-	//								k1 * chassis_power_control->wheel_spd_fdb[2] * chassis_power_control->wheel_spd_fdb[2] +
-	//								k2 * chassis_power_control->current[2] * chassis_power_control->current[2]+ constant;
-	//
-	//	test_power_give_3 = chassis_power_control->current[3] * toque_coefficient * chassis_power_control->wheel_spd_fdb[3] +
-	//								k1 * chassis_power_control->wheel_spd_fdb[3] * chassis_power_control->wheel_spd_fdb[3] +
-	//								k2 * chassis_power_control->current[3] * chassis_power_control->current[3]+ constant;
-
-	//	ob_cap_store = chassis.CapData[1];
-
 	return total_give;
 }
 
 void get_buffer(float *chassis_power_buffer)
 {
 	if (judge_recv_mesg.game_robot_state.chassis_power_limit >= 45 && judge_recv_mesg.game_robot_state.chassis_power_limit <= 220)
-		*chassis_power_buffer = judge_recv_mesg.power_heat_data.chassis_power_buffer;
+		*chassis_power_buffer = judge_recv_mesg.power_heat_data.buffer_energy;
 	else
 		*chassis_power_buffer = 30; // 让焦耳环pid输出为0
 }
@@ -171,5 +138,5 @@ void get_chassis_max_power(uint16_t *max_power_limit)
 	if (judge_recv_mesg.game_robot_state.chassis_power_limit >= 45 && judge_recv_mesg.game_robot_state.chassis_power_limit <= 220)
 		*max_power_limit = judge_recv_mesg.game_robot_state.chassis_power_limit;
 	else
-		*max_power_limit = adebug; // 没接入裁判系统，电管功率输出限定39w
+		*max_power_limit = Debug_Power; // 没接入裁判系统，电管功率输出限定40w
 }

@@ -10,6 +10,7 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "judge_rx_data.h"
 
 /*小电脑发送*/
 static SemaphoreHandle_t pc_txdata_mutex;
@@ -30,6 +31,8 @@ robot_tx_data pc_send_mesg;
 
 uint8_t pc_tx_packet_id = GIMBAL_DATA_ID;
 int count_cali_count = 0;
+
+
 void pc_send_data_packet_pack(void)
 {
 	get_upload_data();
@@ -57,30 +60,37 @@ void get_infantry_info(void)
 	else
 		pc_send_mesg.robot_color = blue; // 敌方蓝	1
 	/*
-	  不发实时弹速，随机误差太大。（后续如机械电控部分可稳定弹速（误差+-0.1m/s）,则可以考虑添加）
-
-	  RMUC22规则步兵17mm弹速：
-
-	  爆发优先 1级  	15m/s     冷却优先 1级    15m/s     弹速优先 1级    30m/s
-	  爆发优先 2级 		15m/s     冷却优先 2级    18m/s     弹速优先 2级    30m/s
-	  爆发优先 3级 		15m/s     冷却优先 3级    18m/s	    弹速优先 3级    30m/s
-	*/
-
-	if (judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit == 15)
-		pc_send_mesg.bullet_level = 1;
-	if (judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit == 18)
-		pc_send_mesg.bullet_level = 2;
-	if (judge_recv_mesg.game_robot_state.shooter_id1_17mm_speed_limit == 30)
-		pc_send_mesg.bullet_level = 3;
-
+		RMUC2024规则
+														枪管
+		爆发优先EF 									冷却优先CF
+			热量				冷却值							热量			冷却值
+			 200				10								50				40
+			 250				15								85				45
+			 300				20								120				50
+			 350				25								155				55
+			 400				30								190				60
+			 450				35								225				65
+			 500				40								260				70
+			 550				45								295				75
+			 600				50								330				80
+			 650				60								400				80
+	*/			
+   pc_send_mesg.bullet_speed = judge_recv_mesg.shoot_data.initial_speed;
+	
 	/* get gimable ctrl mode */
 	switch (mode)
 	{
 	case GIMBAL_TRACK_ARMOR:
 	{
+//			if(coordination_flag)//进入自瞄模式后坐标系不变，一直给电脑发进入时的坐标系
+//		{
+//			single_coordination = gimbal.sensor.yaw_gyro_angle;
+//			coordination_flag = 0;
+//		}
 		pc_send_mesg.task_mode = TRACK_AMOR_MODE;									  // 自瞄模式
 		pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;				  // 0
 		pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle; // 发送陀螺仪的数据//0;(不发)
+		//pc_send_mesg.robot_yaw = single_coordination ;
 		/*反小陀螺-打哨兵模式按键 长按C发送1，长按V发送2*/
 		/* 松手发送0               向左补偿    向右补偿 */
 		// direction:2 拓展装甲板标志位

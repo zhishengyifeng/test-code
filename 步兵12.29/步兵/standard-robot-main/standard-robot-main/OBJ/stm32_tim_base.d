@@ -2,7 +2,7 @@
 ..\obj\stm32_tim_base.o: STM32_TIM_BASE.h
 ..\obj\stm32_tim_base.o: stm32f4xx.h
 ..\obj\stm32_tim_base.o: ..\CORE\core_cm4.h
-..\obj\stm32_tim_base.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\stm32_tim_base.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\stm32_tim_base.o: ..\CORE\core_cmInstr.h
 ..\obj\stm32_tim_base.o: ..\CORE\core_cmFunc.h
 ..\obj\stm32_tim_base.o: ..\CORE\core_cmSimd.h
@@ -37,7 +37,7 @@
 ..\obj\stm32_tim_base.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
 ..\obj\stm32_tim_base.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\stm32_tim_base.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\stm32_tim_base.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\stm32_tim_base.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\stm32_tim_base.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\stm32_tim_base.o: ..\FreeRTOS\include\portable.h
 ..\obj\stm32_tim_base.o: ..\FreeRTOS\include\deprecated_definitions.h

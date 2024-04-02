@@ -53,13 +53,6 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 		}
 		break;
 
-		case CAN_TRIGGER_MOTOR_ID: // 拨盘接收CAN数据
-		{
-			moto_trigger.msg_cnt++ <= 50 ? get_moto_offset(&moto_trigger, message) : encoder_data_handler(&moto_trigger, message);
-			err_detector_hook(TRIGGER_MOTO_OFFLINE);
-		}
-		break;
-
 		case CAN_SUPER_CAP_ID: // 超电
 		{
 			chassis.CapData[0] = (float)((rx1_message.Data[1] << 8 | rx1_message.Data[0]) / 100.f); // 输入电压
@@ -69,12 +62,19 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 		}
 		break;
 
-		case CAN_PIT_MOTOR_ID: // pit轴
-		{
-			encoder_data_handler(&moto_pit, message);
-			err_detector_hook(GIMBAL_PIT_OFFLINE);
-		}
-		break;
+//		case CAN_TRIGGER_MOTOR_ID: // 拨盘接收CAN数据
+//		{
+//			moto_trigger.msg_cnt++ <= 50 ? get_moto_offset(&moto_trigger, message) : encoder_data_handler(&moto_trigger, message);
+//			err_detector_hook(TRIGGER_MOTO_OFFLINE);
+//		}
+//		break;
+
+//		case CAN_PIT_MOTOR_ID: // pit轴
+//		{
+//			encoder_data_handler(&moto_pit, message);
+//			err_detector_hook(GIMBAL_PIT_OFFLINE);
+//		}
+//		break;
 
 		default:
 		{
@@ -82,7 +82,7 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 		break;
 		}
 	}
-	else
+	else if(_hcan == CAN2)
 	{
 		switch (message->StdId)
 		{
@@ -97,42 +97,56 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 			err_detector_hook(FRI_MOTO1_OFFLINE + i);
 		}
 		break;
-
-		case CAN_MPU_ID: // 陀螺仪接收CAN数据及解算
+		
+		case CAN_TRIGGER_MOTOR_ID: // 拨盘接收CAN数据
 		{
-
-			uint8_t *px = rx2_message.Data;
-			for (int i = 0; i < 4; i++)
-			{
-				*((uint8_t *)p_angle + i) = *(px + i);
-			}
-
-			//        gimbal.sensor.yaw_gyro_angle = angle;
-			//        bmi160_yaw_angle=angle;
-			//				gimbal.sensor.yaw_palstance = (int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-			//				bmi160_yaw_acc=(int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-			//				bmi160_yaw_acc/= 16.384f;
-			//        gimbal.sensor.yaw_palstance /= 16.384f;
-			//
-			//        gimbal.sensor.pit_palstance = -(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-			//        gimbal.sensor.pit_palstance /=-16.384f;//左上为正是+号。左下为正为-号
-			//				bmi160_pit_acc=(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-			//				bmi160_pit_acc /=16.384f;
-			//        err_detector_hook(IMU_OFFLINE);
+			moto_trigger.msg_cnt++ <= 50 ? get_moto_offset(&moto_trigger, message) : encoder_data_handler(&moto_trigger, message);
+			err_detector_hook(TRIGGER_MOTO_OFFLINE);
 		}
 		break;
 
-		case CAN_BULLET_RATE:
+		case CAN_PIT_MOTOR_ID: // pit轴
 		{
-			uint8_t uc[4];
-			uc[0] = rx2_message.Data[3];
-			uc[1] = rx2_message.Data[2];
-			uc[2] = rx2_message.Data[1];
-			uc[3] = rx2_message.Data[0];
-
-			memcpy((void *)&shoot.bullet_rate, (void *)uc, 4);
+			encoder_data_handler(&moto_pit, message);
+			err_detector_hook(GIMBAL_PIT_OFFLINE);
 		}
 		break;
+
+//		case CAN_MPU_ID: // 陀螺仪接收CAN数据及解算
+//		{
+
+//			uint8_t *px = rx2_message.Data;
+//			for (int i = 0; i < 4; i++)
+//			{
+//				*((uint8_t *)p_angle + i) = *(px + i);
+//			}
+
+//			//        gimbal.sensor.yaw_gyro_angle = angle;
+//			//        bmi160_yaw_angle=angle;
+//			//				gimbal.sensor.yaw_palstance = (int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
+//			//				bmi160_yaw_acc=(int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
+//			//				bmi160_yaw_acc/= 16.384f;
+//			//        gimbal.sensor.yaw_palstance /= 16.384f;
+//			//
+//			//        gimbal.sensor.pit_palstance = -(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
+//			//        gimbal.sensor.pit_palstance /=-16.384f;//左上为正是+号。左下为正为-号
+//			//				bmi160_pit_acc=(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
+//			//				bmi160_pit_acc /=16.384f;
+//			//        err_detector_hook(IMU_OFFLINE);
+//		}
+//		break;
+
+//		case CAN_BULLET_RATE:
+//		{
+//			uint8_t uc[4];
+//			uc[0] = rx2_message.Data[3];
+//			uc[1] = rx2_message.Data[2];
+//			uc[2] = rx2_message.Data[1];
+//			uc[3] = rx2_message.Data[0];
+
+//			memcpy((void *)&shoot.bullet_rate, (void *)uc, 4);
+//		}
+//		break;
 
 		default:
 		{
@@ -165,7 +179,7 @@ void encoder_data_handler(moto_measure_t *ptr, CanRxMsg *message)
 	ptr->total_ecd = ptr->round_cnt * 8192 + ptr->ecd - ptr->offset_ecd;
 	/* total angle, unit is degree */
 	if (ptr == &moto_trigger)
-		ptr->total_angle = ptr->total_ecd / (ENCODER_ANGLE_RATIO * 36);
+		ptr->total_angle = ptr->total_ecd / (ENCODER_ANGLE_RATIO * 36.0f);
 	else
 		ptr->total_angle = ptr->total_ecd / ENCODER_ANGLE_RATIO;
 
@@ -191,24 +205,22 @@ void get_moto_offset(moto_measure_t *ptr, CanRxMsg *message)
  */
 /*can发送电流函数*/
 /*该函数can1发送拨盘电机和yaw轴pit轴电机电流*/
-void send_gimbal_cur(int16_t pit_iq, int16_t yaw_iq, int16_t trigger_iq)
+void send_gimbal_cur(int16_t pit_iq, int16_t yaw_iq)
 {
 	CanTxMsg TxMessage;
 	TxMessage.StdId = CAN_GIMBAL_ALL_ID; // 标准标识符
 	TxMessage.IDE = CAN_ID_STD;			 // 定义标识符的类型为标准标识符
 	TxMessage.RTR = CAN_RTR_DATA;		 // 数据帧
-	TxMessage.DLC = 0x08;				 // 数据长度为0x08
+	TxMessage.DLC = 0x04;				 // 数据长度为0x04
 	TxMessage.Data[0] = yaw_iq >> 8;
 	TxMessage.Data[1] = yaw_iq;
 	TxMessage.Data[2] = pit_iq >> 8;
-	TxMessage.Data[3] = pit_iq;
-	TxMessage.Data[4] = trigger_iq >> 8;
-	TxMessage.Data[5] = trigger_iq;
-	TxMessage.Data[6] = 0;
-	TxMessage.Data[7] = 0;
-
-	CAN_Transmit(GIMBAL_CAN, &TxMessage);
+	TxMessage.Data[3] = pit_iq;	
+	CAN_Transmit(YAW_CAN, &TxMessage);
+	CAN_Transmit(PITCH_CAN, &TxMessage);
+	
 }
+
 /*该函数can1发送底盘四个3508电机电流*/
 void send_chassis_cur(int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4)
 {
@@ -228,22 +240,20 @@ void send_chassis_cur(int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4)
 
 	CAN_Transmit(CHASSIS_CAN, &TxMessage);
 }
-/*若摩擦轮使用3508电机，则使用该函数发送电流*/
-void send_fric_cur(int16_t iq3, int16_t iq4)
+/*若摩擦轮使用3508电机，则使用该函数发送电流*/								//can2摩擦轮
+void send_fric_cur(int16_t iq1, int16_t iq2, int16_t iq3)
 {
 	CanTxMsg TxMessage;
 	TxMessage.StdId = CAN_FRIC_ALL_ID;
 	TxMessage.IDE = CAN_ID_STD;
 	TxMessage.RTR = CAN_RTR_DATA;
-	TxMessage.DLC = 0x08;
-	TxMessage.Data[0] = iq3 >> 8;
-	TxMessage.Data[1] = iq3;
-	TxMessage.Data[2] = iq4 >> 8;
-	TxMessage.Data[3] = iq4;
-	TxMessage.Data[4] = 0;
-	TxMessage.Data[5] = 0;
-	TxMessage.Data[6] = 0;
-	TxMessage.Data[7] = 0;
+	TxMessage.DLC = 0x06;
+	TxMessage.Data[0] = iq1 >> 8;
+	TxMessage.Data[1] = iq1;
+	TxMessage.Data[2] = iq2 >> 8;
+	TxMessage.Data[3] = iq2;
+	TxMessage.Data[4] = iq3 >> 8;
+	TxMessage.Data[5] = iq3;
 
 	CAN_Transmit(FRIC_CAN, &TxMessage);
 }
@@ -254,7 +264,7 @@ void send_cap_power_can(uint16_t power) // 发送超电
 	TxMessage.StdId = CAN_CAP_ID;
 	TxMessage.IDE = CAN_ID_STD;
 	TxMessage.RTR = CAN_RTR_DATA;
-	TxMessage.DLC = 0x08;
+	TxMessage.DLC = 0x02;
 	TxMessage.Data[0] = power >> 8;
 	TxMessage.Data[1] = power;
 

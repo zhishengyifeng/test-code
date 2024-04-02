@@ -2,7 +2,7 @@
 ..\obj\judge_tx_data.o: ..\PROTOCOL\judge_tx_data.h
 ..\obj\judge_tx_data.o: ..\USER\stm32f4xx.h
 ..\obj\judge_tx_data.o: ..\CORE\core_cm4.h
-..\obj\judge_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\judge_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\judge_tx_data.o: ..\CORE\core_cmInstr.h
 ..\obj\judge_tx_data.o: ..\CORE\core_cmFunc.h
 ..\obj\judge_tx_data.o: ..\CORE\core_cmSimd.h
@@ -41,7 +41,7 @@
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\judge_tx_data.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\judge_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\judge_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\portable.h
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -51,7 +51,7 @@
 ..\obj\judge_tx_data.o: ..\FreeRTOS\include\queue.h
 ..\obj\judge_tx_data.o: ..\USER_CONF\dma.h
 ..\obj\judge_tx_data.o: ..\PROTOCOL\judge_rx_data.h
-..\obj\judge_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\judge_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\judge_tx_data.o: ..\TASK\shoot_task.h
 ..\obj\judge_tx_data.o: ..\FUNTION\remote_ctrl.h
 ..\obj\judge_tx_data.o: ..\USER_CONF\rc.h
@@ -60,5 +60,5 @@
 ..\obj\judge_tx_data.o: ..\TASK\modeswitch_task.h
 ..\obj\judge_tx_data.o: ..\TASK\gimbal_task.h
 ..\obj\judge_tx_data.o: ..\FUNTION\ramp.h
-..\obj\judge_tx_data.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\judge_tx_data.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\judge_tx_data.o: ..\PROTOCOL\pc_rx_data.h

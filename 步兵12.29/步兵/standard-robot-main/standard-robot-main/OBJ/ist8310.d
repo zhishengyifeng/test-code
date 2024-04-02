@@ -1,6 +1,6 @@
 ..\obj\ist8310.o: ..\IST8310\IST8310.c
 ..\obj\ist8310.o: ..\IST8310\IST8310.h
-..\obj\ist8310.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\ist8310.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\ist8310.o: ..\BMI088\devices\struct_typedef.h
 ..\obj\ist8310.o: ..\USER\stm32f4xx.h
 ..\obj\ist8310.o: ..\CORE\core_cm4.h
@@ -39,4 +39,4 @@
 ..\obj\ist8310.o: ..\USER_CONF\delay.h
 ..\obj\ist8310.o: ..\IST8310\IST8310reg.h
 ..\obj\ist8310.o: ..\USER_CONF\I2C.h
-..\obj\ist8310.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\ist8310.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

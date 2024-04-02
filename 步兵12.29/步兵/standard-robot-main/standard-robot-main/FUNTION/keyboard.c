@@ -1,3 +1,4 @@
+
 #include "keyboard.h"
 #include "remote_ctrl.h"
 #include "STM32_TIM_BASE.h"
@@ -21,7 +22,7 @@ extern int Fric_Spd_Ajt;
 extern int SOFT_RESET;
 extern int SMALL_BUFF;
 extern int BIG_BUFF;
-extern int PC_DODGE;
+//extern int PC_DODGE;
 extern int normal_speed;
 extern int direction;
 extern int direction_change;

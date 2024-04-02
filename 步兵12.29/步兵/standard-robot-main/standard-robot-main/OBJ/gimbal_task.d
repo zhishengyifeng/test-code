@@ -2,7 +2,7 @@
 ..\obj\gimbal_task.o: ..\TASK\gimbal_task.h
 ..\obj\gimbal_task.o: ..\USER\stm32f4xx.h
 ..\obj\gimbal_task.o: ..\CORE\core_cm4.h
-..\obj\gimbal_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\gimbal_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\gimbal_task.o: ..\CORE\core_cmInstr.h
 ..\obj\gimbal_task.o: ..\CORE\core_cmFunc.h
 ..\obj\gimbal_task.o: ..\CORE\core_cmSimd.h
@@ -39,7 +39,7 @@
 ..\obj\gimbal_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\gimbal_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\gimbal_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -49,7 +49,7 @@
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\list.h
 ..\obj\gimbal_task.o: ..\USER_CONF\delay.h
 ..\obj\gimbal_task.o: ..\TASK\modeswitch_task.h
-..\obj\gimbal_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\gimbal_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\gimbal_task.o: ..\TASK\comm_task.h
 ..\obj\gimbal_task.o: ..\TASK\detect_task.h
 ..\obj\gimbal_task.o: ..\BSP_CONF\bsp_can.h
@@ -64,8 +64,8 @@
 ..\obj\gimbal_task.o: ..\PROTOCOL\data_fifo.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\semphr.h
 ..\obj\gimbal_task.o: ..\FreeRTOS\include\queue.h
-..\obj\gimbal_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\gimbal_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\gimbal_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\gimbal_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\gimbal_task.o: ..\FUNTION\kalman_filter.h
 ..\obj\gimbal_task.o: .\include\arm_math.h
 ..\obj\gimbal_task.o: ..\CORE\core_cm4.h

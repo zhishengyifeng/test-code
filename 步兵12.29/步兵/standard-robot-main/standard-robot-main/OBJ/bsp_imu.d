@@ -2,7 +2,7 @@
 ..\obj\bsp_imu.o: ..\BSP_CONF\bsp_imu.h
 ..\obj\bsp_imu.o: ..\USER\stm32f4xx.h
 ..\obj\bsp_imu.o: ..\CORE\core_cm4.h
-..\obj\bsp_imu.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\bsp_imu.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\bsp_imu.o: ..\CORE\core_cmInstr.h
 ..\obj\bsp_imu.o: ..\CORE\core_cmFunc.h
 ..\obj\bsp_imu.o: ..\CORE\core_cmSimd.h

@@ -2,7 +2,7 @@
 ..\obj\power_control.o: ..\FUNTION\power_control.h
 ..\obj\power_control.o: ..\USER\stm32f4xx.h
 ..\obj\power_control.o: ..\CORE\core_cm4.h
-..\obj\power_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\power_control.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\power_control.o: ..\CORE\core_cmInstr.h
 ..\obj\power_control.o: ..\CORE\core_cmFunc.h
 ..\obj\power_control.o: ..\CORE\core_cmSimd.h
@@ -44,7 +44,7 @@
 ..\obj\power_control.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\power_control.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\power_control.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\power_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\power_control.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\power_control.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\power_control.o: ..\FreeRTOS\include\portable.h
 ..\obj\power_control.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -57,4 +57,4 @@
 ..\obj\power_control.o: ..\FUNTION\keyboard.h
 ..\obj\power_control.o: ..\BSP_CONF\bsp_can.h
 ..\obj\power_control.o: ..\PROTOCOL\judge_rx_data.h
-..\obj\power_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\power_control.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

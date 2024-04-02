@@ -2,7 +2,7 @@
 ..\obj\protocol.o: ..\PROTOCOL\protocol.h
 ..\obj\protocol.o: ..\USER\stm32f4xx.h
 ..\obj\protocol.o: ..\CORE\core_cm4.h
-..\obj\protocol.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\protocol.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\protocol.o: ..\CORE\core_cmInstr.h
 ..\obj\protocol.o: ..\CORE\core_cmFunc.h
 ..\obj\protocol.o: ..\CORE\core_cmSimd.h
@@ -35,4 +35,4 @@
 ..\obj\protocol.o: ..\FWLIB\inc\stm32f4xx_dac.h
 ..\obj\protocol.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\protocol.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
-..\obj\protocol.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\protocol.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

@@ -1,7 +1,7 @@
 ..\obj\main.o: main.c
 ..\obj\main.o: stm32f4xx.h
 ..\obj\main.o: ..\CORE\core_cm4.h
-..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\main.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\main.o: ..\CORE\core_cmInstr.h
 ..\obj\main.o: ..\CORE\core_cmFunc.h
 ..\obj\main.o: ..\CORE\core_cmSimd.h
@@ -37,7 +37,7 @@
 ..\obj\main.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\main.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\main.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\main.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\main.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\main.o: ..\FreeRTOS\include\portable.h
 ..\obj\main.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -71,12 +71,12 @@
 ..\obj\main.o: ..\TASK\detect_task.h
 ..\obj\main.o: ..\TASK\chassis_task.h
 ..\obj\main.o: ..\FUNTION\pid.h
-..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\main.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\main.o: ..\FUNTION\kalman_filter.h
 ..\obj\main.o: .\include\arm_math.h
 ..\obj\main.o: ..\CORE\core_cm4.h
-..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
-..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\main.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\main.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\main.o: ..\BMI088\devices\BMI088driver.h
 ..\obj\main.o: ..\BMI088\devices\struct_typedef.h
 ..\obj\main.o: ..\IST8310\IST8310.h

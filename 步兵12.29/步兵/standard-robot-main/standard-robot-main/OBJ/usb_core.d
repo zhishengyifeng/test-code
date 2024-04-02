@@ -3,7 +3,7 @@
 ..\obj\usb_core.o: ..\USER\usb_conf.h
 ..\obj\usb_core.o: ..\USER\stm32f4xx.h
 ..\obj\usb_core.o: ..\CORE\core_cm4.h
-..\obj\usb_core.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\usb_core.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\usb_core.o: ..\CORE\core_cmInstr.h
 ..\obj\usb_core.o: ..\CORE\core_cmFunc.h
 ..\obj\usb_core.o: ..\CORE\core_cmSimd.h

@@ -39,7 +39,7 @@ int FRIC_SPD_DOWN = 0;
 int SOFT_RESET = 0;
 int SMALL_BUFF = 0;
 int BIG_BUFF = 0;
-int PC_DODGE = 0;
+//int PC_DODGE = 0;
 char Flag = 1;
 char Flag_Done = 0;
 float yaw_set = 0.0f;
@@ -50,35 +50,30 @@ void get_keyboard(void)
 
 	if (rc.kb.bit.Q && keyboard_flag)
 		KB_FRIC = 1;
-	if (rc.kb.bit.Q && rc.kb.bit.CTRL)
+	if (rc.kb.bit.Q && rc.kb.bit.V)
 		KB_FRIC = 0;
 
 	if (rc.kb.bit.R && keyboard_flag)
 		KB_BALL = 1;
-	if (rc.kb.bit.R && rc.kb.bit.SHIFT)
+	if (rc.kb.bit.R && rc.kb.bit.V)
 		KB_BALL = 0;
 
 	if (rc.kb.bit.B && keyboard_flag)
 		SMALL_BUFF = 1;
-	if (rc.kb.bit.B && rc.kb.bit.SHIFT)
+	if (rc.kb.bit.B && rc.kb.bit.V)
 		SMALL_BUFF = 0;
 
 	if (rc.kb.bit.G && keyboard_flag)
 		BIG_BUFF = 1;
-	if (rc.kb.bit.G && rc.kb.bit.SHIFT)
+	if (rc.kb.bit.G && rc.kb.bit.V)
 		BIG_BUFF = 0;
 
-	if (rc.kb.bit.E && keyboard_flag)
-		PC_DODGE = 1;
-	if (rc.kb.bit.E && rc.kb.bit.SHIFT)
-		PC_DODGE = 0;
+//	if (rc.kb.bit.CTRL && keyboard_flag)
+//		PC_DODGE = 1;
+//	if (rc.kb.bit.CTRL && rc.kb.bit.SHIFT)
+//		PC_DODGE = 0;
 
-	if (rc.kb.bit.Z && rc.kb.bit.CTRL)
-		FRIC_SPD_UP = 1;
-	if (rc.kb.bit.X && rc.kb.bit.CTRL)
-		FRIC_SPD_DOWN = 1;
-
-	if (rc.kb.bit.F && rc.kb.bit.CTRL)
+	if (rc.kb.bit.F && rc.kb.bit.V)
 		SOFT_RESET = 1;
 	if (
 		!rc.kb.bit.Q &&
@@ -86,8 +81,7 @@ void get_keyboard(void)
 		!rc.kb.bit.B &&
 		!rc.kb.bit.G &&
 		!rc.kb.bit.E &&
-		!rc.kb.bit.SHIFT &&
-		!rc.kb.bit.CTRL &&
+		!rc.kb.bit.V &&
 		!rc.kb.bit.Z &&
 		!rc.kb.bit.X &&
 		!rc.kb.bit.F)
@@ -286,11 +280,11 @@ void get_gimbal_mode(void)
 
 void get_chassis_mode(void)
 {
-	if (judge_recv_mesg.game_robot_state.mains_power_chassis_output == 0 || chassis_mode == CHASSIS_RELEASE) // ∑¿÷π∏¥ªÓ–°Õ”¬›
-		PC_DODGE = 0;
+//	if (judge_recv_mesg.game_robot_state.power_management_chassis_output == 0 || chassis_mode == CHASSIS_RELEASE) // ∑¿÷π∏¥ªÓ–°Õ”¬›
+//		PC_DODGE = 0;
 
-	if (chassis.CapData[1] < 14.5f) // µÁ»›µÁ—πµÕπÿ±’–°Õ”¬›,ª∫≥ÂµÁ—π«¯13-14.5V
-		PC_DODGE = 0;
+//	if (chassis.CapData[1] < 14.5f) // µÁ»›µÁ—πµÕπÿ±’–°Õ”¬›,ª∫≥ÂµÁ—π«¯13-14.5V
+//		PC_DODGE = 0;
 
 	if (PC_DODGE)
 		chassis.dodge_ctrl = 1;

@@ -44,7 +44,7 @@ typedef __packed struct
   uint8_t			 ball_storage_open;	//ball storage
 	
   uint8_t      fric_wheel_run; 		//run or not
-  uint16_t     fric_wheel_spd;
+  int16_t     fric_wheel_spd;
 	uint8_t			 fric_wheel_compe;	//Ä¦²ÁÂÖ×ªËÙ²¹³¥
 	uint16_t		 fric_launch_time;
 	uint16_t		 shoot_bullets;
@@ -85,6 +85,7 @@ static void turn_off_friction_wheel(void);
 static void ball_storage_ctrl(void);
 
 static void SpeedAdapt(void);
+float speed_limit();
 //static void shootHeat_Limit(void);
 
 //uint16_t JUDGE_usGetHeatLimit(void);

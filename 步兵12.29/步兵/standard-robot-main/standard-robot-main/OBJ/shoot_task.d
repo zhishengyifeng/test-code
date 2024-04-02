@@ -2,7 +2,7 @@
 ..\obj\shoot_task.o: ..\TASK\shoot_task.h
 ..\obj\shoot_task.o: ..\USER\stm32f4xx.h
 ..\obj\shoot_task.o: ..\CORE\core_cm4.h
-..\obj\shoot_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\shoot_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\shoot_task.o: ..\CORE\core_cmInstr.h
 ..\obj\shoot_task.o: ..\CORE\core_cmFunc.h
 ..\obj\shoot_task.o: ..\CORE\core_cmSimd.h
@@ -38,7 +38,7 @@
 ..\obj\shoot_task.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\shoot_task.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\shoot_task.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\shoot_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\shoot_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\shoot_task.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\shoot_task.o: ..\FreeRTOS\include\portable.h
 ..\obj\shoot_task.o: ..\FreeRTOS\include\deprecated_definitions.h
@@ -48,10 +48,10 @@
 ..\obj\shoot_task.o: ..\FreeRTOS\include\list.h
 ..\obj\shoot_task.o: ..\TASK\comm_task.h
 ..\obj\shoot_task.o: ..\TASK\modeswitch_task.h
-..\obj\shoot_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\shoot_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\shoot_task.o: ..\TASK\detect_task.h
 ..\obj\shoot_task.o: ..\USER_CONF\sys_config.h
-..\obj\shoot_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\shoot_task.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\shoot_task.o: ..\FUNTION\pid.h
 ..\obj\shoot_task.o: ..\BSP_CONF\bsp_can.h
 ..\obj\shoot_task.o: ..\PROTOCOL\judge_rx_data.h

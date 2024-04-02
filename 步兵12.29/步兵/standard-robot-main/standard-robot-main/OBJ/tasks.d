@@ -1,9 +1,9 @@
 ..\obj\tasks.o: ..\FreeRTOS\tasks.c
-..\obj\tasks.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\tasks.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\tasks.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\tasks.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\tasks.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\tasks.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\tasks.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\tasks.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\tasks.o: D:\Keil\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\tasks.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\tasks.o: ..\USER\STM32_TIM_BASE.h
 ..\obj\tasks.o: ..\USER\stm32f4xx.h

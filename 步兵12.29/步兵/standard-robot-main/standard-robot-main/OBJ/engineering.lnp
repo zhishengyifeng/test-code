@@ -87,6 +87,7 @@
 "..\obj\pid.o"
 "..\obj\ladrc.o"
 "..\obj\power_control.o"
+"..\obj\pid_controller.o"
 "..\obj\protocol.o"
 "..\obj\data_fifo.o"
 "..\obj\data_packet.o"
