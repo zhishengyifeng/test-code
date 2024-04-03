@@ -68,6 +68,10 @@ static void client_grapjic_draw_float(float num1,float num2,char name,char type,
 	if(name == fps) 
 	  strcpy(float_string ,"FPS:00.0\n");	
 	////////////////////
+	///////////////////////////
+	if(name == blood)
+	  strcpy(float_string ,"BLOOD:\n");
+	///////////////////////////
 	if(name == Distance)
 		strcpy(float_string ,"Dis: 00.0");
 	if(name == Compensates)//补偿yaw、pit
@@ -107,6 +111,18 @@ static void client_grapjic_draw_float(float num1,float num2,char name,char type,
 	
 	}
 	///////////////////////////
+	///////////////////////////
+	
+			else if(name == blood){
+		
+		float_string[4] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
+		float_string[5] = (uint8_t)fabs(num1)%10+48;
+		float_string[6] = '.';
+		float_string[7] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);	
+			
+	}				
+	///////////////////////////
+
 	else if(name == Compensates)
 	{
 		float_string[3] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
@@ -131,19 +147,19 @@ static void client_grapjic_draw_float(float num1,float num2,char name,char type,
 		
 	}
 	memcpy(&judge_send_mesg.ext_client_custom_character.data[0],float_string,sizeof(float_string));
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.figure_name[0] = name;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.graphic_name[0] = name;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.operate_tpye = type;
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.figure_tpye = Character;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.graphic_tpye = Character;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.layer = layer;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.color =  color ;
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_a =  20 ;				
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_b =  12 ;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_angle =  20 ;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_angle =  12 ;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.width = 3;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_x = start_x;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_y = start_y;
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_c = 0;
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_d = 0;     
-	judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_e = 0;		
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.radius = 0;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_x = 0;
+	judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_y = 0;		
 }
 
 /**
@@ -158,70 +174,70 @@ static void client_graphic_draw_String(char *str,char name,char type,char layer,
 	if(name == Gimbal) 
 	{
 		memcpy(&judge_send_mesg.ext_client_custom_character_gimbal.data[0], string, sizeof(string));
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.figure_name[0] = name;
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.graphic_name[0] = name;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.operate_tpye = type;
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.figure_tpye = Character;
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.graphic_tpye = Character;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.layer = layer;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.color =  color ;
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.details_a =  20 ;						//新规则上把start angle改为了details_a
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.details_b =sizeof(string);	//把end angle改为了details_b
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.start_angle =  20 ;
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.end_angle =sizeof(string) ;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.width = 3;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.start_x = start_x;
 		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.start_y = start_y;
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.details_c = 0;
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.details_d = 0;				
-		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.details_e = 0;	
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.radius = 0;
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.end_x = 0;
+		judge_send_mesg.ext_client_custom_character_gimbal.grapic_data_struct.end_y = 0;	
 	}
 	else if(name == Chassis)
 	{
 		memcpy(&judge_send_mesg.ext_client_custom_character_chassis.data[0], string, sizeof(string));
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.figure_name[0] = name;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.graphic_name[0] = name;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.operate_tpye = type;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.figure_tpye = Character;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.graphic_tpye = Character;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.layer = layer;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.color =  color;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.details_a =  20 ;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.details_b =sizeof(string) ;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.start_angle =  20 ;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.end_angle =sizeof(string) ;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.width = 3;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.start_x = start_x;
 		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.start_y = start_y;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.details_c = 0;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.details_d = 0;
-		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.details_e = 0;		
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.radius = 0;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.end_x = 0;
+		judge_send_mesg.ext_client_custom_character_chassis.grapic_data_struct.end_y = 0;		
 	}
 	else if(name == Shoot)
 	{
 		memcpy(&judge_send_mesg.ext_client_custom_character_shoot.data[0], string, sizeof(string));
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.figure_name[0] = name;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.graphic_name[0] = name;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.operate_tpye = type;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.figure_tpye = Character;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.graphic_tpye = Character;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.layer = layer;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.color =  color;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.details_a =  20 ;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.details_b =sizeof(string) ;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.start_angle =  20 ;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.end_angle =sizeof(string) ;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.width = 3;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.start_x = start_x;
 		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.start_y = start_y;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.details_c = 0;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.details_d = 0;
-		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.details_e = 0;		
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.radius = 0;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.end_x = 0;
+		judge_send_mesg.ext_client_custom_character_shoot.grapic_data_struct.end_y = 0;		
 	}
 	else //视觉有效位
 	{
 		memcpy(&judge_send_mesg.ext_client_custom_character.data[0], string, sizeof(string));
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.figure_name[0] = name;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.graphic_name[0] = name;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.operate_tpye = type;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.figure_tpye = Character;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.graphic_tpye = Character;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.layer = layer;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.color =  color ;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_a =  20;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_b =sizeof(string) ;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_angle =  20;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_angle =sizeof(string) ;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.width = 3;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_x = start_x;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_y = start_y;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_c = 0;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_d = 0;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.details_e = 0;	
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.radius = 0;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_x = 0;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_y = 0;	
 		
 	}
 }
@@ -229,33 +245,33 @@ static void client_graphic_draw_String(char *str,char name,char type,char layer,
 static void client_graphic_draw_car_line(void)//车身线 图层4
 {
 	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].figure_name[0] = line_1c;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].layer = layer4;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].color = Cyan;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].width = 40;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].start_x = 665;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].start_y = 200;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].details_d = 1255;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[0].details_e = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].graphic_name[0] = line_1c;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].layer = layer4;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].color = Cyan;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].width = 40;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].start_x = 665;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].start_y = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].end_x = 1255;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[0].end_y = 200;
 	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].figure_name[0] = line_2c;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].layer = layer4;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].color = Black;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].width = 30;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].start_x = 670;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].start_y = 200;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].details_d = 1250;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[1].details_e = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].graphic_name[0] = line_2c;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].layer = layer4;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].color = Black;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].width = 30;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].start_x = 670;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].start_y = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].end_x = 1250;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[1].end_y = 200;
 
 	float length=670+(chassis.CapData[1]-14)/(cap_store-14)*(1250-670);
 	if(length<=670)length=670;
@@ -265,38 +281,38 @@ static void client_graphic_draw_car_line(void)//车身线 图层4
 	if(length>800&&length<=1000)color=Orange;
 	if(length>1000&&length<=1250)color=Redblue;
 	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].figure_name[0] = line_3c;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].operate_tpye = Change;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].layer = layer4;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].color = color;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].width = 30;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].start_x = 670;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].start_y = 200;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_d = length;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_e = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].graphic_name[0] = line_3c;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].operate_tpye = Change;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].layer = layer4;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].color = color;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].width = 30;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_x = 670;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_y = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_x = length;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_y = 200;
 
 
 }
 
 static void client_graphic_draw_line(void){
 
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].figure_name[0] = line_3c;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].layer = layer4;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].color = Redblue;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].width = 30;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].start_x = 670;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].start_y = 200;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_d = 1250;
-	judge_send_mesg.ext_client_custom_graphic_car_line.interaction_figure[2].details_e = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].graphic_name[0] = line_3c;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].layer = layer4;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].color = Redblue;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].width = 30;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_x = 670;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].start_y = 200;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_x = 1250;
+	judge_send_mesg.ext_client_custom_graphic_car_line.grapic_data_struct[2].end_y = 200;
 
 
 }
@@ -483,9 +499,9 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 	{
 		if(i++ < 5)
 		{
-//			judge_send_mesg.ext_client_custom_graphic_five.data_cmd_id = Client_Draw_Five_Graph;		//新规则没有校验ID
-//			judge_send_mesg.ext_client_custom_graphic_five.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_graphic_five.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_graphic_five.data_cmd_id = Client_Draw_Five_Graph;
+			judge_send_mesg.ext_client_custom_graphic_five.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_graphic_five.receiver_ID = receiver_ID;
 			client_graphic_draw_short_line1 ();
 			data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_graphic_five,
 										sizeof(judge_send_mesg.ext_client_custom_graphic_five), DN_REG_ID);
@@ -500,9 +516,9 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 	{
 		if(i++ < 5)
 		{	
-//			judge_send_mesg.ext_client_custom_graphic_car_line.data_cmd_id = Client_Draw_Five_Graph;
-//			judge_send_mesg.ext_client_custom_graphic_car_line.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_graphic_car_line.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_graphic_car_line.data_cmd_id = Client_Draw_Five_Graph;
+			judge_send_mesg.ext_client_custom_graphic_car_line.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_graphic_car_line.receiver_ID = receiver_ID;
 			client_graphic_draw_line();
 			data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_graphic_car_line,
 										sizeof(judge_send_mesg.ext_client_custom_graphic_car_line), DN_REG_ID);
@@ -518,9 +534,9 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 	{
 		if(i++ < 5)
 		{	
-//		    judge_send_mesg.ext_client_custom_graphic_single.data_cmd_id = Client_Draw_One_Graph;
-//			judge_send_mesg.ext_client_custom_graphic_single.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_graphic_single.receiver_ID = receiver_ID;
+		    judge_send_mesg.ext_client_custom_graphic_single.data_cmd_id = Client_Draw_One_Graph;
+			judge_send_mesg.ext_client_custom_graphic_single.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_graphic_single.receiver_ID = receiver_ID;
 			client_graphic_draw_Circle ();//步兵圆形准心
 			data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_graphic_single,
 											sizeof(judge_send_mesg.ext_client_custom_graphic_single), DN_REG_ID);
@@ -542,27 +558,27 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			i++;
 			if(i >= 1 && i<6) //图层3 底盘
 			{
-//				judge_send_mesg.ext_client_custom_character_chassis.data_cmd_id = Client_Draw_Character_Graph;
-//				judge_send_mesg.ext_client_custom_character_chassis.sender_ID = (uint16_t)current_robot_id;
-//				judge_send_mesg.ext_client_custom_character_chassis.receiver_ID = receiver_ID;
+				judge_send_mesg.ext_client_custom_character_chassis.data_cmd_id = Client_Draw_Character_Graph;
+				judge_send_mesg.ext_client_custom_character_chassis.sender_ID = (uint16_t)current_robot_id;
+				judge_send_mesg.ext_client_custom_character_chassis.receiver_ID = receiver_ID;
 				client_graphic_draw_String("Cha: NOR",Chassis,Add,layer3,Green,80,830);
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_chassis,
 												sizeof(judge_send_mesg.ext_client_custom_character_chassis), DN_REG_ID);
 			}	
 			else if(i >= 6 && i< 11)//云台
 			{
-//				judge_send_mesg.ext_client_custom_character_gimbal.data_cmd_id = Client_Draw_Character_Graph;
-//				judge_send_mesg.ext_client_custom_character_gimbal.sender_ID = (uint16_t)current_robot_id;
-//				judge_send_mesg.ext_client_custom_character_gimbal.receiver_ID = receiver_ID;
+				judge_send_mesg.ext_client_custom_character_gimbal.data_cmd_id = Client_Draw_Character_Graph;
+				judge_send_mesg.ext_client_custom_character_gimbal.sender_ID = (uint16_t)current_robot_id;
+				judge_send_mesg.ext_client_custom_character_gimbal.receiver_ID = receiver_ID;
 				client_graphic_draw_String("Gim: NOR",Gimbal,Add,layer3,Green,80,770);
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_gimbal,
 												sizeof(judge_send_mesg.ext_client_custom_character_gimbal), DN_REG_ID);
 			}
 			else if(i >= 11 && i<16)//发射
 			{				
-//				judge_send_mesg.ext_client_custom_character_shoot.data_cmd_id = Client_Draw_Character_Graph;
-//				judge_send_mesg.ext_client_custom_character_shoot.sender_ID = (uint16_t)current_robot_id;
-//				judge_send_mesg.ext_client_custom_character_shoot.receiver_ID = receiver_ID;	
+				judge_send_mesg.ext_client_custom_character_shoot.data_cmd_id = Client_Draw_Character_Graph;
+				judge_send_mesg.ext_client_custom_character_shoot.sender_ID = (uint16_t)current_robot_id;
+				judge_send_mesg.ext_client_custom_character_shoot.receiver_ID = receiver_ID;	
 				client_graphic_draw_String("FR:F,BAL:F",Shoot,Add,layer3,Green,80,890);
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_shoot,
 												sizeof(judge_send_mesg.ext_client_custom_character_shoot), DN_REG_ID);
@@ -601,31 +617,31 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			
 			if(i >= 16)
 			{
-//				judge_send_mesg.ext_client_custom_character.data_cmd_id = Client_Draw_Character_Graph;
-//				judge_send_mesg.ext_client_custom_character.sender_ID = (uint16_t)current_robot_id;
-//				judge_send_mesg.ext_client_custom_character.receiver_ID = receiver_ID;	
+				judge_send_mesg.ext_client_custom_character.data_cmd_id = Client_Draw_Character_Graph;
+				judge_send_mesg.ext_client_custom_character.sender_ID = (uint16_t)current_robot_id;
+				judge_send_mesg.ext_client_custom_character.receiver_ID = receiver_ID;	
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 												sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);				
 			}
 		}
 		if(text_mask == 2)//Change
 		{
-//			judge_send_mesg.ext_client_custom_character_chassis.data_cmd_id = Client_Draw_Character_Graph;
-//			judge_send_mesg.ext_client_custom_character_chassis.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_character_chassis.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_character_chassis.data_cmd_id = Client_Draw_Character_Graph;
+			judge_send_mesg.ext_client_custom_character_chassis.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_character_chassis.receiver_ID = receiver_ID;
 
-//			judge_send_mesg.ext_client_custom_character_gimbal.data_cmd_id = Client_Draw_Character_Graph;
-//			judge_send_mesg.ext_client_custom_character_gimbal.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_character_gimbal.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_character_gimbal.data_cmd_id = Client_Draw_Character_Graph;
+			judge_send_mesg.ext_client_custom_character_gimbal.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_character_gimbal.receiver_ID = receiver_ID;
 
-//			judge_send_mesg.ext_client_custom_character_shoot.data_cmd_id = Client_Draw_Character_Graph;
-//			judge_send_mesg.ext_client_custom_character_shoot.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_character_shoot.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_character_shoot.data_cmd_id = Client_Draw_Character_Graph;
+			judge_send_mesg.ext_client_custom_character_shoot.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_character_shoot.receiver_ID = receiver_ID;
 			
 			memset(&judge_send_mesg.ext_client_custom_character,0,sizeof(judge_send_mesg.ext_client_custom_character));//清空数组
-//			judge_send_mesg.ext_client_custom_character.data_cmd_id = Client_Draw_Character_Graph;
-//			judge_send_mesg.ext_client_custom_character.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_character.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_character.data_cmd_id = Client_Draw_Character_Graph;
+			judge_send_mesg.ext_client_custom_character.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_character.receiver_ID = receiver_ID;
 
 
 			
@@ -868,9 +884,9 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				
 				if(text_twist == 4)
 				{
-//			judge_send_mesg.ext_client_custom_graphic_car_line.data_cmd_id = Client_Draw_Five_Graph;
-//			judge_send_mesg.ext_client_custom_graphic_car_line.sender_ID = (uint16_t)current_robot_id;
-//			judge_send_mesg.ext_client_custom_graphic_car_line.receiver_ID = receiver_ID;
+			judge_send_mesg.ext_client_custom_graphic_car_line.data_cmd_id = Client_Draw_Five_Graph;
+			judge_send_mesg.ext_client_custom_graphic_car_line.sender_ID = (uint16_t)current_robot_id;
+			judge_send_mesg.ext_client_custom_graphic_car_line.receiver_ID = receiver_ID;
 			
 			client_graphic_draw_car_line();
 			
@@ -889,92 +905,92 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 
 static void client_graphic_draw_short_line1(void) //步兵准星，图层7
 {
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].figure_name[0] = line_1s;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].layer = layer7;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].color = Yellow;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].width = 1;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].start_x = 910;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].start_y = 430;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].details_d = 1010;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[0].details_e = 430;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].graphic_name[0] = line_1s;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].layer = layer7;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].color = Yellow;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].width = 1;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].start_x = 910;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].start_y = 430;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].end_x = 1010;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[0].end_y = 430;
 	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].figure_name[0] = line_2s;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].layer = layer7;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].color = Yellow;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].width = 1;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].start_x = 880;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].start_y = 475;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].details_d = 1040;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[1].details_e = 475;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].graphic_name[0] = line_2s;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].layer = layer7;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].color = Yellow;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].width = 1;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].start_x = 880;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].start_y = 475;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].end_x = 1040;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[1].end_y = 475;
 	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].figure_name[0] = line_3s;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].layer = layer7;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].color = Yellow;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].width = 1;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].start_x = 910;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].start_y = 487;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].details_d =1010;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[2].details_e = 487;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].graphic_name[0] = line_3s;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].layer = layer7;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].color = Yellow;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].width = 1;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].start_x = 910;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].start_y = 487;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].end_x =1010;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[2].end_y = 487;
 	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].figure_name[0] = line_4s;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].layer = layer7;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].color = Yellow;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].width = 1;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].start_x = 880;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].start_y = 500;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].details_d = 1040;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[3].details_e = 500;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].graphic_name[0] = line_4s;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].layer = layer7;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].color = Yellow;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].width = 1;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].start_x = 880;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].start_y = 500;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].end_x = 1040;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[3].end_y = 500;
 	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].figure_name[0] = line_5s;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].figure_tpye = Straight_line;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].layer = layer7;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].color = Yellow;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].details_a = 0;	
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].details_b = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].width = 1;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].start_x = 960;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].start_y = 600;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].details_c = 0;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].details_d = 960;
-	judge_send_mesg.ext_client_custom_graphic_five.interaction_figure[4].details_e = 380;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].graphic_name[0] = line_5s;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].graphic_tpye = Straight_line;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].layer = layer7;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].color = Yellow;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].start_angle = 0;	
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].end_angle = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].width = 1;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].start_x = 960;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].start_y = 600;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].radius = 0;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].end_x = 960;
+	judge_send_mesg.ext_client_custom_graphic_five.grapic_data_struct[4].end_y = 380;
 }
 
 static void client_graphic_draw_Circle(void) //步兵准心2 图层6
 {
-	judge_send_mesg.ext_client_custom_graphic_single.figure_name[0] = circle;
-	judge_send_mesg.ext_client_custom_graphic_single.operate_tpye = Add;
-	judge_send_mesg.ext_client_custom_graphic_single.figure_tpye = Circle;
-	judge_send_mesg.ext_client_custom_graphic_single.layer = layer6;
-	judge_send_mesg.ext_client_custom_graphic_single.color =  Green ;
-	judge_send_mesg.ext_client_custom_graphic_single.details_a =  0 ;
-	judge_send_mesg.ext_client_custom_graphic_single.details_b =  0 ;
-	judge_send_mesg.ext_client_custom_graphic_single.width = 2;
-	judge_send_mesg.ext_client_custom_graphic_single.start_x = 960;
-	judge_send_mesg.ext_client_custom_graphic_single.start_y = 437;//540中心
-	judge_send_mesg.ext_client_custom_graphic_single.details_c = 50;
-	judge_send_mesg.ext_client_custom_graphic_single.details_d = 960;//960中心
-	judge_send_mesg.ext_client_custom_graphic_single.details_e = 437;	
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.graphic_name[0] = circle;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.operate_tpye = Add;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.graphic_tpye = Circle;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.layer = layer6;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.color =  Green ;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.start_angle =  0 ;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.end_angle =  0 ;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.width = 2;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.start_x = 960;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.start_y = 437;//540中心
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.radius = 50;
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.end_x = 960;//960中心
+	judge_send_mesg.ext_client_custom_graphic_single.grapic_data_struct.end_y = 437;	
 }
 
 
@@ -1061,3 +1077,33 @@ void judgement_client_packet_pack(uint8_t *p_data)
 									 STUDENT_DATA_LENGTH, DN_REG_ID);
 }
 
+void sentry_cmd_packet_pack(uint8_t *p_data) //未修改完
+{
+	uint8_t current_robot_id = 0;
+	uint16_t receiver_ID = 0;
+	
+	current_robot_id = judge_recv_mesg.game_robot_state.robot_id;  //读取当前机器人的id
+	
+	judge_send_mesg.ext_student_interactive_data.data_cmd_id = SENTRY_CMD_ID;
+	judge_send_mesg.ext_student_interactive_data.sender_ID = (uint16_t)current_robot_id;
+	judge_send_mesg.ext_student_interactive_data.receiver_ID = JUDGE_SERVER_ID;
+	judge_send_mesg.sentry_cmd.mode_Union.info.confirm_rebirth = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.exchange_rebirth = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.remote_blood_times = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.remote_bullet_times = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.bullet_number = 0;
+	
+	//将自定义的数据复制到发送结构体中
+	memcpy(&judge_send_mesg.ext_student_interactive_data.data[0], p_data,sizeof(judge_send_mesg.ext_student_interactive_data.data));
+	//该函数的功能为将需要发送的数据打包，便于下一步通过串口3发送给裁判系统
+	data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID, (uint8_t *)&judge_send_mesg.ext_student_interactive_data,
+									 STUDENT_DATA_LENGTH, DN_REG_ID);
+}
+void map_data_packet_pack(uint8_t *p_data) //未修改完
+{
+	judge_send_mesg.map_data.sender_id = judge_recv_mesg.game_robot_state.robot_id;   //读取当前机器人的id
+	
+		//该函数的功能为将需要发送的数据打包，便于下一步通过串口3发送给裁判系统
+	data_packet_pack(MAP_DATA_ID, (uint8_t *)&judge_send_mesg.map_data,
+									 sizeof(judge_send_mesg.map_data), DN_REG_ID);
+}
