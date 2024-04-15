@@ -10,12 +10,13 @@
       <TargetName>ENGINEER</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.13.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.5.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -183,6 +184,8 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -323,16 +326,20 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
+            <v6Lang>1</v6Lang>
+            <v6LangP>1</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
+            <v6Lto>0</v6Lto>
+            <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,ARM_MATH_CM4,__FPU_PRESENT=1,USE_USB_OTG_FS,__TARGET_FPU_VFP,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\FWLIB\inc;..\USER;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\USER_CONF;..\BSP_CONF;..\TASK;..\FUNTION;..\PROTOCOL;.\include;..\BMI088\algorithm;..\BMI088\devices;..\BMI088\rm_lib;..\USB_LIB\STM32_USB_Device_Library\Class\cdc\inc;..\USB_LIB\STM32_USB_Device_Library\Core\inc;..\USB_LIB\STM32_USB_OTG_Driver\inc</IncludePath>
+              <IncludePath>..\CORE;..\FWLIB\inc;..\USER;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\USER_CONF;..\BSP_CONF;..\TASK;..\FUNTION;..\PROTOCOL;.\include;..\BMI088\algorithm;..\BMI088\devices;..\BMI088\rm_lib;..\USB_LIB\STM32_USB_Device_Library\Class\cdc\inc;..\USB_LIB\STM32_USB_Device_Library\Core\inc;..\USB_LIB\STM32_USB_OTG_Driver\inc;..\IST8310</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -345,6 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <ClangAsOpt>1</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -740,6 +748,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER_CONF\st_usb_cdc.c</FilePath>
             </File>
+            <File>
+              <FileName>I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER_CONF\I2C.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -865,6 +878,16 @@
               <FileType>1</FileType>
               <FilePath>..\FUNTION\ladrc.c</FilePath>
             </File>
+            <File>
+              <FileName>power_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FUNTION\power_control.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid_controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FUNTION\pid_controller.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -933,6 +956,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>IST8310</GroupName>
+          <Files>
+            <File>
+              <FileName>IST8310.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\IST8310\IST8310.c</FilePath>
+            </File>
+            <File>
+              <FileName>IST8310.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\IST8310\IST8310.h</FilePath>
+            </File>
+            <File>
+              <FileName>IST8310reg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\IST8310\IST8310reg.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>USB_CDC</GroupName>
           <Files>
             <File>
@@ -975,5 +1018,11 @@
       </Groups>
     </Target>
   </Targets>
+
+  <RTE>
+    <apis/>
+    <components/>
+    <files/>
+  </RTE>
 
 </Project>

@@ -24,12 +24,15 @@
 
 typedef struct
 {
-  /* 底盘电机电流 */
-  int16_t chassis_cur[4];
-  /* yaw/pitch/trigger 电机电流 */
-  int16_t gimbal_cur[3];
-  /*摩擦轮电机电流*/
-  int16_t fric_cur[2];
+	/* 底盘 电机电流 */
+	int16_t chassis_cur[4];
+	/* yaw/pitch 电机电流 */
+	int16_t gimbal_cur[2];
+	/*摩擦轮 电机电流*/
+	int16_t fric_cur[2];
+	/*拨盘 电机电流*/
+	int16_t trigger_cur;
+	
 } motor_current_t;
 
 extern motor_current_t glb_cur;

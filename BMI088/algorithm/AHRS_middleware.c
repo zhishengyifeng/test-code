@@ -18,7 +18,7 @@
 #include "AHRS_MiddleWare.h"
 #include "AHRS.h"
 #include "arm_math.h"
-//#include "main.h"
+// #include "main.h"
 /**
  * @brief          用于获取当前高度
  * @author         RM
@@ -26,12 +26,12 @@
  * @retval         返回空
  */
 
-void AHRS_get_height(fp32* high)
+void AHRS_get_height(fp32 *high)
 {
-    if (high != NULL)
-    {
-        *high = 0.0f;
-    }
+	if (high != NULL)
+	{
+		*high = 0.0f;
+	}
 }
 
 /**
@@ -41,12 +41,12 @@ void AHRS_get_height(fp32* high)
  * @retval         返回空
  */
 
-void AHRS_get_latitude(fp32* latitude)
+void AHRS_get_latitude(fp32 *latitude)
 {
-    if (latitude != NULL)
-    {
-        *latitude = 22.0f;
-    }
+	if (latitude != NULL)
+	{
+		*latitude = 22.0f;
+	}
 }
 
 /**
@@ -58,16 +58,16 @@ void AHRS_get_latitude(fp32* latitude)
 
 fp32 AHRS_invSqrt(fp32 num)
 {
-    return 1/sqrtf(num);
+	return 1 / sqrtf(num);
 
-//    fp32 halfnum = 0.5f * num;
-//    fp32 y = num;
-//    long i = *(long*)&y;
-//    i = 0x5f3759df - (i >> 1);
-//    y = *(fp32*)&i;
-//    y = y * (1.5f - (halfnum * y * y));
-//    y = y * (1.5f - (halfnum * y * y));
-//    return y;
+	//    fp32 halfnum = 0.5f * num;
+	//    fp32 y = num;
+	//    long i = *(long*)&y;
+	//    i = 0x5f3759df - (i >> 1);
+	//    y = *(fp32*)&i;
+	//    y = y * (1.5f - (halfnum * y * y));
+	//    y = y * (1.5f - (halfnum * y * y));
+	//    return y;
 }
 
 /**
@@ -79,7 +79,7 @@ fp32 AHRS_invSqrt(fp32 num)
 
 fp32 AHRS_sinf(fp32 angle)
 {
-    return arm_sin_f32(angle);
+	return arm_sin_f32(angle);
 }
 /**
  * @brief          cos函数
@@ -90,7 +90,7 @@ fp32 AHRS_sinf(fp32 angle)
 
 fp32 AHRS_cosf(fp32 angle)
 {
-    return arm_cos_f32(angle);
+	return arm_cos_f32(angle);
 }
 
 /**
@@ -102,7 +102,7 @@ fp32 AHRS_cosf(fp32 angle)
 
 fp32 AHRS_tanf(fp32 angle)
 {
-    return tanf(angle);
+	return tanf(angle);
 }
 /**
  * @brief          用于32位浮点数的反三角函数 asin函数
@@ -114,7 +114,7 @@ fp32 AHRS_tanf(fp32 angle)
 fp32 AHRS_asinf(fp32 sin)
 {
 
-    return asinf(sin);
+	return asinf(sin);
 }
 
 /**
@@ -127,7 +127,7 @@ fp32 AHRS_asinf(fp32 sin)
 fp32 AHRS_acosf(fp32 cos)
 {
 
-    return acosf(cos);
+	return acosf(cos);
 }
 
 /**
@@ -140,5 +140,5 @@ fp32 AHRS_acosf(fp32 cos)
 
 fp32 AHRS_atan2f(fp32 y, fp32 x)
 {
-    return atan2f(y, x);
+	return atan2f(y, x);
 }

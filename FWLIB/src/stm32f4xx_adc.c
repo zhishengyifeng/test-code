@@ -662,7 +662,7 @@ void ADC_VBATCmd(FunctionalState NewState)
          -@@- (*) and (**) are performing the same configuration
      
       (#) Get the conversion data: This subsection provides an important function in 
-          the ADC peripheral since it returns the converted data of the current 
+¡¾          the ADC peripheral since it returns the converted data of the current 
           regular channel. When the Conversion value is read, the EOC Flag is 
           automatically cleared.
      

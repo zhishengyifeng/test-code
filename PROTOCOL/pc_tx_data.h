@@ -27,13 +27,13 @@ typedef enum
 typedef struct
 {
   uint8_t robot_color : 1;  // 颜色 (0/1)
-  uint8_t task_mode : 1;    // 识别模式  （0 自瞄 / 1 大小符）
-  uint8_t visual_valid : 1; // 视觉有效位 (0/1)
+  uint8_t task_mode : 1;    // 识别模式  ＄1�70 自瞄 / 1 大小符）
+  uint8_t visual_valid : 1; // 视觉有效佄1�7 (0/1)
   uint8_t direction : 2;    // 拓展装甲板标志位 (0-3)
-  uint8_t bullet_level : 3; // 弹速等级 1 2 3级
-  float robot_pitch;        // 欧拉角(度)
-  float robot_yaw;          // 欧拉角(度)
-  float time_stamp;         // 电控时间戳(ms)
+  uint8_t bullet_speed : 3; // 弹��等纄1�7 1 2 3纄1�7
+  float robot_pitch;        // 欧拉规1�7(庄1�7)
+  float robot_yaw;          // 欧拉规1�7(庄1�7)
+  float time_stamp;         // 电控时间戄1�7(ms)
 } robot_tx_data;
 #pragma pack()
 

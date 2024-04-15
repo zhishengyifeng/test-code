@@ -73,6 +73,7 @@ extern pid_t pid_trigger;
 extern pid_t pid_trigger_spd;
 extern pid_t pid_fric[2];
 extern pid_t pid_heat_limit;
+extern pid_t pid_Spd_limit;
 extern pid_t pid_power;
 extern pid_t pid_heat_time;
 extern pid_t pid_imu_tmp;

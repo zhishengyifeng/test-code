@@ -11,7 +11,8 @@
 #define RIGHT      (rc.kb.bit.D)
 //      speed      key
 #define FAST_SPD   (rc.kb.bit.SHIFT)
-#define SLOW_SPD   (rc.kb.bit.CTRL)
+#define SLOW_SPD   (rc.kb.bit.C)
+//#define PC_DODGE   (rc.kb.bit.CTRL)
 
 
 //      function   key or mouse operate
@@ -93,6 +94,10 @@ void keyboard_global_hook(void);
 void keyboard_chassis_hook(void);
 void keyboard_shoot_hook(void);
 void keyboard_gimbal_hook(void);
+
+
+
+void Software_Reset(void);
 
 
 

@@ -54,37 +54,44 @@ start_x、start_y: 起始坐标
 static void client_grapjic_draw_float(float num1,float num2,char name,char type,char layer,char color,uint16_t start_x,uint16_t start_y)
 {
 	char float_string[20] = {0};
-	if(name == Pitch) 
-  {
-    if(num1>=0)strcpy(float_string ,"Pit: 00.0");
-		if(num1<0) strcpy(float_string ,"Pit:-00.0");
-  }
-	if(name == Speed) 
-    strcpy(float_string ,"Spd:0000\n\nDog:000");
+//	if(name == Pitch) 
+//  {
+//    if(num1>=0)strcpy(float_string ,"Pit: 00.0");
+//		if(num1<0) strcpy(float_string ,"Pit:-00.0");
+//  }
+//	if(name == Speed) 
+//    strcpy(float_string ,"Spd:0000\n\nDog:000");
 
 	if(name == Cap) 
-		strcpy(float_string ,"ALL:00.0\n\nCap:00.0");
+		strcpy(float_string ,"ALL:00.0  Cap:00.0");
 	////////////////////
-	if(name == fps) 
-	  strcpy(float_string ,"FPS:00.0\n");	
+//	if(name == fps) 
+//	  strcpy(float_string ,"FPS:00.0\n");	
 	////////////////////
-	if(name == Distance)
-		strcpy(float_string ,"Dis: 00.0");
-	if(name == Compensates)//补偿yaw、pit
-  { 
-    if(num1>=0 && num2>=0)strcpy(float_string ,"Y: 00.0\n\nP: 00.0");
-		if(num1<0 && num2>=0) strcpy(float_string ,"Y:-00.0\n\nP: 00.0");
-    if(num1>=0 && num2<0) strcpy(float_string ,"Y: 00.0\n\nP:-00.0");
-    if(num1<0 && num2<0)  strcpy(float_string ,"Y:-00.0\n\nP:-00.0");
-  }
-	if(name == Pitch||name == Distance)
-	{
-		float_string[5] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
-		float_string[6] = (uint8_t)fabs(num1)%10+48;
-		float_string[7] = '.';
-		float_string[8] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);
+	///////////////////////////
+	else if(name == blood)
+	  strcpy(float_string ,"BLOOD:\n000");
+	///////////////////////////
+//	if(name == Distance)
+//		strcpy(float_string ,"Dis: 00.0");
+//	if(name == Compensates)//补偿yaw、pit
+//  { 
+//    if(num1>=0 && num2>=0)strcpy(float_string ,"Y: 00.0\n\nP: 00.0");
+//		if(num1<0 && num2>=0) strcpy(float_string ,"Y:-00.0\n\nP: 00.0");
+//    if(num1>=0 && num2<0) strcpy(float_string ,"Y: 00.0\n\nP:-00.0");
+//    if(num1<0 && num2<0)  strcpy(float_string ,"Y:-00.0\n\nP:-00.0");
+//  }
+//	if(name == Pitch||name == Distance)
+//	{
+//		float_string[5] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
+//		float_string[6] = (uint8_t)fabs(num1)%10+48;
+//		float_string[7] = '.';
+//		float_string[8] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);
+//	}
+	else if(name == Bullet){
+		strcpy(float_string ,"BULLET:\n000");
 	}
-	else if(name == Cap){
+	if(name == Cap){
 		
 		float_string[4] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
 		float_string[5] = (uint8_t)fabs(num1)%10+48;
@@ -96,40 +103,63 @@ static void client_grapjic_draw_float(float num1,float num2,char name,char type,
 		float_string[16] = '.';
 		float_string[17] = (uint8_t)(fmod(fabs(num2)*10.0,10.0)+48);
 	}
-	/////////////////////////////
-		else if(name == fps){
+//	/////////////////////////////
+//		else if(name == fps){
+//		
+//		float_string[4] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
+//		float_string[5] = (uint8_t)fabs(num1)%10+48;
+//		float_string[6] = '.';
+//		float_string[7] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);	
+//	
+//	
+//	}
+//	///////////////////////////
+	///////////////////////////
+	
+	else if(name == blood){
 		
-		float_string[4] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
-		float_string[5] = (uint8_t)fabs(num1)%10+48;
-		float_string[6] = '.';
-		float_string[7] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);	
-	
-	
+		float_string[9] = (uint8_t)fabs(num1)%10+48;			
+		num1/=10;
+		float_string[8] = (uint8_t)fabs(num1)%10+48;	 //48——'0'ASCII码
+		num1/=10;
+		float_string[7] = (uint8_t)fabs(num1)%10+48;	
+	}				
+	///////////////////////////
+	///////////////////////////
+	else if(name == Bullet){
+		
+		float_string[10] = (uint8_t)fabs(num1)%10+48;			
+		num1/=10;
+		float_string[9] = (uint8_t)fabs(num1)%10+48;	 //48——'0'ASCII码
+		num1/=10;
+		float_string[8] = (uint8_t)fabs(num1)%10+48;	
 	}
 	///////////////////////////
-	else if(name == Compensates)
-	{
-		float_string[3] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
-		float_string[4] = (uint8_t)fabs(num1)%10+48;
-		float_string[5] = '.';
-		float_string[6] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);	
 
-		float_string[12] = (uint8_t)fabs(num2)/10+48; //48——'0'ASCII码
-		float_string[13] = (uint8_t)fabs(num2)%10+48;
-		float_string[14] = '.';
-		float_string[15] = (uint8_t)(fmod(fabs(num2)*10.0,10.0)+48);		
-	}else if(name == Speed){
+//	else if(name == Compensates)
+//	{
+//		float_string[3] = (uint8_t)fabs(num1)/10+48; //48——'0'ASCII码
+//		float_string[4] = (uint8_t)fabs(num1)%10+48;
+//		float_string[5] = '.';
+//		float_string[6] = (uint8_t)(fmod(fabs(num1)*10.0,10.0)+48);	
 
-		float_string[4] = (uint16_t)fabs(num1)/1000+48; //48——'0'ASCII码
-		float_string[5] = (uint16_t)fabs(num1)/100-(uint16_t)fabs(num1)/1000*10+48;
-		float_string[6] = (uint16_t)fabs(num1)/10-(uint16_t)fabs(num1)/100*10+48;
-		float_string[7] = (uint16_t)fabs(num1)%10+48;
-		
-		float_string[14] = (uint16_t)fabs(num2)/100+48;
-		float_string[15] = (uint16_t)fabs(num2)/10-(uint16_t)fabs(num2)/100*10+48;
-		float_string[16] = (uint16_t)fabs(num2)%10+48;
-		
-	}
+//		float_string[12] = (uint8_t)fabs(num2)/10+48; //48——'0'ASCII码
+//		float_string[13] = (uint8_t)fabs(num2)%10+48;
+//		float_string[14] = '.';
+//		float_string[15] = (uint8_t)(fmod(fabs(num2)*10.0,10.0)+48);		
+	//}
+//else if(name == Speed){
+
+//		float_string[4] = (uint16_t)fabs(num1)/1000+48; //48——'0'ASCII码
+//		float_string[5] = (uint16_t)fabs(num1)/100-(uint16_t)fabs(num1)/1000*10+48;
+//		float_string[6] = (uint16_t)fabs(num1)/10-(uint16_t)fabs(num1)/100*10+48;
+//		float_string[7] = (uint16_t)fabs(num1)%10+48;
+//		
+//		float_string[14] = (uint16_t)fabs(num2)/100+48;
+//		float_string[15] = (uint16_t)fabs(num2)/10-(uint16_t)fabs(num2)/100*10+48;
+//		float_string[16] = (uint16_t)fabs(num2)%10+48;
+//		
+//	}
 	memcpy(&judge_send_mesg.ext_client_custom_character.data[0],float_string,sizeof(float_string));
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.graphic_name[0] = name;
 	judge_send_mesg.ext_client_custom_character.grapic_data_struct.operate_tpye = type;
@@ -216,7 +246,7 @@ static void client_graphic_draw_String(char *str,char name,char type,char layer,
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.color =  color ;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_angle =  20;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.end_angle =sizeof(string) ;
-		judge_send_mesg.ext_client_custom_character.grapic_data_struct.width = 3;
+		judge_send_mesg.ext_client_custom_character.grapic_data_struct.width = 4;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_x = start_x;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.start_y = start_y;
 		judge_send_mesg.ext_client_custom_character.grapic_data_struct.radius = 0;
@@ -567,38 +597,43 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_shoot,
 												sizeof(judge_send_mesg.ext_client_custom_character_shoot), DN_REG_ID);
 			}
-			else if(i == 16)//Cap、View、Pit
-				client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Add,layer2,Green,1100,620); //图层2
-			else if(i == 17)
-				client_grapjic_draw_float(gimbal.sensor.pit_relative_angle,0,Pitch,Add,layer2,Redblue,1400,890);
+			else if(i >= 16 && i<18)//Cap、View、Pit
+				client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Add,layer2,Green,785,280); //图层2
+//			else if(i == 17)
+//				client_grapjic_draw_float(gimbal.sensor.pit_relative_angle,0,Pitch,Add,layer2,Redblue,1400,890);
 			else if(i == 18)
 			{
 				memset(&judge_send_mesg.ext_client_custom_character,0,sizeof(judge_send_mesg.ext_client_custom_character));//清空数组
-				client_graphic_draw_String("View:F",View,Add,layer2,Pink,1100,467);
+				client_graphic_draw_String("View:F",View,Add,layer2,Pink,920,670);
 			}
-			else if(i == 19)//补偿
+//			else if(i == 19)//补偿
+//			{
+//				memset(&judge_send_mesg.ext_client_custom_character,0,sizeof(judge_send_mesg.ext_client_custom_character));//清空数组
+//				client_grapjic_draw_float(yaw_set,pit_set,Compensates,Add,layer2,Yellow,1600,890);			
+//			}
+			else if(i == 19)//blood
 			{
-				memset(&judge_send_mesg.ext_client_custom_character,0,sizeof(judge_send_mesg.ext_client_custom_character));//清空数组
-				client_grapjic_draw_float(yaw_set,pit_set,Compensates,Add,layer2,Yellow,1600,890);			
+				client_grapjic_draw_float(judge_recv_mesg.game_robot_state.current_HP,0,blood,Add,layer2,Cyan,720,560);			
 			}
-			else if(i == 20)
+			else if(i == 20)//bullet
 			{
-				client_grapjic_draw_float(chassis.vx,chassis.vw,Speed,Add,layer2,Green,1400,830);
+				client_grapjic_draw_float(judge_recv_mesg.bullet_remaining.projectile_allowance_17mm,0,Bullet,Add,layer2,Cyan,1100,560);
 			}
+//			else if(i == 20)
+//			{
+//				client_grapjic_draw_float(chassis.vx,chassis.vw,Speed,Add,layer2,Green,1400,830);
+//			}
 			//////////////////////////
-			else if(i == 21){
-			    client_grapjic_draw_float(nowfps,0,fps,Add,layer2,Yellow,1100,670);
-				
-			}
-			///////////////
+//			else if(i == 21){
+//			    client_grapjic_draw_float(nowfps,0,fps,Add,layer2,Yellow,1100,670);
+//				
+//			}
+//			///////////////
 			else
 			{
 				text_mask = 2;
 				i = 0;
-			}
-			
-			
-			
+			}			
 			if(i >= 16)
 			{
 				judge_send_mesg.ext_client_custom_character.data_cmd_id = Client_Draw_Character_Graph;
@@ -688,7 +723,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			switch(cha){
 				case 1:
 				{
-				client_graphic_draw_String("Cha: DOG",Chassis,Change,layer3,Pink,80,830);
+				client_graphic_draw_String("Cha: DOG",Chassis,Change,layer3,Amaranth,80,830);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_chassis,
 												sizeof(judge_send_mesg.ext_client_custom_character_chassis), DN_REG_ID);
@@ -715,7 +750,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 					
 			switch(gim){
 				case 1:{
-				client_graphic_draw_String("Gim: TRA",Gimbal,Change,layer3,Pink,80,770);
+				client_graphic_draw_String("Gim: TRA",Gimbal,Change,layer3,Orange,80,770);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_gimbal,
 												sizeof(judge_send_mesg.ext_client_custom_character_gimbal), DN_REG_ID);		
@@ -731,7 +766,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				}
 
 					case 3 :{
-				client_graphic_draw_String("Gim: BUF",Gimbal,Change,layer3,Orange,80,770);
+				client_graphic_draw_String("Gim: BUF",Gimbal,Change,layer3,Amaranth,80,770);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_gimbal,
 												sizeof(judge_send_mesg.ext_client_custom_character_gimbal), DN_REG_ID);			
@@ -748,7 +783,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			if(s<5){
 				switch(sho){
 				case 1:{
-				client_graphic_draw_String("FR:T,BAL:T",Shoot,Change,layer3,Pink,80,890);
+				client_graphic_draw_String("FR:T,BAL:T",Shoot,Change,layer3,Orange,80,890);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_shoot,
 												sizeof(judge_send_mesg.ext_client_custom_character_shoot), DN_REG_ID);
@@ -756,7 +791,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				}
 
 				case 2 :{
-				client_graphic_draw_String("FR:T,BAL:F",Shoot,Change,layer3,Pink,80,890);
+				client_graphic_draw_String("FR:T,BAL:F",Shoot,Change,layer3,Orange,80,890);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_shoot,
 												sizeof(judge_send_mesg.ext_client_custom_character_shoot), DN_REG_ID);		
@@ -772,7 +807,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 				}
 					
 					case 4 :{
-				client_graphic_draw_String("FR:F,BAL:T",Shoot,Change,layer3,Pink,80,890);
+				client_graphic_draw_String("FR:F,BAL:T",Shoot,Change,layer3,Green,80,890);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character_shoot,
 												sizeof(judge_send_mesg.ext_client_custom_character_shoot), DN_REG_ID);
@@ -791,7 +826,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			switch(view){
 				case 1:
 				{
-				client_graphic_draw_String("View:T",View,Change,layer2,Green,1100,467);
+				client_graphic_draw_String("View:T",View,Change,layer2,Orange,920,670);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 				sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);		
@@ -800,7 +835,7 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 
 				case 2:{
 
-				client_graphic_draw_String("View:F",View,Change,layer2,Pink,1100,467);
+				client_graphic_draw_String("View:F",View,Change,layer2,Pink,920,670);
 				Idle_mask = 0;
 				data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);		
@@ -828,43 +863,61 @@ void judgement_client_graphics_draw_pack(uint8_t text_twist)
 			{
 				if(text_twist == 1 && gimbal_mode != GIMBAL_SHOOT_BUFF) //实时显示电容 ，打能量机关除外
 				{
-					if(chassis.CapData[1]<14.5f)
-						client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Change,layer2,Yellow,1100,620);
-					else if(chassis.CapData[1]>14.5f)
-						client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Change,layer2,Green,1100,620);
+					if(chassis.CapData[1]<16.0f)
+						client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Change,layer2,Yellow,785,280);
+					else if(chassis.CapData[1]>16.0f)
+						client_grapjic_draw_float(cap_store,chassis.CapData[1],Cap,Change,layer2,Green,785,280);//1100，620
 					
 					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
 				}
-				else if (text_twist == 1 && gimbal_mode == GIMBAL_SHOOT_BUFF)//打能量机关，实时显示补偿
-				{
-					client_grapjic_draw_float(pc_recv_mesg.aim_yaw,pc_recv_mesg.aim_pitch,Compensates,Change,layer2,Yellow,1600,890);	
-					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
-													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
-				}
+//				else if (text_twist == 1 && gimbal_mode == GIMBAL_SHOOT_BUFF)//打能量机关，实时显示补偿
+//				{
+//					client_grapjic_draw_float(pc_recv_mesg.aim_yaw,pc_recv_mesg.aim_pitch,Compensates,Change,layer2,Yellow,1600,890);	
+//					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
+//													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
+//				}
 				//////////////////////////////////////
-				if(text_twist == 1) //实时显示fps
-				{
-					client_grapjic_draw_float(nowfps,0,fps,Change,layer2,Yellow,1100,670);
-					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
-					sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);
-				}
+//				if(text_twist == 1) //实时显示fps
+//				{
+//					client_grapjic_draw_float(nowfps,0,fps,Change,layer2,Yellow,1100,670);
+//					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
+//					sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);
+//				}
 				//////////////////////////////////////
-				if(text_twist == 2) //实时显示Pitch
+					if(text_twist == 2)//实时显示血量
 				{
-					client_grapjic_draw_float(gimbal.sensor.pit_relative_angle,0,Pitch,Change,layer2,Redblue,1400,890);
+					if(judge_recv_mesg.game_robot_state.current_HP>=80)
+						client_grapjic_draw_float(judge_recv_mesg.game_robot_state.current_HP,0,blood,Change,layer2,Cyan,720,560);
+					else
+						client_grapjic_draw_float(judge_recv_mesg.game_robot_state.current_HP,0,blood,Change,layer2,Pink,720,560);				
 					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
 				}
-				if(text_twist == 3)
+					if(text_twist == 3) //实时显示bullet
 				{
-					static float num=0;
-					if(chassis.vx)num=chassis.vx;
-					else num=chassis.vy;
-					client_grapjic_draw_float(num,chassis.vw,Speed,Change,layer2,Green,1400,830);
+					if(judge_recv_mesg.bullet_remaining.projectile_allowance_17mm >30)
+					client_grapjic_draw_float(judge_recv_mesg.bullet_remaining.projectile_allowance_17mm,0,Bullet,Change,layer2,Cyan,1100,560);
+					else
+					client_grapjic_draw_float(judge_recv_mesg.bullet_remaining.projectile_allowance_17mm,0,Bullet,Change,layer2,Pink,1100,560);	
 					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
 													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
 				}
+//				if(text_twist == 3) //实时显示Pitch
+//				{
+//					client_grapjic_draw_float(gimbal.sensor.pit_relative_angle,0,Pitch,Change,layer2,Redblue,1400,890);
+//					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
+//													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
+//				}
+//				if(text_twist == 3)
+//				{
+//					static float num=0;
+//					if(chassis.vx)num=chassis.vx;
+//					else num=chassis.vy;
+//					client_grapjic_draw_float(num,chassis.vw,Speed,Change,layer2,Green,1400,830);
+//					data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID,(uint8_t *)&judge_send_mesg.ext_client_custom_character,
+//													sizeof(judge_send_mesg.ext_client_custom_character), DN_REG_ID);					
+//				}
 				
 				if(text_twist == 4)
 				{
@@ -1061,3 +1114,33 @@ void judgement_client_packet_pack(uint8_t *p_data)
 									 STUDENT_DATA_LENGTH, DN_REG_ID);
 }
 
+void sentry_cmd_packet_pack(uint8_t *p_data) //未修改完
+{
+	uint8_t current_robot_id = 0;
+//	uint16_t receiver_ID = 0;
+	
+	current_robot_id = judge_recv_mesg.game_robot_state.robot_id;  //读取当前机器人的id
+	
+	judge_send_mesg.ext_student_interactive_data.data_cmd_id = SENTRY_CMD_ID;
+	judge_send_mesg.ext_student_interactive_data.sender_ID = (uint16_t)current_robot_id;
+	judge_send_mesg.ext_student_interactive_data.receiver_ID = JUDGE_SERVER_ID;
+	judge_send_mesg.sentry_cmd.mode_Union.info.confirm_rebirth = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.exchange_rebirth = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.remote_blood_times = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.remote_bullet_times = 0;
+	judge_send_mesg.sentry_cmd.mode_Union.info.bullet_number = 0;
+	
+	//将自定义的数据复制到发送结构体中
+	memcpy(&judge_send_mesg.ext_student_interactive_data.data[0], p_data,sizeof(judge_send_mesg.ext_student_interactive_data.data));
+	//该函数的功能为将需要发送的数据打包，便于下一步通过串口3发送给裁判系统
+	data_packet_pack(STUDENT_INTERACTIVE_HEADER_DATA_ID, (uint8_t *)&judge_send_mesg.ext_student_interactive_data,
+									 STUDENT_DATA_LENGTH, DN_REG_ID);
+}
+void map_data_packet_pack(uint8_t *p_data) //未修改完
+{
+	judge_send_mesg.map_data.sender_id = judge_recv_mesg.game_robot_state.robot_id;   //读取当前机器人的id
+	
+		//该函数的功能为将需要发送的数据打包，便于下一步通过串口3发送给裁判系统
+	data_packet_pack(MAP_DATA_ID, (uint8_t *)&judge_send_mesg.map_data,
+									 sizeof(judge_send_mesg.map_data), DN_REG_ID);
+}

@@ -1,7 +1,6 @@
 #ifndef _gimbal_task_H
 #define _gimbal_task_H
 
-
 #include "stm32f4xx.h"
 #include "ramp.h"
 typedef enum
@@ -9,18 +8,17 @@ typedef enum
   GIMBAL_INIT_NEVER,
   GIMBAL_INIT_DONE,
   NO_ACTION,
-  IS_ACTION, 
-}gimbal_state_t;
-
+  IS_ACTION,
+} gimbal_state_t;
 
 typedef struct
 {
-  /* ½Ç¶È»·µÄ¸ø¶¨ºÍ·´À¡ */
+  /* ï¿½Ç¶È»ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ */
   float yaw_angle_ref;
   float pit_angle_ref;
   float yaw_angle_fdb;
   float pit_angle_fdb;
-  /* ËÙ¶È»·µÄ¸ø¶¨ºÍ·´À¡ */
+  /* ï¿½Ù¶È»ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ */
   float yaw_spd_ref;
   float pit_spd_ref;
   float yaw_spd_fdb;
@@ -29,40 +27,39 @@ typedef struct
 
 typedef struct
 {
-  /* Ïà¶Ô½Ç¶È£¬ÍÓÂÝÒÇÅ·À­½Ç */
+  /* ï¿½ï¿½Ô½Ç¶È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å·ï¿½ï¿½ï¿½ï¿½ */
   float pit_relative_angle;
   float yaw_relative_angle;
   float pit_gyro_angle;
   float yaw_gyro_angle;
-  /* ½ÇËÙ¶È */
+  /* ï¿½ï¿½ï¿½Ù¶ï¿½ */
   float yaw_palstance;
   float pit_palstance;
 } gim_sensor_t;
 
-
 typedef struct
 {
   uint8_t small_buff_ctrl;
-	uint8_t big_buff_ctrl;
+  uint8_t big_buff_ctrl;
   uint8_t track_ctrl;
-	uint8_t separate_ctrl;
-	uint8_t chassis_stop;
-  
+  uint8_t separate_ctrl;
+  uint8_t chassis_stop;
+
   gim_pid_t pid;
   gim_sensor_t sensor;
   gimbal_state_t state;
   gimbal_state_t last_state;
-  
-  /*´ÓFLASHÖÐ¶Á³öµÄÐ£×¼±àÂëÎ»*/
-  int32_t       pit_center_offset;
-  int32_t       yaw_center_offset;
-  float         yaw_offset_angle;
-  float         pit_offset_angle;
-  float					yaw_dodge_angle;
-}gimbal_t;
 
-/*¿¨¶ûÂüÓÃ£¬ËÙ¶ÈÏà¹Ø½á¹¹Ìå*/
-typedef struct  // speed_calc_data_t
+  /*ï¿½ï¿½FLASHï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Ð£×¼ï¿½ï¿½ï¿½ï¿½Î»*/
+  int32_t pit_center_offset;
+  int32_t yaw_center_offset;
+  float yaw_offset_angle;
+  float pit_offset_angle;
+  float yaw_dodge_angle;
+} gimbal_t;
+
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½Ø½á¹¹ï¿½ï¿½*/
+typedef struct // speed_calc_data_t
 {
   int delay_cnt;
   int freq;
@@ -73,27 +70,27 @@ typedef struct  // speed_calc_data_t
   float processed_speed;
 } speed_calc_data_t;
 
-/* ¸ú×ÙÎ¢·ÖÆ÷£¨pc£© */
+/* ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pcï¿½ï¿½ */
 typedef struct
 {
-	float r;
-	float h;
-	float fh;
-	float v1, v2;
-	float lambda, pre_v1;
+  float r;
+  float h;
+  float fh;
+  float v1, v2;
+  float lambda, pre_v1;
 } TD_LADRC;
 
-/*Ç°À¡¿ØÖÆ²ÎÊý*/
+/*Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Æ²ï¿½ï¿½ï¿½*/
 typedef struct
 {
-	//Ç°À¡²¹³¥²ÎÊý
-	float a;
-	float b;
-	//»º´æ²ÎÊý
-	float rin;
-	float lastRin;
-	float perrRin;
-}FFC;
+  // Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  float a;
+  float b;
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  float rin;
+  float lastRin;
+  float perrRin;
+} FFC;
 
 extern gimbal_t gimbal;
 extern uint8_t input_flag;
@@ -111,10 +108,7 @@ static void track_aimor_handler(void);
 static void shoot_buff_ctrl_handler(void);
 
 float target_speed_calc(speed_calc_data_t *S, uint32_t time, float position);
-void initFeedforwardParam(FFC *vFFC,float a,float b);
-float getFeedforwardControl(FFC* vFFC,float v);
-
-
+void initFeedforwardParam(FFC *vFFC, float a, float b);
+float getFeedforwardControl(FFC *vFFC, float v);
 
 #endif
-

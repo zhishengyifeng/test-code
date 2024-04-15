@@ -1,14 +1,13 @@
 #include "ladrc.h"
 
-LADRC_NUM Fric_speed={0}; //系统需要整定的参数
-
+LADRC_NUM Fric_speed = {0}; // 系统需要整定的参数
 
 /**
    *@Brief default 参数表
    *@Brief 根据经验 ts在0.2~0.3之间 Wo与Wc选定后从小到大整定b0
    *@Date@WangShun 2022-05-28 2022-07-03补充
 ---------------------------------------------------
-          LADRC default参数表
+		  LADRC default参数表
 ---------------------------------------------------
 ---------------------------------------------------
   ts	|	h	|	r	|   wc   |   w0  |	b0
@@ -56,25 +55,23 @@ LADRC_NUM Fric_speed={0}; //系统需要整定的参数
 ---------------------------------------------------
 */
 
-
 /**
  * 函数说明 LADRC初始参考值
  * 		WangShun于2022-07-03创建
  */
-//const float LADRC_Unit[5][5] =
-//    {
-//        {0.005, 20, 100, 400, 0.5},
-//        {0.001, 20, 33, 133, 8},
-//        {0.005, 100, 20, 80, 0.5},
-//        {0.005, 100, 14, 57, 0.5},
-//        {0.005, 100, 50, 10, 1}};
-		
+// const float LADRC_Unit[5][5] =
+//     {
+//         {0.005, 20, 100, 400, 0.5},
+//         {0.001, 20, 33, 133, 8},
+//         {0.005, 100, 20, 80, 0.5},
+//         {0.005, 100, 14, 57, 0.5},
+//         {0.005, 100, 50, 10, 1}};
 
-static void abs_limit(float *x,int32_t limit)
+static void abs_limit(float *x, int32_t limit)
 {
-	if(*x > limit)
+	if (*x > limit)
 		*x = limit;
-	if(*x < -limit)
+	if (*x < -limit)
 		*x = -limit;
 }
 /**
@@ -82,23 +79,23 @@ static void abs_limit(float *x,int32_t limit)
  * 		Liao于2023-04-09创建
  */
 
-//LADRC_NUM Vision_angle =
-//{ 
+// LADRC_NUM Vision_angle =
+//{
 //	.h=0.005,//定时时间及时间步长
 //	.r=20,//跟踪速度参数
 //	.wc=100,//观测器带宽
 //	.w0=400,//状态误差反馈率带宽
 //	.b0=0.5,//系统参数
 //	.maxout=8000 //输出限幅
-//};
-void LADRC_Init(LADRC_NUM *LADRC_TYPE1,float h,float r,float wc,float w0,float b0,int32_t max_out)
+// };
+void LADRC_Init(LADRC_NUM *LADRC_TYPE1, float h, float r, float wc, float w0, float b0, int32_t max_out)
 {
-	LADRC_TYPE1->h = h;  //定时时间及时间步长
-  LADRC_TYPE1->r = r;  //跟踪速度参数
-  LADRC_TYPE1->wc = wc; //观测器带宽
-  LADRC_TYPE1->w0 = w0; //状态误差反馈率带宽
-  LADRC_TYPE1->b0 = b0; //系统参数
-	LADRC_TYPE1->maxout = max_out;//输出限幅
+	LADRC_TYPE1->h = h;			   // 定时时间及时间步长
+	LADRC_TYPE1->r = r; 			   // 跟踪速度参数
+	LADRC_TYPE1->wc = wc;		   // 观测器带宽
+	LADRC_TYPE1->w0 = w0;		   // 状态误差反馈率带宽
+	LADRC_TYPE1->b0 = b0;		   // 系统参数
+	LADRC_TYPE1->maxout = max_out; // 输出限幅
 }
 
 /**
@@ -107,9 +104,9 @@ void LADRC_Init(LADRC_NUM *LADRC_TYPE1,float h,float r,float wc,float w0,float b
  */
 void LADRC_REST(LADRC_NUM *LADRC_TYPE1)
 {
-  LADRC_TYPE1->z1 = 0; //定时时间及时间步长
-  LADRC_TYPE1->z2 = 0; //跟踪速度参数
-  LADRC_TYPE1->z3 = 0; //观测器带宽
+	LADRC_TYPE1->z1 = 0; // 定时时间及时间步长
+	LADRC_TYPE1->z2 = 0; // 跟踪速度参数
+	LADRC_TYPE1->z3 = 0; // 观测器带宽
 }
 /**
  * 函数名：void ADRC_TD(LADRC_NUM *LADRC_TYPE1,float Expect)
@@ -120,9 +117,9 @@ void LADRC_REST(LADRC_NUM *LADRC_TYPE1)
  */
 void LADRC_TD(LADRC_NUM *LADRC_TYPE1, float Expect)
 {
-  float fh = -LADRC_TYPE1->r * LADRC_TYPE1->r * (LADRC_TYPE1->v1 - Expect) - 2 * LADRC_TYPE1->r * LADRC_TYPE1->v2;
-  LADRC_TYPE1->v1 += LADRC_TYPE1->v2 * LADRC_TYPE1->h;
-  LADRC_TYPE1->v2 += fh * LADRC_TYPE1->h;
+	float fh = -LADRC_TYPE1->r * LADRC_TYPE1->r * (LADRC_TYPE1->v1 - Expect) - 2 * LADRC_TYPE1->r * LADRC_TYPE1->v2;
+	LADRC_TYPE1->v1 += LADRC_TYPE1->v2 * LADRC_TYPE1->h;
+	LADRC_TYPE1->v2 += fh * LADRC_TYPE1->h;
 }
 /**
  * 函数名：LADRC_ESO(LADRC_NUM *LADRC_TYPE1,float FeedBack)
@@ -133,38 +130,38 @@ void LADRC_TD(LADRC_NUM *LADRC_TYPE1, float Expect)
  */
 void LADRC_ESO(LADRC_NUM *LADRC_TYPE1, float FeedBack)
 {
-  float Beita_01 = 3 * LADRC_TYPE1->w0;
-  float Beita_02 = 3 * LADRC_TYPE1->w0 * LADRC_TYPE1->w0;
-  float Beita_03 = LADRC_TYPE1->w0 * LADRC_TYPE1->w0 * LADRC_TYPE1->w0;
+	float Beita_01 = 3 * LADRC_TYPE1->w0;
+	float Beita_02 = 3 * LADRC_TYPE1->w0 * LADRC_TYPE1->w0;
+	float Beita_03 = LADRC_TYPE1->w0 * LADRC_TYPE1->w0 * LADRC_TYPE1->w0;
 
-  float e = LADRC_TYPE1->z1 - FeedBack;
-  LADRC_TYPE1->z1 += (LADRC_TYPE1->z2 - Beita_01 * e) * LADRC_TYPE1->h;
-  LADRC_TYPE1->z2 += (LADRC_TYPE1->z3 - Beita_02 * e + LADRC_TYPE1->b0 * LADRC_TYPE1->u) * LADRC_TYPE1->h;
-  LADRC_TYPE1->z3 += -Beita_03 * e * LADRC_TYPE1->h;
+	float e = LADRC_TYPE1->z1 - FeedBack;
+	LADRC_TYPE1->z1 += (LADRC_TYPE1->z2 - Beita_01 * e) * LADRC_TYPE1->h;
+	LADRC_TYPE1->z2 += (LADRC_TYPE1->z3 - Beita_02 * e + LADRC_TYPE1->b0 * LADRC_TYPE1->u) * LADRC_TYPE1->h;
+	LADRC_TYPE1->z3 += -Beita_03 * e * LADRC_TYPE1->h;
 }
 /**
    *@Brief  LADRC_LSEF
    *@Date   线性控制率
-      WangShun于2022-07-03创建
+	  WangShun于2022-07-03创建
    */
 void LADRC_LF(LADRC_NUM *LADRC_TYPE1)
 {
-  float Kp = LADRC_TYPE1->wc * LADRC_TYPE1->wc;
-  float Kd = 2 * LADRC_TYPE1->wc;
-  /**
-   *@Brief  按自抗扰入门书上kd = 2wc
-   *@Before Kd=3*LADRC_TYPE1->wc;
-   *@Now    Kd=2*LADRC_TYPE1->wc;
-   *@WangShun  2022-04-27  注释
-   */
-  float e1 = LADRC_TYPE1->v1 - LADRC_TYPE1->z1;
-  float e2 = LADRC_TYPE1->v2 - LADRC_TYPE1->z2;
-  float u0 = Kp * e1 + Kd * e2;
-  LADRC_TYPE1->u = (u0 - LADRC_TYPE1->z3) / LADRC_TYPE1->b0;
-//  if (LADRC_TYPE1->u > 2000)
-//    LADRC_TYPE1->u = 2000;
-//  else if (LADRC_TYPE1->u < -2000)
-//    LADRC_TYPE1->u = -2000;
+	float Kp = LADRC_TYPE1->wc * LADRC_TYPE1->wc;
+	float Kd = 2 * LADRC_TYPE1->wc;
+	/**
+	 *@Brief  按自抗扰入门书上kd = 2wc
+	 *@Before Kd=3*LADRC_TYPE1->wc;
+	 *@Now    Kd=2*LADRC_TYPE1->wc;
+	 *@WangShun  2022-04-27  注释
+	 */
+	float e1 = LADRC_TYPE1->v1 - LADRC_TYPE1->z1;
+	float e2 = LADRC_TYPE1->v2 - LADRC_TYPE1->z2;
+	float u0 = Kp * e1 + Kd * e2;
+	LADRC_TYPE1->u = (u0 - LADRC_TYPE1->z3) / LADRC_TYPE1->b0;
+	//  if (LADRC_TYPE1->u > 2000)
+	//    LADRC_TYPE1->u = 2000;
+	//  else if (LADRC_TYPE1->u < -2000)
+	//    LADRC_TYPE1->u = -2000;
 	abs_limit(&(LADRC_TYPE1->u), LADRC_TYPE1->maxout);
 }
 /**
@@ -176,10 +173,10 @@ void LADRC_LF(LADRC_NUM *LADRC_TYPE1)
  */
 float LADRC_Loop(LADRC_NUM *LADRC_TYPE1, float Expect, float RealTimeOut)
 {
-  float Expect_Value = Expect;
-  float Measure = RealTimeOut;
-  LADRC_TD(LADRC_TYPE1, Expect_Value);
-  LADRC_ESO(LADRC_TYPE1, Measure);
-  LADRC_LF(LADRC_TYPE1);
+	float Expect_Value = Expect;
+	float Measure = RealTimeOut;
+	LADRC_TD(LADRC_TYPE1, Expect_Value);
+	LADRC_ESO(LADRC_TYPE1, Measure);
+	LADRC_LF(LADRC_TYPE1);
 	return LADRC_TYPE1->u;
 }

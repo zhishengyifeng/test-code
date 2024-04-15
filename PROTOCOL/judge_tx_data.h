@@ -28,6 +28,7 @@ typedef enum
 	STUDENT_RED_INFANTRY5_ID  			= 5,
 	STUDENT_RED_AERIAL_ID	    			= 6,
 	STUDENT_RED_SENTRY_ID	    			= 7,
+	STUDENT_RED_RADAR_ID            = 8,
 	STUDENT_RED_RadarStation_ID	    = 9,
 	STUDENT_RED_Outpost_ID	    		= 10,//前哨站(前哨和基地的ID用于小地图交互数据)
 	STUDENT_RED_Base_ID	    				= 11,//基地
@@ -38,6 +39,7 @@ typedef enum
 	STUDENT_BLUE_INFANTRY5_ID 			= 105,
 	STUDENT_BLUE_AERIAL_ID    			= 106,
 	STUDENT_BLUE_SENTRY_ID	  			= 107,
+	STUDENT_BLUE_RADAR_ID           = 108,
 	STUDENT_BLUE_RadarStation_ID	  = 109,
 	STUDENT_BLUE_Outpost_ID	    		= 110,
 	STUDENT_BLUE_Base_ID	    			= 111,
@@ -55,6 +57,9 @@ typedef enum
 	BLUE_INFANTRY4_CLIENT_ID  = 0x0168,
 	BLUE_INFANTRY5_CLIENT_ID  = 0x0169,
 	BLUE_AERIAL_CLIENT_ID	    = 0x016A,	
+	
+	//裁判系统服务器（用于哨兵和雷达自主决策指令）
+	JUDGE_SERVER_ID           = 0x8080,
 }interactive_id_e;
 
 //内容ID和命令ID
@@ -77,6 +82,10 @@ typedef enum
 	Client_Draw_Five_Graph												= 0x0103,
 	Client_Draw_Seven_Graph												= 0x0104,
 	Client_Draw_Character_Graph										= 0x0110,
+	/* NEW */
+	SENTRY_CMD_ID                                 = 0x0120, //哨兵自主决策指令
+	RADAR_CMD_ID                                  = 0x0121, //雷达自主决策指令
+  /* NEW */
 	//命令ID
 	Robot_communicative_data											= 0x0301,
 	Custom_control_interactive_port								= 0x0302,
@@ -204,6 +213,8 @@ typedef enum
 	Compensates                   =39,
 	Speed													=40,
 	fps                           =41,
+	blood                         =42,
+	Bullet                        =43,
 	//图形操作
 	Null_operate								=0,//空操作
 	Delete_graph								=1,//删除图层
@@ -244,6 +255,57 @@ typedef enum
 	White												=8,//白色
 }client_graphic_draw_operate_data_e;
 
+/* 0301下的0120 */
+typedef __packed struct  
+{ 
+ __packed union
+  {
+     //uint32_t sentry_cmd;
+     __packed struct 
+    {
+      uint32_t confirm_rebirth      :  1; // 是否确认读条复活  0 不复活/1 复活
+      uint32_t exchange_rebirth     :  1; // 是否确认兑换复活  0 不兑换/1 兑换（花费金币：[ROUNDUP（（420- 比赛剩余时长）/60）×80+机器人等级×20]金币/1 台）
+			uint32_t bullet_number        : 11; // 想要兑换的发弹量  可将其从0修改至X，则消耗X金币成功兑换X允许发弹量。此后哨兵可将其从X修改至X+Y
+			uint32_t remote_bullet_times  :  4; // 远程兑换发弹量次数,开始为0，单调递增且每次仅能增加1
+			uint32_t remote_blood_times   :  4; // 远程兑换血量的请求次数，开始为0，单调递增且每次仅能增加1 (花费金币：[50+ROUNDUP（（420- 比赛剩余时长） /60）×20]金币/1 次)
+      uint32_t reserved             : 11; // 保留位
+		} info;
+	} mode_Union;
+} sentry_cmd_t;
+/*
+在哨兵发送该子命令时，服务器将按照从相对低位到相对高位
+的原则依次处理这些指令，处理至全部成功或不能处理为止。
+举例：若队伍金币数为 0，此时哨兵战亡，“是否确认复活”
+的值为 1，“是否想要兑换立即复活”的值为 1，“想要兑换
+的发弹量值”为 100。（假定之前哨兵未兑换过发弹量）由于
+此时队伍金币数不足以使哨兵兑换立即复活，则服务器将会忽
+视后续指令，等待哨兵发送的下一组指令。
+bit 21-31：保留
+*/
+/* 0301下的0121 */
+typedef __packed struct
+{
+uint8_t radar_cmd;
+} radar_cmd_t;
+
+/*0307*/
+typedef __packed struct
+{
+ uint8_t intention;
+ uint16_t start_position_x;
+ uint16_t start_position_y;
+ int8_t delta_x[49];
+ int8_t delta_y[49];
+ uint16_t sender_id;
+}map_data_t;
+
+/*0308*/
+typedef __packed struct
+{ 
+ uint16_t sender_id;
+ uint16_t receiver_id;
+ uint16_t user_data[30];
+}custom_info_t;
 /** 
   * @brief  the data structure receive from judgement
   */
@@ -264,8 +326,14 @@ typedef struct
 	ext_client_custom_graphic_seven_t							ext_client_custom_graphic_seven;
 	ext_client_custom_character_t									ext_client_custom_character;
 	ext_client_custom_character_t									ext_client_custom_character_chassis;//底盘状态
-	ext_client_custom_character_t									ext_client_custom_character_shoot;//射击状态
-	ext_client_custom_character_t									ext_client_custom_character_gimbal;//云台状态
+	ext_client_custom_character_t									ext_client_custom_character_shoot;  //射击状态
+	ext_client_custom_character_t									ext_client_custom_character_gimbal; //云台状态
+	//0x0120~0x0121发送的内容
+	sentry_cmd_t                                  sentry_cmd;                         //0x0120 哨兵自主决策指令
+	radar_cmd_t                                   radar_cmd;                          //0x0121 雷达自主决策指令
+	//0x0307~0x0308发送的内容
+	map_data_t                                    map_data;                           //0x0307 发送路径坐标数据    
+	custom_info_t                                 custom_info;                        //0x0308 己方机器人端发送自定义消息
 } judge_txdata_t;
 
 extern judge_txdata_t judge_send_mesg;
@@ -273,6 +341,8 @@ extern fifo_s_t  judge_txdata_fifo;
 
 void judgement_tx_param_init(void);
 void judgement_client_packet_pack(uint8_t *p_data);
+void sentry_cmd_packet_pack(uint8_t *p_data);
+void map_data_packet_pack(uint8_t *p_data);
 void judgement_client_graphics_draw_pack(uint8_t text_twist);
 static void client_graphic_DODGE_low_voltage (void);
 static void client_graphic_draw_accelerate (void);

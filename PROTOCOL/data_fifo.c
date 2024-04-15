@@ -28,167 +28,161 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-fifo_s_t* fifo_s_create(uint32_t unit_cnt, SemaphoreHandle_t mutex)
+fifo_s_t *fifo_s_create(uint32_t unit_cnt, SemaphoreHandle_t mutex)
 {
-  fifo_s_t *pfifo     = NULL;
-  uint8_t  *base_addr = NULL;
-  
-  //! Check input parameters.
-  ASSERT(0 != unit_cnt);
+	fifo_s_t *pfifo = NULL;
+	uint8_t *base_addr = NULL;
 
-  //! Allocate Memory for pointer of new FIFO Control Block.
-  pfifo = (fifo_s_t*) malloc(sizeof(fifo_s_t));
-  if(NULL == pfifo)
-  {
-    //! Allocate Failure, exit now.
-    return (NULL);
-		
-  }
+	//! Check input parameters.
+	ASSERT(0 != unit_cnt);
 
-  //! Allocate memory for FIFO.
-  base_addr = malloc(unit_cnt);
-  if(NULL == base_addr)
-  {
-    //! Allocate Failure, exit now.
-    return (NULL);
-  }
+	//! Allocate Memory for pointer of new FIFO Control Block.
+	pfifo = (fifo_s_t *)malloc(sizeof(fifo_s_t));
+	if (NULL == pfifo)
+	{
+		//! Allocate Failure, exit now.
+		return (NULL);
+	}
 
-  fifo_s_init(pfifo, base_addr, unit_cnt, mutex);
+	//! Allocate memory for FIFO.
+	base_addr = malloc(unit_cnt);
+	if (NULL == base_addr)
+	{
+		//! Allocate Failure, exit now.
+		return (NULL);
+	}
 
-  return (pfifo);
+	fifo_s_init(pfifo, base_addr, unit_cnt, mutex);
+
+	return (pfifo);
 }
 
-void fifo_s_destory(fifo_s_t* pfifo)
+void fifo_s_destory(fifo_s_t *pfifo)
 {
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  ASSERT(NULL != pfifo->start_addr);
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
+	ASSERT(NULL != pfifo->start_addr);
 
-  //! free FIFO memory
-  free(pfifo->start_addr);
-  
-  //! delete mutex
-  MUTEX_DELETE();
-  
-  //! free FIFO Control Block memory.
-  free(pfifo);
+	//! free FIFO memory
+	free(pfifo->start_addr);
 
-  return;
+	//! delete mutex
+	MUTEX_DELETE();
+
+	//! free FIFO Control Block memory.
+	free(pfifo);
+
+	return;
 }
 
-
-
-int32_t fifo_s_init(fifo_s_t* pfifo, void* base_addr, uint32_t unit_cnt, SemaphoreHandle_t mutex)
+int32_t fifo_s_init(fifo_s_t *pfifo, void *base_addr, uint32_t unit_cnt, SemaphoreHandle_t mutex)
 {
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  ASSERT(NULL != base_addr);
-  ASSERT(0    != unit_cnt);
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
+	ASSERT(NULL != base_addr);
+	ASSERT(0 != unit_cnt);
 
-  pfifo->mutex = mutex;
-  
-  if (mutex != NULL)
-  {
-    //! Initialize FIFO Control Block.
-    pfifo->start_addr  = (uint8_t*) base_addr;
-    pfifo->end_addr    = (uint8_t*) base_addr + unit_cnt - 1;
-    pfifo->buf_size    = unit_cnt;
-    pfifo->free        = unit_cnt;
-    pfifo->used        = 0;
-    pfifo->read_index  = 0;
-    pfifo->write_index = 0;
-    
-    return 0;
-  }
-  else
-  {
-    return -1;
-  }
+	pfifo->mutex = mutex;
+
+	if (mutex != NULL)
+	{
+		//! Initialize FIFO Control Block.
+		pfifo->start_addr = (uint8_t *)base_addr;
+		pfifo->end_addr = (uint8_t *)base_addr + unit_cnt - 1;
+		pfifo->buf_size = unit_cnt;
+		pfifo->free = unit_cnt;
+		pfifo->used = 0;
+		pfifo->read_index = 0;
+		pfifo->write_index = 0;
+
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
 }
 
-
-int32_t fifo_s_put(fifo_s_t* pfifo, uint8_t element)
+int32_t fifo_s_put(fifo_s_t *pfifo, uint8_t element)
 {
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
 
-  if(0 >= pfifo->free)
-  {
-    //! Error, FIFO is full!
-    return -1;
-  }
-  
-  MUTEX_WAIT();
-  pfifo->start_addr[pfifo->write_index++] = element;
-  pfifo->write_index %= pfifo->buf_size;
-  pfifo->free--;
-  pfifo->used++;
-  MUTEX_RELEASE();
-  
-  return 0;
+	if (0 >= pfifo->free)
+	{
+		//! Error, FIFO is full!
+		return -1;
+	}
+
+	MUTEX_WAIT();
+	pfifo->start_addr[pfifo->write_index++] = element;
+	pfifo->write_index %= pfifo->buf_size;
+	pfifo->free--;
+	pfifo->used++;
+	MUTEX_RELEASE();
+
+	return 0;
 }
-
 
 int32_t fifo_s_puts(fifo_s_t *pfifo, uint8_t *psource, uint32_t number)
 {
-  int puts_num = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  if(psource == NULL)
-      return -1;
-  
-  MUTEX_WAIT();
-  for(uint32_t i = 0; (i < number) && (pfifo->free > 0); i++)
-  {
-    pfifo->start_addr[pfifo->write_index++] = psource[i];
-    pfifo->write_index %= pfifo->buf_size;
-    pfifo->free--;
-    pfifo->used++;
-    puts_num++;
-  }
-  MUTEX_RELEASE();
-  return puts_num;
+	int puts_num = 0;
+
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
+
+	if (psource == NULL)
+		return -1;
+
+	MUTEX_WAIT();
+	for (uint32_t i = 0; (i < number) && (pfifo->free > 0); i++)
+	{
+		pfifo->start_addr[pfifo->write_index++] = psource[i];
+		pfifo->write_index %= pfifo->buf_size;
+		pfifo->free--;
+		pfifo->used++;
+		puts_num++;
+	}
+	MUTEX_RELEASE();
+	return puts_num;
 }
 
-uint8_t fifo_s_get(fifo_s_t* pfifo)
+uint8_t fifo_s_get(fifo_s_t *pfifo)
 {
-  uint8_t   retval = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  MUTEX_WAIT();
-  retval = pfifo->start_addr[pfifo->read_index++];
-  pfifo->read_index %= pfifo->buf_size;
-  pfifo->free++;
-  pfifo->used--;
-  MUTEX_RELEASE();
+	uint8_t retval = 0;
 
-  return retval;
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
+
+	MUTEX_WAIT();
+	retval = pfifo->start_addr[pfifo->read_index++];
+	pfifo->read_index %= pfifo->buf_size;
+	pfifo->free++;
+	pfifo->used--;
+	MUTEX_RELEASE();
+
+	return retval;
 }
 
-
-uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
+uint16_t fifo_s_gets(fifo_s_t *pfifo, uint8_t *source, uint8_t len)
 {
-  uint8_t   retval = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  MUTEX_WAIT();
-  for (int i = 0; (i < len) && (pfifo->used > 0); i++)
-  {
-    source[i] = pfifo->start_addr[pfifo->read_index++];
-    pfifo->read_index %= pfifo->buf_size;
-    pfifo->free++;
-    pfifo->used--;
-    retval++;
-  }
-  MUTEX_RELEASE();
+	uint8_t retval = 0;
 
-  return retval;
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
+
+	MUTEX_WAIT();
+	for (int i = 0; (i < len) && (pfifo->used > 0); i++)
+	{
+		source[i] = pfifo->start_addr[pfifo->read_index++];
+		pfifo->read_index %= pfifo->buf_size;
+		pfifo->free++;
+		pfifo->used--;
+		retval++;
+	}
+	MUTEX_RELEASE();
+
+	return retval;
 }
 
 /******************************************************************************************
@@ -201,25 +195,24 @@ uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
 //! \retval the data element of FIFO.
 //
 ******************************************************************************************/
-uint8_t fifo_s_pre_read(fifo_s_t* pfifo, uint8_t offset)
+uint8_t fifo_s_pre_read(fifo_s_t *pfifo, uint8_t offset)
 {
-  uint32_t index;
+	uint32_t index;
 
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
 
-  if(offset > pfifo->used)
-  {        
-    return 0x00;
-  }
-  else
-  {
-    index = ((pfifo->read_index + offset) % pfifo->buf_size);
-    // Move Read Pointer to right position   
-    return pfifo->start_addr[index];
-  }
+	if (offset > pfifo->used)
+	{
+		return 0x00;
+	}
+	else
+	{
+		index = ((pfifo->read_index + offset) % pfifo->buf_size);
+		// Move Read Pointer to right position
+		return pfifo->start_addr[index];
+	}
 }
-
 
 /******************************************************************************************
 //!
@@ -227,12 +220,12 @@ uint8_t fifo_s_pre_read(fifo_s_t* pfifo, uint8_t offset)
 //!         - Zero(false) if not empty.
 //
 ******************************************************************************************/
-uint8_t fifo_is_empty(fifo_s_t* pfifo)
+uint8_t fifo_is_empty(fifo_s_t *pfifo)
 {
-  //! Check input parameter.
-  ASSERT(NULL != pfifo);
+	//! Check input parameter.
+	ASSERT(NULL != pfifo);
 
-  return (0 == pfifo->used);
+	return (0 == pfifo->used);
 }
 
 /*****************************************************************************************
@@ -241,12 +234,12 @@ uint8_t fifo_is_empty(fifo_s_t* pfifo)
 //!         - Zero(false) if not full.
 //
 *****************************************************************************************/
-uint8_t fifo_is_full(fifo_s_t* pfifo)
+uint8_t fifo_is_full(fifo_s_t *pfifo)
 {
-  //! Check input parameter.
-  ASSERT(NULL != pfifo);
+	//! Check input parameter.
+	ASSERT(NULL != pfifo);
 
-  return (0 == pfifo->free);
+	return (0 == pfifo->free);
 }
 
 /******************************************************************************************
@@ -254,12 +247,12 @@ uint8_t fifo_is_full(fifo_s_t* pfifo)
 //! \retval The number of elements in FIFO.
 //
 ******************************************************************************************/
-uint32_t fifo_used_count(fifo_s_t* pfifo)
+uint32_t fifo_used_count(fifo_s_t *pfifo)
 {
-  //! Check input parameter.
-  ASSERT(NULL != pfifo);
+	//! Check input parameter.
+	ASSERT(NULL != pfifo);
 
-  return (pfifo->used);
+	return (pfifo->used);
 }
 
 /******************************************************************************************
@@ -267,14 +260,13 @@ uint32_t fifo_used_count(fifo_s_t* pfifo)
 //! \retval The number of elements in FIFO.
 //
 ******************************************************************************************/
-uint32_t fifo_free_count(fifo_s_t* pfifo)
+uint32_t fifo_free_count(fifo_s_t *pfifo)
 {
-  //! Check input parameter.
-  ASSERT(NULL != pfifo);
+	//! Check input parameter.
+	ASSERT(NULL != pfifo);
 
-  return (pfifo->free);
+	return (pfifo->free);
 }
-
 
 /******************************************************************************************
 //
@@ -285,19 +277,18 @@ uint32_t fifo_free_count(fifo_s_t* pfifo)
 //! \retval 0 if success, -1 if failure.
 //
 ******************************************************************************************/
-uint8_t fifo_flush(fifo_s_t* pfifo)
+uint8_t fifo_flush(fifo_s_t *pfifo)
 {
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
+	//! Check input parameters.
+	ASSERT(NULL != pfifo);
 
-  //! Initialize FIFO Control Block.
-  MUTEX_WAIT();
-  pfifo->free        = pfifo->buf_size;
-  pfifo->used        = 0;
-  pfifo->read_index  = 0;
-  pfifo->write_index = 0;
-  MUTEX_RELEASE();
+	//! Initialize FIFO Control Block.
+	MUTEX_WAIT();
+	pfifo->free = pfifo->buf_size;
+	pfifo->used = 0;
+	pfifo->read_index = 0;
+	pfifo->write_index = 0;
+	MUTEX_RELEASE();
 
-  return 0;
+	return 0;
 }
-

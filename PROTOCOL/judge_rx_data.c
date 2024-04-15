@@ -2,13 +2,15 @@
 #include "dma.h"
 #include "string.h"
 #include "judge_task.h"
-
+#include "chassis_task.h"
+#include "modeswitch_task.h"
 
 
 /*裁判系统的数据接收 --裁判系统发送数据，stm32接收；
   发送对应的命令码cmd_id,然后读取相应信息*/
 	
 judge_rxdata_t judge_recv_mesg;
+judge_data_limit_t judge_data_limit;
 
 /* judge system dma receive data object */
 uart_dma_rxdata_t judge_rx_obj;
@@ -62,7 +64,7 @@ void judgement_data_handler(uint8_t *p_frame)
   CMD_ID =  cmd_id; 
   switch (cmd_id)
   {
-    case GAME_STATE_ID://1HZ周期发送
+    case GAME_STATE_ID:                                               //001,比赛状态数据,1HZ周期发送
     {
       memcpy(&judge_recv_mesg.game_state, data_addr, data_length);//读取比赛状态数据保存在结构体judge_recv_mesg中
 		
@@ -83,38 +85,35 @@ void judgement_data_handler(uint8_t *p_frame)
       {
           /*用户代码*/
       }
+			
+			if(judge_recv_mesg.game_state.game_progress == 4 )//&& judge_recv_mesg.game_state.stage_remain_time >= 0 )
+			{
+				
+			}
     }
     break;
 		
-	  case GAME_RESULT_ID:                                              //比赛结束后发送
-      memcpy(&judge_recv_mesg.game_result, data_addr, data_length);   //比赛结果
+	  case GAME_RESULT_ID:                                              //002,比赛结果数据
+      memcpy(&judge_recv_mesg.game_result, data_addr, data_length);   
     break;
 		
-    case GAME_ROBOT_HP_ID:                                            //0x0003，1HZ周期发送
-      memcpy(&judge_recv_mesg.game_robot_HP, data_addr, data_length); //比赛机器人血量信息
+    case GAME_ROBOT_HP_ID:                                            //003，比赛机器人血量数据,1HZ周期发送
+      memcpy(&judge_recv_mesg.game_robot_HP, data_addr, data_length); 
     break;
-		
-    case DART_STATE_ID:                                               //0x004，飞镖发射时发送
-			 memcpy(&judge_recv_mesg.dart_state, data_addr, data_length);
-		break;
-		
-		case ICRA_BUFF_DEBUFF_ZONE_STATE_ID:                              //人工智能挑战赛加成或惩罚
-			 memcpy(&judge_recv_mesg.ICRA_buff_debuff_zone_state, data_addr, data_length);
-		break;
-		
-    case EVENT_DATA_ID:                                               //1HZ周期发送
-      memcpy(&judge_recv_mesg.event_data, data_addr, data_length);    //场地事件数据
+			
+    case EVENT_DATA_ID:                                               //004,场地事件数据，1HZ周期发送
+      memcpy(&judge_recv_mesg.event_data, data_addr, data_length);    
     break; 
 		
     case SUPPLY_PROJECTILE_ACTION_ID:                                 //102，场地补给站动作标识符，动作发生后发送
       memcpy(&judge_recv_mesg.supply_projectile_action, data_addr, data_length);
     break;
 		
-		case REFEREE_WARNING_ID:                                          //0x0104，裁判警告数据，警告后发送
+		case REFEREE_WARNING_ID:                                          //104，裁判警告数据，警告后发送
       memcpy(&judge_recv_mesg.referee_warning, data_addr, data_length);
 		break;
 		
-		case DART_REMAINING_TINME_ID:                                     //105，1HZ周期发送
+		case DART_REMAINING_TINME_ID:                                     //105，飞镖发射口倒计时,1HZ周期发送
 			memcpy(&judge_recv_mesg.dart_remaining_time, data_addr, data_length);
 		break;
 		
@@ -144,6 +143,8 @@ void judgement_data_handler(uint8_t *p_frame)
 		
 		case SHOOT_DATA_ID:                                               //207，实时射击数据，子弹发射后发送
 			memcpy(&judge_recv_mesg.shoot_data, data_addr, data_length);
+			judge_data_limit.shooter_id1_17mm_speed_limit = 30;  //m/s
+			judge_data_limit.shooter_id2_17mm_speed_limit = 30;  //m/s
 		break;
 		
 		case BULLET_REMAINING_ID:                                         //208，弹丸剩余量，仅哨兵、空中ICRA机器人，1HZ发送
@@ -158,6 +159,21 @@ void judgement_data_handler(uint8_t *p_frame)
 			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
 		break;
 		
+		case GROUND_ROBOT_POSITION_ID:                                    //20B，地面机器人位置数据
+			memcpy(&judge_recv_mesg.ground_robot_position, data_addr, data_length);
+		break;
+
+		case RADAR_MARK_DATA_ID:                                          //20C，雷达标记进度数据
+			memcpy(&judge_recv_mesg.radar_mark_data, data_addr, data_length);
+		break;
+
+		case SENTRY_INFO_ID:                                              //020D，哨兵自主决策相关信息同步
+			memcpy(&judge_recv_mesg.sentry_info, data_addr, data_length);
+		break;
+		
+		case RADAR_INFO_ID:                                               //020E，雷达自主决策信息同步
+			memcpy(&judge_recv_mesg.radar_info, data_addr, data_length);
+		break;
 //	  case STUDENT_INTERACTIVE_HEADER_DATA_ID:                         //301 机器人间交互数据，发送方触发发送
 //	  {
 //		  if(data_length <= 119)                                         //数据段头结构长度+交互数据长度
@@ -182,6 +198,22 @@ void judgement_data_handler(uint8_t *p_frame)
 		case KEYBOARD_AND_MOUSE_INFORMATION_ID:                                            //304，键盘、鼠标信息，通过图传串口发送
 			memcpy(&judge_recv_mesg.mouse_keyboard_informationt, data_addr, data_length);
     break;
+		
+		case MAP_ROBOT_DATA_ID:                                                            //305，选手端小地图接收雷达数据
+//			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
+		break;
+		
+		case CUSTOM_CLIENT_DATA_ID:                                               				 //306，自定义控制器与选手端交互数据
+//			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
+		break;
+		
+		case MAP_DATA_ID:                                               									 //307，选手端小地图接收哨兵数据
+//			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
+		break;
+		
+		case CUSTOM_INFO_ID:                                               								 //308，选手端小地图接收机器人消息
+//			memcpy(&judge_recv_mesg.dart_client_cmd, data_addr, data_length);
+		break;
 		
 		default:
     {

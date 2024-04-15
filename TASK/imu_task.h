@@ -36,15 +36,30 @@
 #define INS_MAG_Y_ADDRESS_OFFSET 1
 #define INS_MAG_Z_ADDRESS_OFFSET 2
 
-#define BMI088_BOARD_INSTALL_SPIN_MATRIX    \
-    {0.0f, 1.0f, 0.0f},                     \
+//#if (INFANTRY_NUM == INFANTRY_5)
+////竖直摩擦轮陀螺仪矩阵
+#define BMI088_BOARD_INSTALL_SPIN_MATRIX     \
     {-1.0f, 0.0f, 0.0f},                     \
-    {0.0f, 0.0f, 1.0f}                      \
+    {0.0f, -1.0f, 0.0f},                     \
+    {0.0f, 0.0f, 1.0f}                       \
+//    {0.0f, 1.0f, 0.0f},                     \
+//    {-1.0f, 0.0f, 0.0f},                     \
+//    {0.0f, 0.0f, 1.0f}                      \
+//		
+//#else 
+//////水平摩擦轮陀螺仪矩阵
+//#define BMI088_BOARD_INSTALL_SPIN_MATRIX   \
+    {-1.0f, 0.0f, 0.0f},                     \
+    {0.0f, -1.0f, 0.0f},                     \
+    {0.0f, 0.0f, 1.0f}                     		
+		
 
+
+//#endif
 
 #define IST8310_BOARD_INSTALL_SPIN_MATRIX   \
-    {1.0f, 0.0f, 0.0f},                     \
     {0.0f, 1.0f, 0.0f},                     \
+    {-1.0f, 0.0f, 0.0f},                     \
     {0.0f, 0.0f, 1.0f}                      \
 
 typedef struct
@@ -62,10 +77,7 @@ typedef struct
   float yaw;
 } imu_attitude_t;
 
-
-
 void imu_task(void const *argu);
-
 
 #endif
 

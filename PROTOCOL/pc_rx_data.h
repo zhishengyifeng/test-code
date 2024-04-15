@@ -35,13 +35,13 @@ typedef struct
     uint8_t data_byte;
     struct
     {
-      uint8_t task_mode : 1;    // 模式 ( 0 自瞄  / 1 大小符)
-      uint8_t visual_valid : 1; // 视觉有效位
-      uint8_t reserved : 6;     // 保留位
+      uint8_t task_mode : 1;    // 模式 ( 0 自瞄  / 1 大小笄1�7)
+      uint8_t visual_valid : 1; // 视觉有效佄1�7
+      uint8_t reserved : 6;     // 保留佄1�7
     } info;
   } mode_Union;
-  float aim_pitch; // 欧拉角(度)
-  float aim_yaw;   // 欧拉角(度)
+  float aim_pitch; // 欧拉规1�7(庄1�7)
+  float aim_yaw;   // 欧拉规1�7(庄1�7)
 } robot_rx_data;
 #pragma pack()
 

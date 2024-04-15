@@ -16,9 +16,7 @@
 
 3. 复制以下命令
 
-   	git clone https://github.com/AwakeLion-Robot-Lab/control-group-standard-robot.git
-   	或
-   	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
+		git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
 
 4. 注意不要使用Ctrl+V粘贴，否则会出现错误
    正确粘贴快捷键是Shift+Ins,或者右键点击再选Paste
@@ -30,13 +28,11 @@
 #### git命令使用说明
 1. git clone 拉取远程仓库的代码到本地，如：
 
-      	git clone https://github.com/AwakeLion-Robot-Lab/control-group-standard-robot.git
-     	或
-     	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
+      	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
      
 2. 切换至新分支xxx（相当于复制了remote的仓库到本地的xxx分支上）
 
-     	git checkout -b xxx /git switch -c xxx(右边的命令更好记|switch然后change)
+     	git checkout -b xxx 
 
 
 3. 修改完成后，查看自己对代码做出的改变
@@ -59,13 +55,13 @@
 
 
 #### git开发流程
-1. 从GitLab/Github拉取代码
+1. 从GitLab拉取代码
 
-    	git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
+			git clone https://jihulab.com/awakelion-robot-lab/control-group/standard-robot.git
 
-2. 新建my-feature分支，并由main分支切换到my-feature分支，执行以下这一条命令即可          (通常我们把开发分支命名为develop)
+2. 新建my-feature分支，并由main分支切换到my-feature分支，执行以下这一条命令即可
 
-			git checkout -b my-feature/git switch -c xxx(右边的命令更好记|switch然后change)
+			git checkout -b my-feature
 
 3. 在自己电脑上用Keil,Vscode或Qt修改代码或者添加文件
 
@@ -94,24 +90,10 @@
 
 ​	以上就是使用git来管理和维护代码的基本工作流程。
 
-8. 版本回退
-​	方法一	reset	该命令会强行覆盖当前版本和要回退的版本之间的其他版本（不太建议）
-```
-   git log                      （查看版本号）
-   git reset --hard +目标版本号     （回退到目标版本）
-```
-
-​	方法二	revert	在当前版本的基础上新增一个版本，不影响以前的代码
-```
-   git log                      （查看版本号）
-   git revert -n +目标版本号     （回退到目标版本）
-```
-​	以上就是常用到的全部命令，当然也可以通过vscode+git插件通过图形化操作界面完成。
 
 
 
 #### 可能会遇到的情况
-
 ​	假设你两天前拉了一份main分支的代码，并在此时此刻你完成了代码的修改，但是在10分钟前GitLab远程仓库的main分支被你的组长更新了，这种情况的解决方法如下：
 
 1. 在你的电脑上由当前的my-feature开发分支切换到main原始主分支
@@ -141,6 +123,8 @@
 5. 将本地的my-feature分支更新到GitLab远程仓库
 
 			git push orgin my-feature
+
+
 
 
 
