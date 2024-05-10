@@ -23,6 +23,10 @@
 #include "BMI088Middleware.h"
 #include "ahrs.h"
 #include "modeswitch_task.h"
+#include "filter.h"
+
+
+#include "stdio.h"
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
@@ -69,6 +73,7 @@ static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+static fp32 gyro_filter[3] = {0.0f, 0.0f, 0.0f};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f}; // euler angle, unit rad.??? ?? rad
 fp32 INS_angle_final[3] = {0.0f, 0.0f, 0.0f}; // 转换单位后的角度
 
@@ -103,9 +108,9 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 	}
 }
 
-
 void imu_task(void const *argu)
 {
+	u8 i_filter = 0;
 	uint32_t imu_wake_time = osKernelSysTick();
 	imu_Task_Handle = xTaskGetHandle(pcTaskGetName(NULL));
 	imu_start_flag = 1;
@@ -141,7 +146,31 @@ void imu_task(void const *argu)
 
 		accel_fliter_3[2] = accel_fliter_2[2] * fliter_num[0] + accel_fliter_1[2] * fliter_num[1] + INS_accel[2] * fliter_num[2];
 		
-		AHRS_update(INS_quat, timing_time, INS_gyro, accel_fliter_3, INS_mag);
+		
+		#if (ORDER>0)
+			//陀螺仪低通滤波
+			if(i_filter<ORDER+1)
+			{
+				i_filter++;
+				Filter0(INS_gyro[0],WINDOWS);
+				Filter1(INS_gyro[1],WINDOWS);
+				Filter2(INS_gyro[2],WINDOWS);
+				gyro_filter[0] = INS_gyro[0];
+				gyro_filter[1] = INS_gyro[1];
+				gyro_filter[2] = INS_gyro[2];
+			}
+			else
+			{
+				gyro_filter[0] = Filter0(INS_gyro[0],WINDOWS);
+				gyro_filter[1] = Filter1(INS_gyro[1],WINDOWS);
+				gyro_filter[2] = Filter2(INS_gyro[2],WINDOWS);
+			}
+		#else
+				gyro_filter[0] = INS_gyro[0];
+				gyro_filter[1] = INS_gyro[1];
+				gyro_filter[2] = INS_gyro[2];
+		#endif
+		AHRS_update(INS_quat, timing_time, gyro_filter, accel_fliter_3, INS_mag);
 		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);
 
 		INS_angle_final[0] = INS_angle[0] * RAD_TO_ANGLE;
