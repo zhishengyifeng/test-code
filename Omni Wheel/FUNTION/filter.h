@@ -3,7 +3,7 @@
 
 #include "stm32f4xx.h"
 
-#define ORDER 6
+#define ORDER 0
 
 #if (ORDER == 20)
 #define WINDOWS Fir_hanning_20_30Hz

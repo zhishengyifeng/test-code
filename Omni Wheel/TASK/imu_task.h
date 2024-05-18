@@ -38,20 +38,9 @@
 
 //////竖直摩擦轮陀螺仪矩阵
 #define BMI088_BOARD_INSTALL_SPIN_MATRIX     \
-    {-1.0f, 0.0f, 0.0f},                     \
     {0.0f, -1.0f, 0.0f},                     \
-    {0.0f, 0.0f, 1.0f}                       
-//    {0.0f, 1.0f, 0.0f},                     \
-//    {-1.0f, 0.0f, 0.0f},                     \
-//    {0.0f, 0.0f, 1.0f}                      \
-//		
-//#else 
-//水平摩擦轮陀螺仪矩阵
-//#define BMI088_BOARD_INSTALL_SPIN_MATRIX   \
-//    {0.0f, 1.0f, 0.0f},                     \
-//    {-1.0f, 0.0f, 0.0f},                     \
-//    {0.0f, 0.0f, 1.0f}                                      		
-//#endif
+    {1.0f, 0.0f, 0.0f},                     \
+    {0.0f, 0.0f, 1.0f}                      
 
 #define IST8310_BOARD_INSTALL_SPIN_MATRIX   \
     {0.0f, 1.0f, 0.0f},                     \

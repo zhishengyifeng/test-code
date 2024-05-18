@@ -4,8 +4,8 @@
 #include "stm32f4xx.h"
 #include "chassis_task.h"
 
-#define Debug_Power				40//没有裁判系统时的功率限制
-#define Deta_Power				30//触发缓启动的功率差
+#define Debug_Power				70//没有裁判系统时的功率限制
+#define Deta_Power				80//触发缓启动的功率差
 
 extern float Charge_factor;
 

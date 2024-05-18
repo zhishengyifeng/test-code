@@ -22,18 +22,18 @@
 #include "power_control.h"
 float a1, b1, a2, b2, a3, b3, a4, b4;
 float ob_total_power;
-/*2023èµ›å­£è§„åˆ™
+/*2023Èü¼¾¹æÔò
 
-åˆå§‹çŠ¶æ€			100 40
+³õÊ¼×´Ì¬			100 40
 
-åŠŸç‡ä¼˜å…ˆ
-		1çº§		150 60
-		2çº§		200 80
-		3çº§		250 100
-è¡€é‡ä¼˜å…ˆ
-		1çº§		200 45
-		2çº§		300 50
-		3çº§		400 55
+¹¦ÂÊÓÅÏÈ
+		1¼¶		150 60
+		2¼¶		200 80
+		3¼¶		250 100
+ÑªÁ¿ÓÅÏÈ
+		1¼¶		200 45
+		2¼¶		300 50
+		3¼¶		400 55
 
 */
 
@@ -45,7 +45,7 @@ extern pid_t pid_chassis_power_buffer;
 
 chassis_t chassis;
 
-// å‰ä¸‰ä¸ªæ—‹è½¬pid åä¸‰ä¸ªé€Ÿåº¦pid
+// Ç°Èı¸öĞı×ªpid ºóÈı¸öËÙ¶Èpid
 
 ////////////////////
 #if (INFANTRY_NUM == INFANTRY_4)
@@ -79,24 +79,24 @@ float chassis_spd_pid[4][3] = {{10, 0.0f, 0},
 #error "INFANTRY_NUM define error!"
 #endif
 
-#define POWER_NEW//æ–°åŠŸç‡ç®—æ³•ï¼Œè‹¥è¦ç”¨è€åŠŸç‡ç®—æ³•å°±æ³¨é‡Šæ‰è¿™ä¸€è¡Œ
+#define POWER_NEW//ĞÂ¹¦ÂÊËã·¨£¬ÈôÒªÓÃÀÏ¹¦ÂÊËã·¨¾Í×¢ÊÍµôÕâÒ»ĞĞ
 								 
 
-float	power_new_pid[3] = {10.0f, 0.1f, 0.0f}; //æ–°åŠŸç‡ç®—æ³•PIDï¼ˆä»£æ›¿ä¸‹è¾¹çš„cap_vol_pidï¼‰
-float cap_vol_pid[3] = {1.0f, 0, 0.0f};		   // è¶…çº§ç”µå®¹ç”µå‹æ§åˆ¶PID
-float chassis_power_buffer_pid[3] = {1, 0, 0}; // ç¼“å†²ç„¦è€³æ§åˆ¶PID
+float	power_new_pid[3] = {10.0f, 4.0f, 0.0f}; //ĞÂ¹¦ÂÊËã·¨PID£¨´úÌæÏÂ±ßµÄcap_vol_pid£©
+float cap_vol_pid[3] = {1.0f, 0, 0.0f};		   // ³¬¼¶µçÈİµçÑ¹¿ØÖÆPID
+float chassis_power_buffer_pid[3] = {1, 0, 0}; // »º³å½¹¶ú¿ØÖÆPID
 #ifndef POWER_NEW
-float chassis_vw_pid[3] = {0.1, 0, 0.1};	   // å°é™€èºè½¬é€Ÿæ§åˆ¶PID
+float chassis_vw_pid[3] = {0.1, 0, 0.1};	   // Ğ¡ÍÓÂİ×ªËÙ¿ØÖÆPID
 #else
-float chassis_vw_pid[3] = {0.0f, 0.3f, 0.0f};	   // å°é™€èºè½¬é€Ÿæ§åˆ¶PID
+float chassis_vw_pid[3] = {0.0f, 0.3f, 0.0f};	   // Ğ¡ÍÓÂİ×ªËÙ¿ØÖÆPID
 #endif
 
-float cap_store = 24;		  // ç”µå®¹å­˜å‚¨å¤§å°(ç»™å®šåˆå€¼ä¸º24)
-float cx = 0, cy = 0, cw = 0; // ç¼“å¯åŠ¨èµ‹å€¼å˜é‡
-uint8_t fast_flag = 0;		  // åŠ é€ŸçŠ¶æ€æ ‡å¿—ä½
-int Speed_up = 0;			  // åŠ é€Ÿé”®æ ‡å¿—ä½
+float cap_store = 24;		  // µçÈİ´æ´¢´óĞ¡(¸ø¶¨³õÖµÎª24)
+float cx = 0, cy = 0, cw = 0; // »ºÆô¶¯¸³Öµ±äÁ¿
+uint8_t fast_flag = 0;		  // ¼ÓËÙ×´Ì¬±êÖ¾Î»
+int Speed_up = 0;			  // ¼ÓËÙ¼ü±êÖ¾Î»
 
-float Vw = 0;						//å®é™…è½¬é€Ÿ
+float Vw = 0;						//Êµ¼Ê×ªËÙ
 
 void chassis_task(void *parm)
 {
@@ -114,33 +114,33 @@ void chassis_task(void *parm)
 
 			if (Signal & INFO_GET_CHASSIS_SIGNAL)
 			{
-				/*åº•ç›˜vwæ—‹è½¬çš„pid*/
+				/*µ×ÅÌvwĞı×ªµÄpid*/
 				PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
 				PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
 				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 600, 600, DONE);
 				
-				/*åº•ç›˜vx,vyå¹³ç§»çš„pid*/
+				/*µ×ÅÌvx,vyÆ½ÒÆµÄpid*/
 				for (int i = 0; i < 4; i++)
 					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16000, 1500, DONE);
 
-				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // äº‘å°å½’ä¸­ä¹‹ååº•ç›˜æ‰èƒ½åŠ¨
+				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // ÔÆÌ¨¹éÖĞÖ®ºóµ×ÅÌ²ÅÄÜ¶¯
 				{
 					Cap_refresh();
 					switch (chassis_mode)
 					{
-					/*äº‘å°åº•ç›˜è·Ÿéšæ¨¡å¼*/
+					/*ÔÆÌ¨µ×ÅÌ¸úËæÄ£Ê½*/
 					case CHASSIS_NORMAL_MODE:
 					{
 						chassis_normal_handler();
 					}
 					break;
-					/*å°é™€èºæ¨¡å¼*/
+					/*Ğ¡ÍÓÂİÄ£Ê½*/
 					case CHASSIS_DODGE_MODE:
 					{
 						chassis_dodge_handler();
 					}
 					break;
-					/*åº•ç›˜åœæ­¢æ¨¡å¼*/
+					/*µ×ÅÌÍ£Ö¹Ä£Ê½*/
 					case CHASSIS_STOP_MODE:
 					{
 						chassis_stop_handler();
@@ -158,13 +158,15 @@ void chassis_task(void *parm)
 					cw = chassis.vw;
 
 
-					// å°†ç¼“å¯åŠ¨çš„æ•°æ®ä»£å…¥è§£ç®—ï¼ˆå‰åç¼“å¯åŠ¨ï¼Œå·¦å³ä»¥åŠå°é™€èºä¸è¿›è¡Œç¼“å¯åŠ¨ï¼‰
+					// ½«»ºÆô¶¯µÄÊı¾İ´úÈë½âËã£¨Ç°ºó»ºÆô¶¯£¬×óÓÒÒÔ¼°Ğ¡ÍÓÂİ²»½øĞĞ»ºÆô¶¯£©
 					mecanum_calc(cx, chassis.vy, chassis.vw, chassis.wheel_spd_ref);
 
 					for (int i = 0; i < 4; i++)
 						chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
 
-					ob_total_power = Chassis_Power_Control(&chassis); // åŠŸç‡æ§åˆ¶
+					#ifdef POWER_NEW
+						ob_total_power = Chassis_Power_Control(&chassis); // ¹¦ÂÊ¿ØÖÆ
+					#endif
 
 					if (!chassis_is_controllable())
 						memset(chassis.current, 0, sizeof(chassis.current));
@@ -186,8 +188,8 @@ void chassis_task(void *parm)
 
 void Cap_refresh()
 {
-	// ä¸æ–­åˆ·æ–°å¹¶è®°å½•å½“å‰ç”µæ± æ‰€èƒ½ç»™ç”µå®¹å……çš„æœ€å¤§ç”µå‹
-	// ç”µå®¹çš„æœ€å¤§å‹å€¼éšç€ç”µæ± æ ¼æ•°è¿›è¡Œå˜åŒ–ï¼Œå› è€Œéœ€è¦ä¸æ–­åˆ·æ–°
+	// ²»¶ÏË¢ĞÂ²¢¼ÇÂ¼µ±Ç°µç³ØËùÄÜ¸øµçÈİ³äµÄ×î´óµçÑ¹
+	// µçÈİµÄ×î´óÑ¹ÖµËæ×Åµç³Ø¸ñÊı½øĞĞ±ä»¯£¬Òò¶øĞèÒª²»¶ÏË¢ĞÂ
 	static int i = 0;
 	if (judge_recv_mesg.power_heat_data.buffer_energy == 60 && (chassis.CapData[0] - chassis.CapData[1] < 2 || chassis.CapData[1] >= 20))
 	{
@@ -206,37 +208,37 @@ void Cap_refresh()
 
 extern int Speed_up;
 #ifndef POWER_NEW
-//è€åŠŸç‡ç®—æ³•--ç”µå®¹pid
-// åº•ç›˜åŠŸç‡æ§åˆ¶å‡½æ•°ï¼Œé€šè¿‡ç”µå®¹æ€»å€¼ï¼Œç”µå®¹å½“å‰å€¼ï¼Œåº•ç›˜åŠŸç‡é™åˆ¶å€¼ï¼Œè®¡ç®—å‡ºåº•ç›˜xã€yè½´ä¸Šçš„é€Ÿåº¦
+//ÀÏ¹¦ÂÊËã·¨--µçÈİpid
+// µ×ÅÌ¹¦ÂÊ¿ØÖÆº¯Êı£¬Í¨¹ıµçÈİ×ÜÖµ£¬µçÈİµ±Ç°Öµ£¬µ×ÅÌ¹¦ÂÊÏŞÖÆÖµ£¬¼ÆËã³öµ×ÅÌx¡¢yÖáÉÏµÄËÙ¶È
 void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, float *power_yaw_speed, float real_time_Cap_remain, float real_time_Cap_can_store, float judge_power_limit)
 {
 	static float max = 3000;
 	static float min = 1150;						  // 1000;
-	static float parameter;							  // å˜é€Ÿç³»æ•°
-	static float Cap_low = 14.0f;					  // ä½•æ—¶åœæ­¢åŠ é€Ÿ
-	float cap_flag = real_time_Cap_can_store - 18.0f; // 18~real_time_Cap_can_storeè¿™ä¸€æ®µè¿›è¡ŒæŒ‰æ¯”ä¾‹èµ‹å€¼
+	static float parameter;							  // ±äËÙÏµÊı
+	static float Cap_low = 14.0f;					  // ºÎÊ±Í£Ö¹¼ÓËÙ
+	float cap_flag = real_time_Cap_can_store - 18.0f; // 18~real_time_Cap_can_storeÕâÒ»¶Î½øĞĞ°´±ÈÀı¸³Öµ
 	if (real_time_Cap_remain < 15.0f)
 	{
 		*power_yaw_speed = (5 - (15.0f - real_time_Cap_remain)) / 5 * 0.01f;
-	} // ä½ç”µå®¹æŒ‰æ¯”ä¾‹å‡å°‘é¼ æ ‡å·¦å³ç§»åŠ¨é€Ÿåº¦
+	} // µÍµçÈİ°´±ÈÀı¼õÉÙÊó±ê×óÓÒÒÆ¶¯ËÙ¶È
 	else
 	{
 		*power_yaw_speed = 0.01f;
 	}
 
-	if (real_time_Cap_remain > 18.0f && real_time_Cap_remain < real_time_Cap_can_store) // å½“å‰ç”µå®¹åœ¨18å’Œæ»¡ç”µå®¹ä¹‹é—´
-	{																					// æ ¸å¿ƒ   é€šè¿‡è®¡ç®—å¾—å‡ºåº•ç›˜xè½´æˆ–yè½´çš„æœ€å°é€Ÿåº¦
+	if (real_time_Cap_remain > 18.0f && real_time_Cap_remain < real_time_Cap_can_store) // µ±Ç°µçÈİÔÚ18ºÍÂúµçÈİÖ®¼ä
+	{																					// ºËĞÄ   Í¨¹ı¼ÆËãµÃ³öµ×ÅÌxÖá»òyÖáµÄ×îĞ¡ËÙ¶È
 		min = 1350 + (cap_flag - (real_time_Cap_can_store - real_time_Cap_remain)) / cap_flag * (judge_power_limit - 45) / 45 * 500;
 	}
 	else
-	{				// å½“ç”µå®¹å°äº18æ—¶ç›´æ¥ç”¨è¿™ä¸ª
+	{				// µ±µçÈİĞ¡ÓÚ18Ê±Ö±½ÓÓÃÕâ¸ö
 		min = 1150; // 1000;
 	}
 
-	// æŒ‰åŠ é€Ÿé”®åSpeed_up = 0,ä»¥3508çš„æœ€å¿«é€Ÿåº¦è¿›è¡Œå†²åˆºï¼ŒSpeed_up = 1å³æœªæŒ‰åŠ é€Ÿé”®
+	// °´¼ÓËÙ¼üºóSpeed_up = 0,ÒÔ3508µÄ×î¿ìËÙ¶È½øĞĞ³å´Ì£¬Speed_up = 1¼´Î´°´¼ÓËÙ¼ü
 	if (Speed_up == 1)
 	{
-		if (real_time_Cap_remain == real_time_Cap_can_store) // ç”µå®¹å……æ»¡
+		if (real_time_Cap_remain == real_time_Cap_can_store) // µçÈİ³äÂú
 		{
 			pid_calc(power_pid, real_time_Cap_remain + 0.5f, real_time_Cap_can_store);
 		}
@@ -247,7 +249,7 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 		}
 	}
 	else if (real_time_Cap_remain < Cap_low)
-		Speed_up = 1; // ä¸€æ—¦æ£€æµ‹åˆ°ç”µå®¹ä½åˆ™è‡ªåŠ¨å…³é—­åŠ é€Ÿ
+		Speed_up = 1; // Ò»µ©¼ì²âµ½µçÈİµÍÔò×Ô¶¯¹Ø±Õ¼ÓËÙ
 
 	if (km.vy > 0 || rm.vy > 0)
 	{
@@ -262,7 +264,7 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 				*power_vy = -*power_vy;
 			}
 			*power_vy -= parameter * power_pid->out;
-			VAL_LIMIT(*power_vy, min * 0.7f, max); // ä½ç”µå®¹å¹³ç§»ï¼Œé€Ÿåº¦ä¸‹é™æ›´ä½
+			VAL_LIMIT(*power_vy, min * 0.7f, max); // µÍµçÈİÆ½ÒÆ£¬ËÙ¶ÈÏÂÏŞ¸üµÍ
 		}
 	}
 	else
@@ -323,7 +325,7 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 		}
 	}
 
-	if (SLOW_SPD) // æ…¢é€Ÿ
+	if (SLOW_SPD) // ÂıËÙ
 	{
 		if (*power_vx > 0)
 			*power_vx = 1000;
@@ -335,11 +337,11 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 		else if (*power_vy < 0)
 			*power_vy = -1000;
 	}
-	else if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // å¿«é€Ÿ
+	else if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // ¿ìËÙ
 	{
 		Speed_up = 0;
 	}
-	else // æ­£å¸¸é€Ÿåº¦
+	else // Õı³£ËÙ¶È
 	{
 		Speed_up = 1;
 	}
@@ -347,14 +349,14 @@ void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, f
 	if (real_time_Cap_remain > Cap_low && !FAST_SPD)
 	{
 		fast_flag = 1;
-	} // é˜²æ­¢åŠ é€Ÿè¿‡ç¨‹ä¸­åå¤å¼€å…³åŠ é€Ÿæ¨¡å¼ï¼ˆæŠ½æï¼‰
+	} // ·ÀÖ¹¼ÓËÙ¹ı³ÌÖĞ·´¸´¿ª¹Ø¼ÓËÙÄ£Ê½£¨³é´¤£©
 	if (real_time_Cap_remain < Cap_low)
 	{
 		fast_flag = 0;
 	}
 }
 
-// å°é™€èºæ¨¡å¼
+// Ğ¡ÍÓÂİÄ£Ê½
 static void chassis_dodge_handler(void)
 {
 	float chassis_vx_dodge, chassis_vy_dodge;
@@ -366,25 +368,25 @@ static void chassis_dodge_handler(void)
 
 	if (last_chassis_mode != CHASSIS_DODGE_MODE)
 	{
-		/* åˆšåˆšè¿›å…¥å°é™€èºæ—¶ï¼Œæ—‹è½¬é€Ÿåº¦é€šè¿‡è®¡ç®—å¾—åˆ° */
+		/* ¸Õ¸Õ½øÈëĞ¡ÍÓÂİÊ±£¬Ğı×ªËÙ¶ÈÍ¨¹ı¼ÆËãµÃµ½ */
 		chassis.vw = dodge_min + ((float)judge_recv_mesg.game_robot_state.chassis_power_limit - 45) / 45 * 150;
 
 		if (cap_store - chassis.CapData[1] < 0.5)
-			dodge_cap = chassis.CapData[1] - 0.5; // é˜²æ­¢å……æ”¾å¹³è¡¡
+			dodge_cap = chassis.CapData[1] - 0.5; // ·ÀÖ¹³ä·ÅÆ½ºâ
 		else
 			dodge_cap = chassis.CapData[1];
 	}
 
-	/*å°é™€èº*/
+	/*Ğ¡ÍÓÂİ*/
 	dodge_angle = gimbal.sensor.yaw_relative_angle;
 	//
-	if ((rm.vx != 0 || rm.vy != 0) && (km.vx == 0 || km.vy == 0)) // å°é™€èºæ—¶é¥æ§æ–¹å‘é™ä½é€Ÿåº¦
+	if ((rm.vx != 0 || rm.vy != 0) && (km.vx == 0 || km.vy == 0)) // Ğ¡ÍÓÂİÊ±Ò£¿Ø·½Ïò½µµÍËÙ¶È
 	{
 		dodge_chassis_vx = rm.vx * 0.5f;
 		dodge_chassis_vy = rm.vy * 0.5f;
 	}
 	else
-		// é”®ç›˜æ—¶åˆ™é€šè¿‡åŠŸç‡ç®—æ³•æ¥æ§åˆ¶é€Ÿåº¦ï¼Œé˜²æ­¢æ‰ç”µå®¹
+		// ¼üÅÌÊ±ÔòÍ¨¹ı¹¦ÂÊËã·¨À´¿ØÖÆËÙ¶È£¬·ÀÖ¹µôµçÈİ
 		chassis_power_contorl(&pid_power, &dodge_chassis_vx, &dodge_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
 	chassis.vy = (dodge_chassis_vx * arm_sin_f32(PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32(PI / 180 * dodge_angle));
@@ -400,36 +402,36 @@ static void chassis_dodge_handler(void)
 }
 
 #else
-//æ–°åŠŸç‡ç®—æ³•
+//ĞÂ¹¦ÂÊËã·¨
 void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
 {
-    static  float max = 3300;
+    static  float max = 4000;
     static float min = 1150;//1000;
-    static float Cap_low = 15.0f;      // ä½•æ—¶åœæ­¢åŠ é€Ÿ
-		float Ref_temp = 0;//åŠŸç‡æ¢å¯åŠ¨ä¸´æ—¶å˜é‡
+    static float Cap_low = 15.0f;      // ºÎÊ±Í£Ö¹¼ÓËÙ
+		float Ref_temp = 0;//¹¦ÂÊ»»Æô¶¯ÁÙÊ±±äÁ¿
 
 		*power_yaw_speed = 0.01f;
 
 
 		if (real_time_Cap_remain < Cap_low)
-				Speed_up = 1; // ä¸€æ—¦æ£€æµ‹åˆ°ç”µå®¹ä½åˆ™è‡ªåŠ¨å…³é—­åŠ é€Ÿ
+				Speed_up = 1; // Ò»µ©¼ì²âµ½µçÈİµÍÔò×Ô¶¯¹Ø±Õ¼ÓËÙ
 		
 		if(!SLOW_SPD)
 		{
 			Charge_factor = 1.0f;
 		}
-		else//é™é€Ÿç»™åº•ç›˜å……ç”µ
+		else//½µËÙ¸øµ×ÅÌ³äµç
 		{
-			Charge_factor = 0.6f;// 1-0.6=40% çš„ç”µé‡ç»™ç”µå®¹å……ç”µ
+			Charge_factor = 0.6f;// 1-0.6=40% µÄµçÁ¿¸øµçÈİ³äµç
 		}
 		
-		if(km.vy != 0 || rm.vy != 0 || km.vx != 0 || rm.vx != 0)//åº•ç›˜è¾“å…¥ä¸ä¸º0,æ‰è¿›è¡Œpidè¿ç®—ï¼ˆé˜²æ­¢åº•ç›˜é™æ­¢æ—¶ï¼Œpid->outç§¯æ»¡ï¼‰
+		if(km.vy != 0 || rm.vy != 0 || km.vx != 0 || rm.vx != 0)//µ×ÅÌÊäÈë²»Îª0,²Å½øĞĞpidÔËËã£¨·ÀÖ¹µ×ÅÌ¾²Ö¹Ê±£¬pid->out»ıÂú£©
 		{
-				if (Speed_up == 1)//ä¸åŠ é€Ÿ				
+				if (Speed_up == 1)//²»¼ÓËÙ				
 				{
 					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
 					{
-						if((judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor - ob_total_power > Deta_Power)//åŠŸç‡ç›¸å·®è¿‡å¤§
+						if((judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor - ob_total_power > Deta_Power)//¹¦ÂÊÏà²î¹ı´ó
 						{
 							Ref_temp = ob_total_power + Deta_Power;							
 							pid_calc(power_pid,ob_total_power,Ref_temp);
@@ -437,8 +439,8 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 						else
 							pid_calc(power_pid,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor);
 					}
-					else//æ²¡æ¥è£åˆ¤ç³»ç»Ÿ
-						pid_calc(power_pid,ob_total_power,(Debug_Power+5)*Charge_factor);//æ²¡æœ‰è¿æ¥è£åˆ¤ç³»ç»Ÿï¼Œå°è½¦åº•ç›˜æœŸæœ›åŠŸç‡è¾¾åˆ°45w			
+					else//Ã»½Ó²ÃÅĞÏµÍ³
+						pid_calc(power_pid,ob_total_power,(Debug_Power+5)*Charge_factor);//Ã»ÓĞÁ¬½Ó²ÃÅĞÏµÍ³£¬Ğ¡³µµ×ÅÌÆÚÍû¹¦ÂÊ´ïµ½45w			
 				}
 			
 		}
@@ -495,11 +497,11 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 			*power_vx = 0;
 	}
 		
-	if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // å¿«é€Ÿ
+	if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // ¿ìËÙ
 	{
 		Speed_up = 0;
 	}
-	else // æ­£å¸¸é€Ÿåº¦
+	else // Õı³£ËÙ¶È
 	{
 		Speed_up = 1;
 	}
@@ -507,14 +509,14 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 	if ((real_time_Cap_remain > Cap_low )&& (!FAST_SPD))
 	{
 		fast_flag = 1;
-	} // é˜²æ­¢åŠ é€Ÿè¿‡ç¨‹ä¸­åå¤å¼€å…³åŠ é€Ÿæ¨¡å¼ï¼ˆæŠ½æï¼‰
+	} // ·ÀÖ¹¼ÓËÙ¹ı³ÌÖĞ·´¸´¿ª¹Ø¼ÓËÙÄ£Ê½£¨³é´¤£©
 	if (real_time_Cap_remain < Cap_low)
 	{
 		fast_flag = 0;
 	}
 }
 
-// å°é™€èºæ¨¡å¼
+// Ğ¡ÍÓÂİÄ£Ê½
 static void chassis_dodge_handler(void)
 {
 	float chassis_vx_dodge, chassis_vy_dodge;
@@ -529,39 +531,39 @@ static void chassis_dodge_handler(void)
 		PID_Clear(&pid_chassis_vw);
 	}
 
-	/*å°é™€èº*/
+	/*Ğ¡ÍÓÂİ*/
 	dodge_angle = gimbal.sensor.yaw_relative_angle;
 	//
-	if ((rm.vx != 0 || rm.vy != 0) && (km.vx == 0 || km.vy == 0)) // å°é™€èºæ—¶é¥æ§æ–¹å‘é™ä½é€Ÿåº¦
+	if ((rm.vx != 0 || rm.vy != 0) && (km.vx == 0 || km.vy == 0)) // Ğ¡ÍÓÂİÊ±Ò£¿Ø·½Ïò½µµÍËÙ¶È
 	{
 		dodge_chassis_vx = rm.vx * 0.5f;
 		dodge_chassis_vy = rm.vy * 0.5f;
 	}
 	else
-		// é”®ç›˜æ—¶åˆ™é€šè¿‡åŠŸç‡ç®—æ³•æ¥æ§åˆ¶é€Ÿåº¦ï¼Œé˜²æ­¢æ‰ç”µå®¹
+		// ¼üÅÌÊ±ÔòÍ¨¹ı¹¦ÂÊËã·¨À´¿ØÖÆËÙ¶È£¬·ÀÖ¹µôµçÈİ
 		chassis_power_contorl(&pid_power, &dodge_chassis_vx, &dodge_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
 	chassis.vy = (dodge_chassis_vx * arm_sin_f32(PI / 180 * dodge_angle) + dodge_chassis_vy * arm_cos_f32(PI / 180 * dodge_angle));
 	chassis.vx = (dodge_chassis_vx * arm_cos_f32(PI / 180 * dodge_angle) - dodge_chassis_vy * arm_sin_f32(PI / 180 * dodge_angle));
 
-	if (Speed_up == 1)//ä¸åŠ é€Ÿ				
+	if (Speed_up == 1)//²»¼ÓËÙ				
 	{
 		if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
 		{
 			pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit)*Charge_factor);
 		}
-		else//æ²¡æ¥è£åˆ¤ç³»ç»Ÿ
-			pid_calc(&pid_chassis_vw,ob_total_power,(Debug_Power+5)*Charge_factor);//æ²¡æœ‰è¿æ¥è£åˆ¤ç³»ç»Ÿï¼Œå°è½¦åº•ç›˜æœŸæœ›åŠŸç‡è¾¾åˆ°45w
+		else//Ã»½Ó²ÃÅĞÏµÍ³
+			pid_calc(&pid_chassis_vw,ob_total_power,(Debug_Power+5)*Charge_factor);//Ã»ÓĞÁ¬½Ó²ÃÅĞÏµÍ³£¬Ğ¡³µµ×ÅÌÆÚÍû¹¦ÂÊ´ïµ½45w
 	}
-	else if (Speed_up == 0)//æŒ‰ä¸‹åŠ é€ŸåŠŸç‡å¤š100w
+	else if (Speed_up == 0)//°´ÏÂ¼ÓËÙ¹¦ÂÊ¶à100w
 	{
 		if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
 		{
 			pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit+105));
 		}
-		else//æ²¡æ¥è£åˆ¤ç³»ç»Ÿ
+		else//Ã»½Ó²ÃÅĞÏµÍ³
 		{
-			pid_calc(&pid_chassis_vw,ob_total_power,105+Debug_Power);//æ²¡æœ‰è¿æ¥è£åˆ¤ç³»ç»Ÿï¼Œå°è½¦åº•ç›˜æœŸæœ›åŠŸç‡è¾¾åˆ°150w
+			pid_calc(&pid_chassis_vw,ob_total_power,105+Debug_Power);//Ã»ÓĞÁ¬½Ó²ÃÅĞÏµÍ³£¬Ğ¡³µµ×ÅÌÆÚÍû¹¦ÂÊ´ïµ½150w
 		}
 	}	
 
@@ -573,18 +575,18 @@ static void chassis_dodge_handler(void)
 }
 #endif
 
-// æ™®é€šæ¨¡å¼
+// ÆÕÍ¨Ä£Ê½
 static void chassis_normal_handler(void)
 {
 	float nor_chassis_vx, nor_chassis_vy;
-	// è®¡ç®—åº•ç›˜xã€yè½´ä¸Šçš„é€Ÿåº¦
+	// ¼ÆËãµ×ÅÌx¡¢yÖáÉÏµÄËÙ¶È
 	chassis_power_contorl(&pid_power, &nor_chassis_vx, &nor_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
 
 	int position_ref = 0;
 	if (chassis_mode == CHASSIS_NORMAL_MODE)
 	{
 		if (input_flag == 1)
-		// wè½´æ–¹å‘è·Ÿç€äº‘å°åŠ¨
+		// wÖá·½Ïò¸ú×ÅÔÆÌ¨¶¯
 		{
 			chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, position_ref));
 		}
@@ -598,7 +600,7 @@ static void chassis_normal_handler(void)
 }
 
 
-// åœæ­¢æ¨¡å¼
+// Í£Ö¹Ä£Ê½
 static void chassis_stop_handler(void)
 {
 	for (int i = 0; i < 4; i++)
@@ -610,19 +612,19 @@ static void chassis_stop_handler(void)
 	chassis.vx = 0;
 	chassis.vw = 0;
 }
-// åˆå§‹åŒ–
+// ³õÊ¼»¯
 void chassis_param_init(void)
 {
 	memset(&chassis, 0, sizeof(chassis));
 
-	/*åº•ç›˜vwæ—‹è½¬çš„pid*/
+	/*µ×ÅÌvwĞı×ªµÄpid*/
 	PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, INIT);
 	#ifndef POWER_NEW
-	PID_Struct_Init(&pid_power, cap_vol_pid[0], cap_vol_pid[1], cap_vol_pid[2], 100, 20, INIT);//è€åŠŸç‡ç®—æ³•
+	PID_Struct_Init(&pid_power, cap_vol_pid[0], cap_vol_pid[1], cap_vol_pid[2], 100, 20, INIT);//ÀÏ¹¦ÂÊËã·¨
 	#else
-  PID_Struct_Init(&pid_power, power_new_pid[0], power_new_pid[1], power_new_pid[2], 3000, 2000, INIT);//æ–°åŠŸç‡ç®—æ³•
+  PID_Struct_Init(&pid_power, power_new_pid[0], power_new_pid[1], power_new_pid[2], 4000, 3000, INIT);//ĞÂ¹¦ÂÊËã·¨
 	#endif
-	/*åº•ç›˜vx,vyå¹³ç§»çš„pid*/
+	/*µ×ÅÌvx,vyÆ½ÒÆµÄpid*/
 	/////////////////
 	for (int i = 0; i < 4; i++)
 		PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 10000, 500, INIT);
@@ -631,15 +633,15 @@ void chassis_param_init(void)
 
 /**
  * @brief mecanum chassis velocity decomposition
- * @param input : â†‘=+vx(mm/s)  â†=+vy(mm/s)  ccw=+vw(deg/s)
+ * @param input : ¡ü=+vx(mm/s)  ¡û=+vy(mm/s)  ccw=+vw(deg/s)
  *        output: every wheel speed(rpm)
- * @trans è¾“å…¥ï¼š		å‰åå·¦å³çš„é‡
- *				 è¾“å‡ºï¼š		æ¯ä¸ªè½®å­å¯¹åº”çš„é€Ÿåº¦
+ * @trans ÊäÈë£º		Ç°ºó×óÓÒµÄÁ¿
+ *				 Êä³ö£º		Ã¿¸öÂÖ×Ó¶ÔÓ¦µÄËÙ¶È
  * @note  1=FR 2=FL 3=BL 4=BR
- * @work	 åˆ†ææ¼”ç®—å…¬å¼è®¡ç®—çš„æ•ˆç‡
+ * @work	 ·ÖÎöÑİËã¹«Ê½¼ÆËãµÄĞ§ÂÊ
  */
 int rotation_center_gimbal = 0;
-static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // åº•ç›˜è§£ç®—ï¼Œå¾—åˆ°åº•ç›˜è·å¾—ç›¸åº”é€Ÿåº¦éœ€è¦çš„å››ä¸ªç”µæœºå€¼
+static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // µ×ÅÌ½âËã£¬µÃµ½µ×ÅÌ»ñµÃÏàÓ¦ËÙ¶ÈĞèÒªµÄËÄ¸öµç»úÖµ
 {
 	static float rotate_ratio_fr;
 	static float rotate_ratio_fl;
@@ -658,10 +660,10 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // åº•ç›
 
 	VAL_LIMIT(vx, -MAX_CHASSIS_VX_SPEED, MAX_CHASSIS_VX_SPEED); // mm/s
 	VAL_LIMIT(vy, -MAX_CHASSIS_VY_SPEED, MAX_CHASSIS_VY_SPEED); // mm/s
-	/*å°é™€èºä»¥å¤–çš„æ¨¡å¼ï¼Œvwé™åˆ¶æ­£å¸¸*/
+	/*Ğ¡ÍÓÂİÒÔÍâµÄÄ£Ê½£¬vwÏŞÖÆÕı³£*/
 	if (chassis_mode != CHASSIS_DODGE_MODE && !chassis.dodge_ctrl)
 		VAL_LIMIT(vw, -MAX_CHASSIS_VR_SPEED, MAX_CHASSIS_VR_SPEED); // deg/s
-	/*å°é™€èºæ—¶ï¼Œvwä¸å—é™åˆ¶*/
+	/*Ğ¡ÍÓÂİÊ±£¬vw²»ÊÜÏŞÖÆ*/
 	//	else
 	//		VAL_LIMIT(vw, -MAX_CHASSIS_VR_SPEED, MAX_CHASSIS_VR_SPEED);  //deg/s
 
@@ -674,7 +676,7 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // åº•ç›
 	wheel_rpm[2] = (0.707*(vx + vy) - (vw * rotate_ratio_bl)) * wheel_rpm_ratio;
 	wheel_rpm[3] = (0.707*(-vx + vy) - (vw * rotate_ratio_br)) * wheel_rpm_ratio;
 	
-	//æ­£è¿åŠ¨å­¦è§£ç®—
+	//ÕıÔË¶¯Ñ§½âËã
 	float k = ((WHEELBASE + WHEELTRACK) / 2.0f - GIMBAL_X_OFFSET + GIMBAL_Y_OFFSET) / RADIAN_COEF;
 	float k2 = 60.0f / (PERIMETER * CHASSIS_DECELE_RATIO);
 	Vw = -((wheel_rpm[0]+wheel_rpm[2])/(2*k*k2));
@@ -697,7 +699,7 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // åº•ç›
 	memcpy(speed, wheel_rpm, 4 * sizeof(int16_t));
 }
 
-// ç¼“å¯åŠ¨å‡½æ•°
+// »ºÆô¶¯º¯Êı
 void buffer(float *a, float b, float high_parameter, float low_parameter)
 {
 
@@ -713,5 +715,4 @@ void buffer(float *a, float b, float high_parameter, float low_parameter)
 			*a -= low_parameter;
 	}
 }
-
 

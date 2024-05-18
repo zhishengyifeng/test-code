@@ -8,40 +8,40 @@
 #include "judge_rx_data.h"
 #include "math.h"
 
-void get_buffer(float *chassis_power_buffer);		   // è·å–ç¼“å†²ç„¦è€³
-void get_chassis_max_power(uint16_t *max_power_limit); // è·å–é™å®šåŠŸç‡
+void get_buffer(float *chassis_power_buffer);		   // »ñÈ¡»º³å½¹¶ú
+void get_chassis_max_power(uint16_t *max_power_limit); // »ñÈ¡ÏŞ¶¨¹¦ÂÊ
 
 uint8_t cap_state = 0;
-float Charge_factor = 1;// 1-Charge_factor = ç”µå®¹å……ç”µç™¾åˆ†æ¯”
+float Charge_factor = 1;// 1-Charge_factor = µçÈİ³äµç°Ù·Ö±È
 
 float Chassis_Power_Control(chassis_t *chassis_power_control)
 {
-	uint16_t max_power_limit = 40; // åˆå§‹ç»™å®š40w(æ²¡æ„ä¹‰) -- ç”¨äºè®¡ç®—é™å®šåŠŸç‡
+	uint16_t max_power_limit = 40; // ³õÊ¼¸ø¶¨40w(Ã»ÒâÒå) -- ÓÃÓÚ¼ÆËãÏŞ¶¨¹¦ÂÊ
 
-	float chassis_max_power = 0; // åº•ç›˜æœ€å¤§ç»™å®šåŠŸç‡
-	float input_power = 0;		 // é™å®šåŠŸç‡ï¼ˆæ¥è‡ªç”µç®¡ï¼‰
-	float initial_give_power[4]; // åŸå…ˆå°†è¦è¾¾åˆ°çš„åŠŸç‡
+	float chassis_max_power = 0; // µ×ÅÌ×î´ó¸ø¶¨¹¦ÂÊ
+	float input_power = 0;		 // ÏŞ¶¨¹¦ÂÊ£¨À´×Ôµç¹Ü£©
+	float initial_give_power[4]; // Ô­ÏÈ½«Òª´ïµ½µÄ¹¦ÂÊ
 	float initial_total_power = 0;
 	float scaled_give_power[4];
-	float total_give = 0; // æœ€ç»ˆç»™äºˆçš„åŠŸç‡
+	float total_give = 0; // ×îÖÕ¸øÓèµÄ¹¦ÂÊ
 
 	float chassis_power_buffer = 0.0f;
 
-	float toque_coefficient = 1.99688994e-6f; // (20/16384)*(0.3)*(187/3591)/9.55 --- n*toque_coefficient = è½¬çŸ©/9.55 ï¼Œ rpm*n*toque_coefficient = Pm(æœºæ¢°åŠŸç‡)
+	float toque_coefficient = 1.99688994e-6f; // (20/16384)*(0.3)*(187/3591)/9.55 --- n*toque_coefficient = ×ª¾Ø/9.55 £¬ rpm*n*toque_coefficient = Pm(»úĞµ¹¦ÂÊ)
 
 	float k2 = 1.23e-07;  // k2
 	float k1 = 1.453e-07; // k1
 	float constant = 4.081f;
 
 
-	get_buffer(&chassis_power_buffer);							   // è·å–ç¼“å†²ç„¦è€³
-	pid_calc(&pid_chassis_power_buffer, chassis_power_buffer, 30); // ç¼“å†²èƒ½é‡ç¯ï¼ŒæŠŠç¼“å†²ç„¦è€³å‹è‡³30Jï¼Œç»“æœä¸ºè´Ÿ
-	get_chassis_max_power(&max_power_limit);					   // è·å–å½“å‰ç­‰çº§çš„åŠŸç‡é™åˆ¶
-	input_power = max_power_limit - pid_chassis_power_buffer.out;  // æ›´æ–°å½“å‰ç”µç®¡æœ€å¤§è¾“å‡ºåŠŸç‡
+	get_buffer(&chassis_power_buffer);							   // »ñÈ¡»º³å½¹¶ú
+	pid_calc(&pid_chassis_power_buffer, chassis_power_buffer, 30); // »º³åÄÜÁ¿»·£¬°Ñ»º³å½¹¶úÑ¹ÖÁ30J£¬½á¹ûÎª¸º
+	get_chassis_max_power(&max_power_limit);					   // »ñÈ¡µ±Ç°µÈ¼¶µÄ¹¦ÂÊÏŞÖÆ
+	input_power = max_power_limit - pid_chassis_power_buffer.out;  // ¸üĞÂµ±Ç°µç¹Ü×î´óÊä³ö¹¦ÂÊ
 
-	send_cap_power_can(input_power * 100); // å°†é™åˆ¶åŠŸç‡å‘é€ç»™åŠŸæ§æ¿(å•ä½:w)
+	send_cap_power_can(input_power * 100); // ½«ÏŞÖÆ¹¦ÂÊ·¢ËÍ¸ø¹¦¿Ø°å(µ¥Î»:w)
 
-	// é€‰æ‹©æ˜¯å¦æ¶ˆè€—ç”µå®¹
+	// Ñ¡ÔñÊÇ·ñÏûºÄµçÈİ
 	if (FAST_SPD || rc.ch2 == 660)
 	{
 		cap_state = 1;
@@ -51,50 +51,50 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 		cap_state = 0;
 	}
 
-	if (chassis_power_control->CapData[1] > 15) // ç”µå®¹ç”µå‹>15V
+	if (chassis_power_control->CapData[1] > 15) // µçÈİµçÑ¹>15V
 	{
-		if (cap_state == 0) // å…³é—­ç”µå®¹åŠ é€Ÿ
+		if (cap_state == 0) // ¹Ø±ÕµçÈİ¼ÓËÙ
 		{
-				chassis_max_power = (input_power + 5)*Charge_factor; // ç»™å®šåº•ç›˜çš„æœ€å¤§ç»™å®šåŠŸç‡ç•¥å¤§äºé™åˆ¶åŠŸç‡ï¼Œé˜²æ­¢ç”µå®¹ä¸€ç›´æ»¡ç”µå¯¼è‡´åŠŸç‡æµªè´¹
+				chassis_max_power = (input_power + 5)*Charge_factor; // ¸ø¶¨µ×ÅÌµÄ×î´ó¸ø¶¨¹¦ÂÊÂÔ´óÓÚÏŞÖÆ¹¦ÂÊ£¬·ÀÖ¹µçÈİÒ»Ö±Âúµçµ¼ÖÂ¹¦ÂÊÀË·Ñ
 		}
-		else // å¼€å¯ç”µå®¹åŠ é€Ÿ
+		else // ¿ªÆôµçÈİ¼ÓËÙ
 		{
 			chassis_max_power = input_power + 1000;
 		}
 	}
-	else // ç”µå®¹ç”µé‡ä¸è¶³ï¼Œåº•ç›˜æœ€å¤§ç»™å®šåŠŸç‡ = é™åˆ¶åŠŸç‡
+	else // µçÈİµçÁ¿²»×ã£¬µ×ÅÌ×î´ó¸ø¶¨¹¦ÂÊ = ÏŞÖÆ¹¦ÂÊ
 	{
 		chassis_max_power = input_power*Charge_factor;
 	}
 
-	for (uint8_t i = 0; i < 4; i++) // è®¡ç®—æ¯ä¸ªè½®å­åŸæœ¬å°†è¦è¾¾åˆ°çš„åŠŸç‡
+	for (uint8_t i = 0; i < 4; i++) // ¼ÆËãÃ¿¸öÂÖ×ÓÔ­±¾½«Òª´ïµ½µÄ¹¦ÂÊ
 	{
 		// Pin = Pm + k1w^2 + k2tao^2 + constant
-		// æ‹Ÿåˆå…¬å¼:Pin = Pm + k1*w^2 + k2*Icmd^2 + constant(ç”¨ç»™å®š3508çš„nä»£æ›¿tao)
+		// ÄâºÏ¹«Ê½:Pin = Pm + k1*w^2 + k2*Icmd^2 + constant(ÓÃ¸ø¶¨3508µÄn´úÌætao)
 		initial_give_power[i] = chassis_power_control->current[i] * toque_coefficient * chassis_power_control->wheel_spd_fdb[i] +
 								k1 * chassis_power_control->wheel_spd_fdb[i] * chassis_power_control->wheel_spd_fdb[i] +
 								k2 * chassis_power_control->current[i] * chassis_power_control->current[i] + constant;
 
-		if (initial_give_power[i] < 0) // äº§ç”Ÿåç”Ÿç”µåŠ¨åŠ¿ï¼Œåˆ™ä¸åŠ å…¥æ€»åŠŸç‡çš„è®¡ç®—
+		if (initial_give_power[i] < 0) // ²úÉú·´Éúµç¶¯ÊÆ£¬Ôò²»¼ÓÈë×Ü¹¦ÂÊµÄ¼ÆËã
 			continue;
-		initial_total_power += initial_give_power[i]; // åº•ç›˜åŸå…ˆå°†è¦è¾¾åˆ°çš„åŠŸç‡
+		initial_total_power += initial_give_power[i]; // µ×ÅÌÔ­ÏÈ½«Òª´ïµ½µÄ¹¦ÂÊ
 	}
 	total_give = initial_total_power;
 
 
-	if (initial_total_power > chassis_max_power) // åº•ç›˜å°†è¦è¶…åŠŸç‡--è¿›è¡ŒåŠŸç‡æ§åˆ¶ï¼Œ è‹¥æ²¡è¶…ï¼Œåˆ™ç»§ç»­pidè¿ç®—è‡³è¶…åŠŸç‡
+	if (initial_total_power > chassis_max_power) // µ×ÅÌ½«Òª³¬¹¦ÂÊ--½øĞĞ¹¦ÂÊ¿ØÖÆ£¬ ÈôÃ»³¬£¬Ôò¼ÌĞøpidÔËËãÖÁ³¬¹¦ÂÊ
 	{
-		float power_scale = chassis_max_power / initial_total_power; // ç¼©æ”¾ç³»æ•°ï¼Œç”¨æ¯ä¸ªç”µæœºçš„å½“å‰åŠŸç‡ä¹˜ä»¥ç¼©æ”¾ç³»æ•°ï¼Œå¾—åˆ°ç”µæœºçš„æœŸæœ›åŠŸç‡ï¼Œï¼ˆåŠŸç‡æ€»å’Œ = chassis_max_powerï¼‰
+		float power_scale = chassis_max_power / initial_total_power; // Ëõ·ÅÏµÊı£¬ÓÃÃ¿¸öµç»úµÄµ±Ç°¹¦ÂÊ³ËÒÔËõ·ÅÏµÊı£¬µÃµ½µç»úµÄÆÚÍû¹¦ÂÊ£¬£¨¹¦ÂÊ×ÜºÍ = chassis_max_power£©
 		total_give = 0;
 		for (uint8_t i = 0; i < 4; i++)
 		{
-			scaled_give_power[i] = initial_give_power[i] * power_scale; // è·å–æ¯ä¸ªè½®å­ç¼©æ”¾åçš„æœŸæœ›åŠŸç‡
+			scaled_give_power[i] = initial_give_power[i] * power_scale; // »ñÈ¡Ã¿¸öÂÖ×ÓËõ·ÅºóµÄÆÚÍû¹¦ÂÊ
 			total_give += scaled_give_power[i];
-			if (scaled_give_power[i] < 0) // æ”¾å‡ºåŠŸç‡çš„å°±ä¸å‚ä¸è®¡ç®—
+			if (scaled_give_power[i] < 0) // ·Å³ö¹¦ÂÊµÄ¾Í²»²ÎÓë¼ÆËã
 			{
 				continue;
 			}
-			//æ ¹æ®å½“å‰è½¬é€Ÿï¼Œè®¡ç®—å‡ºèƒ½è®©ç”µæœºè¾¾åˆ°æœŸæœ›åŠŸç‡çš„tao
+			//¸ù¾İµ±Ç°×ªËÙ£¬¼ÆËã³öÄÜÈÃµç»ú´ïµ½ÆÚÍû¹¦ÂÊµÄtao
 			float a = k2;
 			float b = toque_coefficient * chassis_power_control->wheel_spd_fdb[i];
 			float c = k1 * chassis_power_control->wheel_spd_fdb[i] * chassis_power_control->wheel_spd_fdb[i] - scaled_give_power[i] + constant;
@@ -130,12 +130,12 @@ void get_buffer(float *chassis_power_buffer)
 	if (judge_recv_mesg.game_robot_state.chassis_power_limit >= 45 && judge_recv_mesg.game_robot_state.chassis_power_limit <= 220)
 		*chassis_power_buffer = judge_recv_mesg.power_heat_data.buffer_energy;
 	else
-		*chassis_power_buffer = 30; // è®©ç„¦è€³ç¯pidè¾“å‡ºä¸º0
+		*chassis_power_buffer = 30; // ÈÃ½¹¶ú»·pidÊä³öÎª0
 }
 void get_chassis_max_power(uint16_t *max_power_limit)
 {
 	if (judge_recv_mesg.game_robot_state.chassis_power_limit >= 45 && judge_recv_mesg.game_robot_state.chassis_power_limit <= 220)
 		*max_power_limit = judge_recv_mesg.game_robot_state.chassis_power_limit;
 	else
-		*max_power_limit = Debug_Power; // æ²¡æ¥å…¥è£åˆ¤ç³»ç»Ÿï¼Œç”µç®¡åŠŸç‡è¾“å‡ºé™å®š40w
+		*max_power_limit = Debug_Power; // Ã»½ÓÈë²ÃÅĞÏµÍ³£¬µç¹Ü¹¦ÂÊÊä³öÏŞ¶¨40w
 }

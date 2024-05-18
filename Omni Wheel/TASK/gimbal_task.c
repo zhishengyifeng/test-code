@@ -82,11 +82,11 @@ float pit_init_pid[6] = {55, 0.015, 30, 70, 0, 0};
 float yaw_init_pid[6] = {50, 0.01, 20, 110, 0, 0};
 
 // 普通参数（小陀螺与普通模式共用一套参数）
-float pit_pid[6] = {55, 0.015, 30, 50, 0, 0};
+float pit_pid[6] = {30, 0.015, 30, 20, 0, 0};
 float yaw_pid[6] = {15, 0.01, 20, 110, 0, 0};
 
 // 自瞄参数
-float pit_vision_pid[6] = {60, 0.01f, 0, 80, 0, 0};
+float pit_vision_pid[6] = {55, 0.015, 30, 50, 0, 0};
 float yaw_vision_pid[6] = {30, 0.01f, 5, 100, 0, 0};
 // 神符参数
 float pit_buff_pid[6] = {27, 0.13, 5, 100, 0.1, 0};
@@ -688,8 +688,9 @@ static void track_aimor_handler(void)
 			yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw;//gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw; // 补偿小陀螺自瞄时底盘的反方向力
 		else
 //			yaw_ctrl = gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw;
-		yaw_ctrl = gimbal.sensor.yaw_gyro_angle + pc_recv_mesg.aim_yaw;
-		pit_ctrl = gimbal.sensor.pit_relative_angle + pc_recv_mesg.aim_pitch;
+		yaw_ctrl = pc_recv_mesg.aim_yaw;
+//		pit_ctrl = gimbal.sensor.pit_relative_angle + pc_recv_mesg.aim_pitch;
+		pit_ctrl = pc_recv_mesg.aim_pitch;
 		last_vision_status = 1;
 	}
 	/*视觉无效处理*/
