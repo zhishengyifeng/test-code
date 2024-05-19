@@ -102,7 +102,7 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 {
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		gyro[i] = bmi088->Gyro[0] * gyro_scale_factor[i][0] + bmi088->Gyro[1] * gyro_scale_factor[i][1] + bmi088->Gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
+		gyro[i] = (bmi088->Gyro[0]+gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1]+gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2]+gyro_offset[2]) * gyro_scale_factor[i][2];
 		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2];
 //		mag[i] = ist8310->Mag[0] * mag_scale_factor[i][0] + ist8310->Mag[1] * mag_scale_factor[i][1] + ist8310->Mag[2] * mag_scale_factor[i][2] + mag_offset[i];
 	}
@@ -180,8 +180,8 @@ void imu_task(void const *argu)
 
 			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
 			gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
-			gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;		//加速度
-			gimbal.sensor.pit_palstance = BMI088.Gyro[1] * 100;	//加速度
+			gimbal.sensor.yaw_palstance = INS_gyro[2]*100;		//加速度
+			gimbal.sensor.pit_palstance = INS_gyro[1]*100;	//加速度
 
 		err_detector_hook(IMU_OFFLINE);
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);

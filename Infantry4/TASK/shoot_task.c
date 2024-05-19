@@ -286,6 +286,12 @@ static void ball_storage_ctrl(void)
     TIM_SetCompare3(TIM8,ccr_close);
   }
 }
+
+void shoot_stop_reflashangle(void)
+{
+	single_shoot_angle = moto_trigger.total_angle;
+}
+
 /**
  * @brief		拨盘角度变换，解决二连发问题，解决使用绝对值卡弹问题
  * @param[in]	state:该参数传入单发或者连发两种之一的状态
@@ -478,22 +484,11 @@ static void shoot_bullet_handler(void)
 	
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
 		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)))
-//		trig.angle_ref = moto_trigger.total_angle;
 		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	
-//	if(trig.angle_ref%45!=0){//解决二连发问题  		//没解决，反而把机械拨盘叉数解决了 绷
-//	int i=trig.angle_ref%45;
-//		if(i>=25)trig.angle_ref+=45-i;
-//		else trig.angle_ref-=i;
-//	}
    //pid计算
   pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref);
 	
-	/*(trig.c_sta == TRIG_PRESS_DOWN && moto_trigger.speed_rpm==0)//若卡弹就反转
-	{
-	     pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref-Angle);
-	}
-	else*/
 	    trig.spd_ref = pid_trigger.out;
 	pid_calc(&pid_trigger_spd, moto_trigger.speed_rpm, trig.spd_ref);
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && judge_recv_mesg.game_robot_state.power_management_shooter_output == 0)//摩擦轮被裁判系统断电后让拨盘停转

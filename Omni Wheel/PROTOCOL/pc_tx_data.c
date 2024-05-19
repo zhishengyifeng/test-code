@@ -118,7 +118,7 @@ void get_infantry_info(void)
 		{
 			// 发送编码位角度？看视觉需求，用电机还是陀螺仪
 			pc_send_mesg.task_mode = BIG_BUFF_MODE; // 大能量机关
-			pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
+			pc_send_mesg.robot_pitch =  gimbal.sensor.pit_relative_angle;
 			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_relative_angle;
 		}
 		else
@@ -126,7 +126,7 @@ void get_infantry_info(void)
 			// 发送编码位角度？看视觉需求，用电机还是陀螺仪
 			pc_send_mesg.task_mode = NORMAL_CTRL_MODE; // 普通模式
 			pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
-			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle;
+			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_relative_angle;
 		}
 	}
 	break;

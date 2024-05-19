@@ -868,12 +868,12 @@ ARM Macro Assembler    Page 14
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=..\obj\startup_stm32f407xx.d -o..\obj\startup_stm32f407xx.o -IC
-:\Users\28434\Desktop\RM\步兵\麦轮\狗洞3.19\狗洞3.19\standard-robot-main\USER\R
-TE -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.0 -ID:\Keil_v5\ARM\CMSIS\Inclu
-de -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM3
-2F4xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SE
-TA 514" --predefine="STM32F407xx SETA 1" --list=.\listings\startup_stm32f407xx.
-lst ..\CORE\startup_stm32f407xx.s
+:\Users\28434\Desktop\RM\步兵\test-code\稳定能用版本-不可修改\麦轮-联盟赛\USER\
+RTE -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.0 -ID:\Keil_v5\ARM\CMSIS\Incl
+ude -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM
+32F4xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
+ETA 514" --predefine="STM32F407xx SETA 1" --list=.\listings\startup_stm32f407xx
+.lst ..\CORE\startup_stm32f407xx.s
 
 
 

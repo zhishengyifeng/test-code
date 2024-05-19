@@ -59,15 +59,15 @@ void get_keyboard(void)
 	if (rc.kb.bit.R && rc.kb.bit.CTRL)
 		KB_BALL = 0;
 
-//	if (rc.kb.bit.B && keyboard_flag)
-//		SMALL_BUFF = 1;
-//	if (rc.kb.bit.B && rc.kb.bit.V)
-//		SMALL_BUFF = 0;
+	if (rc.kb.bit.B && keyboard_flag)
+		SMALL_BUFF = 1;
+	if (rc.kb.bit.B && rc.kb.bit.CTRL)
+		SMALL_BUFF = 0;
 
-//	if (rc.kb.bit.G && keyboard_flag)
-//		BIG_BUFF = 1;
-//	if (rc.kb.bit.G && rc.kb.bit.V)
-//		BIG_BUFF = 0;
+	if (rc.kb.bit.G && keyboard_flag)
+		BIG_BUFF = 1;
+	if (rc.kb.bit.G && rc.kb.bit.CTRL)
+		BIG_BUFF = 0;
 
 	if (rc.kb.bit.E && keyboard_flag)
 		PC_DODGE = 1;

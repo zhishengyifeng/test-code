@@ -67,13 +67,13 @@ float chassis_spd_pid[4][3] = {{10, 0.0f, 0},
 
 #define POWER_NEW//ĞÂ¹¦ÂÊËã·¨£¬ÈôÒªÓÃÀÏ¹¦ÂÊËã·¨¾Í×¢ÊÍµôÕâÒ»ĞĞ
 								 
-float	power_new_pid[3] = {10.0f, 3.0f, 0.0f}; //ĞÂ¹¦ÂÊËã·¨PID£¨´úÌæÏÂ±ßµÄcap_vol_pid£©
+float	power_new_pid[3] = {5.0f, 3.0f, 0.0f}; //ĞÂ¹¦ÂÊËã·¨PID£¨´úÌæÏÂ±ßµÄcap_vol_pid£©
 float cap_vol_pid[3] = {1.0f, 0, 0.0f};		   // ³¬¼¶µçÈİµçÑ¹¿ØÖÆPID
 float chassis_power_buffer_pid[3] = {1, 0, 0}; // »º³å½¹¶ú¿ØÖÆPID
 #ifndef POWER_NEW
 float chassis_vw_pid[3] = {0.1, 0, 0.1};	   // Ğ¡ÍÓÂİ×ªËÙ¿ØÖÆPID
 #else
-float chassis_vw_pid[3] = {0.0f, 0.3f, 0.0f};	   // Ğ¡ÍÓÂİ×ªËÙ¿ØÖÆPID
+float chassis_vw_pid[3] = {0.0f, 0.5f, 0.0f};	   // Ğ¡ÍÓÂİ×ªËÙ¿ØÖÆPID
 #endif
 
 float cap_store = 24;		  // µçÈİ´æ´¢´óĞ¡(¸ø¶¨³õÖµÎª24)
@@ -100,11 +100,11 @@ void chassis_task(void *parm)
 				/*µ×ÅÌvwĞı×ªµÄpid*/
 				PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
 				PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
-				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 600, 600, DONE);
+				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 650, 650, DONE);
 
 				/*µ×ÅÌvx,vyÆ½ÒÆµÄpid*/
 				for (int i = 0; i < 4; i++)
-					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16000, 1500, DONE);
+					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16384, 1500, DONE);
 				
 				Cap_refresh();
 				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // ÔÆÌ¨¹éÖĞÖ®ºóµ×ÅÌ²ÅÄÜ¶¯
@@ -343,7 +343,11 @@ static void chassis_dodge_handler(void)
 	float chassis_vx_dodge, chassis_vy_dodge;
 	float dodge_angle;
 	float dodge_min = 150;
-	float dodge_max = 500;
+	#if (INFANTRY_CLASS == INFANTRY_OMV)
+		float dodge_max = 650;
+	#else
+		float dodge_max = 500;
+	#endif
 	float dodge_chassis_vx, dodge_chassis_vy;
 	static int dodge_cap = 0;
 
@@ -386,7 +390,7 @@ static void chassis_dodge_handler(void)
 //ĞÂ¹¦ÂÊËã·¨
 void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
 {
-    static  float max = 3300;
+    static  float max = 3000;
     static float min = 1150;//1000;
     static float Cap_low = 15.0f;      // ºÎÊ±Í£Ö¹¼ÓËÙ
 		float Ref_temp = 0;//¹¦ÂÊ»»Æô¶¯ÁÙÊ±±äÁ¿
@@ -423,60 +427,72 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 					else//Ã»½Ó²ÃÅĞÏµÍ³
 						pid_calc(power_pid,ob_total_power,(Debug_Power+5)*Charge_factor);//Ã»ÓĞÁ¬½Ó²ÃÅĞÏµÍ³£¬Ğ¡³µµ×ÅÌÆÚÍû¹¦ÂÊ´ïµ½45w			
 				}
+				else if (Speed_up == 0)//°´ÏÂ¼ÓËÙ¹¦ÂÊ¶à100w
+				{
+					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
+					{
+						pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit+105));
+					}
+					else//Ã»½Ó²ÃÅĞÏµÍ³
+					{
+						pid_calc(&pid_chassis_vw,ob_total_power,105+Debug_Power);//Ã»ÓĞÁ¬½Ó²ÃÅĞÏµÍ³£¬Ğ¡³µµ×ÅÌÆÚÍû¹¦ÂÊ´ïµ½150w
+					}
+				}	
 			
 		}
-	if(Speed_up == 1)
-	{
-		if (km.vy > 0 || rm.vy > 0)
+		
+		if(Speed_up == 1)
 		{
-			 *power_vy = (min + power_pid->out);
-			 VAL_LIMIT(*power_vy, min * 0.7f, max);
-		}
-		else if (km.vy < 0 || rm.vy < 0)
-		{
-			 *power_vy = -(min + power_pid->out);
-			 VAL_LIMIT(*power_vy, -max, -min * 0.7f);
-		}
-		else
-			*power_vy = 0;
+			if (km.vy > 0 || rm.vy > 0)
+			{
+				 *power_vy = (min + power_pid->out);
+				 VAL_LIMIT(*power_vy, min * 0.7f, max);
+			}
+			else if (km.vy < 0 || rm.vy < 0)
+			{
+				 *power_vy = -(min + power_pid->out);
+				 VAL_LIMIT(*power_vy, -max, -min * 0.7f);
+			}
+			else
+				*power_vy = 0;
 
-		if (km.vx > 0 || rm.vx > 0)
-		{
-				*power_vx = (min + power_pid->out);
-			 VAL_LIMIT(*power_vx, min, max);
+			if (km.vx > 0 || rm.vx > 0)
+			{
+					*power_vx = (min + power_pid->out);
+				 VAL_LIMIT(*power_vx, min, max);
+			}
+			else if (km.vx < 0 || rm.vx < 0)
+			{
+				*power_vx = -(min + power_pid->out);
+				VAL_LIMIT(*power_vx, -max, -min);
+			}
+			else
+				*power_vx = 0;
 		}
-		else if (km.vx < 0 || rm.vx < 0)
+		else if(Speed_up == 0)
 		{
-			*power_vx = -(min + power_pid->out);
-			VAL_LIMIT(*power_vx, -max, -min);
-		}
-		else
-			*power_vx = 0;
-	}
-	else if(Speed_up == 0)
-	{
-		if (km.vy > 0 || rm.vy > 0)
-		{
-			 *power_vy = CHASSIS_KB_MAX_SPEED_Y;
-		}
-		else if (km.vy < 0 || rm.vy < 0)
-		{
-			 *power_vy = -CHASSIS_KB_MAX_SPEED_Y;
-		}
-		else
-			*power_vy = 0;
+			if (km.vy > 0 || rm.vy > 0)
+			{
+				 *power_vy = CHASSIS_KB_MAX_SPEED_Y;
+			}
+			else if (km.vy < 0 || rm.vy < 0)
+			{
+				 *power_vy = -CHASSIS_KB_MAX_SPEED_Y;
+			}
+			else
+				*power_vy = 0;
 
-		if (km.vx > 0 || rm.vx > 0)
-		{
-				*power_vx = CHASSIS_KB_MAX_SPEED_X;
+			if (km.vx > 0 || rm.vx > 0)
+			{
+					*power_vx = CHASSIS_KB_MAX_SPEED_X;
+			}
+			else if (km.vx < 0 || rm.vx < 0)
+			{
+				*power_vx = -CHASSIS_KB_MAX_SPEED_X;
+			}
+			else
+				*power_vx = 0;
 		}
-		else if (km.vx < 0 || rm.vx < 0)
-		{
-			*power_vx = -CHASSIS_KB_MAX_SPEED_X;
-		}
-		else
-			*power_vx = 0;
-	}
 		
 	if (fast_flag && (rc.ch2 == 660 || FAST_SPD)) // ¿ìËÙ
 	{
@@ -503,7 +519,7 @@ static void chassis_dodge_handler(void)
 	float dodge_angle;
 	float dodge_min = 150;
 	#if (INFANTRY_CLASS == INFANTRY_OMV)
-		float dodge_max = 600;
+		float dodge_max = 650;
 	#else
 		float dodge_max = 500;
 	#endif
@@ -653,11 +669,18 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // µ×ÅÌ½
 	int16_t wheel_rpm[4];
 	float max = 0;
 
+	#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
 	wheel_rpm[0] = (-vx - vy - vw * rotate_ratio_fr) * wheel_rpm_ratio;
 	wheel_rpm[1] = (vx - vy - vw * rotate_ratio_fl) * wheel_rpm_ratio;
 	wheel_rpm[2] = (vx + vy - vw * rotate_ratio_bl) * wheel_rpm_ratio;
 	wheel_rpm[3] = (-vx + vy - vw * rotate_ratio_br) * wheel_rpm_ratio;
-
+	#elif (INFANTRY_CLASS == INFANTRY_OMV)
+	wheel_rpm[0] = (0.707f*(-vx - vy) - (vw * rotate_ratio_fr)) * wheel_rpm_ratio;
+	wheel_rpm[1] = (0.707f*(vx - vy) - (vw * rotate_ratio_fl)) * wheel_rpm_ratio;
+	wheel_rpm[2] = (0.707f*(vx + vy) - (vw * rotate_ratio_bl)) * wheel_rpm_ratio;
+	wheel_rpm[3] = (0.707f*(-vx + vy) - (vw * rotate_ratio_br)) * wheel_rpm_ratio;
+	#endif
+	
 	// find max item
 	for (uint8_t i = 0; i < 4; i++)
 	{

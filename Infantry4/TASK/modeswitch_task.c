@@ -51,27 +51,27 @@ void get_keyboard(void)
 
 	if (rc.kb.bit.Q && keyboard_flag)
 		KB_FRIC = 1;
-	if (rc.kb.bit.Q && rc.kb.bit.V)
+	if (rc.kb.bit.Q && rc.kb.bit.CTRL)
 		KB_FRIC = 0;
 
 	if (rc.kb.bit.R && keyboard_flag)
 		KB_BALL = 1;
-	if (rc.kb.bit.R && rc.kb.bit.V)
+	if (rc.kb.bit.R && rc.kb.bit.CTRL)
 		KB_BALL = 0;
 
 	if (rc.kb.bit.B && keyboard_flag)
 		SMALL_BUFF = 1;
-	if (rc.kb.bit.B && rc.kb.bit.V)
+	if (rc.kb.bit.B && rc.kb.bit.CTRL)
 		SMALL_BUFF = 0;
 
 	if (rc.kb.bit.G && keyboard_flag)
 		BIG_BUFF = 1;
-	if (rc.kb.bit.G && rc.kb.bit.V)
+	if (rc.kb.bit.G && rc.kb.bit.CTRL)
 		BIG_BUFF = 0;
 
-	if (rc.kb.bit.CTRL)//按住CTRL开小陀螺
+	if (rc.kb.bit.E && keyboard_flag)
 		PC_DODGE = 1;
-	else
+	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
 
 //	if (rc.kb.bit.F && rc.kb.bit.V)
@@ -81,16 +81,15 @@ void get_keyboard(void)
 		!rc.kb.bit.R &&
 		!rc.kb.bit.B &&
 		!rc.kb.bit.G &&
+		!rc.kb.bit.E &&
 		!rc.kb.bit.V &&
 		!rc.kb.bit.Z &&
 		!rc.kb.bit.X &&
-		!rc.kb.bit.CTRL &&
 		!rc.kb.bit.F)
 		keyboard_flag = 1;
 	else
 		keyboard_flag = 0; // 松手后才执行
 }
-
 rc_status remote_get_bit(void)
 {
 	if (rc.kb.bit.W)

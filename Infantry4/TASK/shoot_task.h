@@ -77,6 +77,7 @@ void shoot_task(void *parm);
 static void shoot_para_ctrl(void);
 void shoot_param_init(void);
 void get_last_shoot_mode(void);
+void shoot_stop_reflashangle(void);
 static void shoot_bullet_handler(void);
 static void fric_wheel_ctrl(void);
 //static void turn_on_friction_wheel(int16_t lspd,int16_t rspd);

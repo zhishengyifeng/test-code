@@ -51,7 +51,7 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 		cap_state = 0;
 	}
 
-	if (chassis_power_control->CapData[1] > 15) // 电容电压>15V
+	if (chassis_power_control->CapData[1] > 14) // 电容电压>14V
 	{
 		if (cap_state == 0) // 关闭电容加速
 		{
@@ -102,9 +102,9 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 			if (chassis_power_control->current[i] > 0) // Selection of the calculation formula according to the direction of the original moment
 			{
 				float temp = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
-				if (temp > 16000)
+				if (temp > 16384)
 				{
-					chassis_power_control->current[i] = 16000;
+					chassis_power_control->current[i] = 16384;
 				}
 				else
 					chassis_power_control->current[i] = temp;
@@ -112,9 +112,9 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 			else
 			{
 				float temp = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
-				if (temp < -16000)
+				if (temp < -16384)
 				{
-					chassis_power_control->current[i] = -16000;
+					chassis_power_control->current[i] = -16384;
 				}
 				else
 					chassis_power_control->current[i] = temp;

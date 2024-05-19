@@ -117,11 +117,11 @@ void chassis_task(void *parm)
 				/*µ×ÅÌvwÐý×ªµÄpid*/
 				PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
 				PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
-				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 600, 600, DONE);
+				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 650, 650, DONE);
 				
 				/*µ×ÅÌvx,vyÆ½ÒÆµÄpid*/
 				for (int i = 0; i < 4; i++)
-					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16000, 1500, DONE);
+					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16384, 1500, DONE);
 
 				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // ÔÆÌ¨¹éÖÐÖ®ºóµ×ÅÌ²ÅÄÜ¶¯
 				{
@@ -362,7 +362,7 @@ static void chassis_dodge_handler(void)
 	float chassis_vx_dodge, chassis_vy_dodge;
 	float dodge_angle;
 	float dodge_min = 150;
-	float dodge_max = 500;
+	float dodge_max = 650;
 	float dodge_chassis_vx, dodge_chassis_vy;
 	static int dodge_cap = 0;
 
@@ -405,7 +405,7 @@ static void chassis_dodge_handler(void)
 //ÐÂ¹¦ÂÊËã·¨
 void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
 {
-    static  float max = 4000;
+    static  float max = 3000;
     static float min = 1150;//1000;
     static float Cap_low = 15.0f;      // ºÎÊ±Í£Ö¹¼ÓËÙ
 		float Ref_temp = 0;//¹¦ÂÊ»»Æô¶¯ÁÙÊ±±äÁ¿
@@ -522,7 +522,7 @@ static void chassis_dodge_handler(void)
 	float chassis_vx_dodge, chassis_vy_dodge;
 	float dodge_angle;
 	float dodge_min = 150;
-	float dodge_max = 600;
+	float dodge_max = 650;
 	float dodge_chassis_vx, dodge_chassis_vy;
 	static int dodge_cap = 0;
 
@@ -671,10 +671,10 @@ static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // µ×ÅÌ½
 	float max = 0;
 
 	
-	wheel_rpm[0] = (0.707*(-vx - vy) - (vw * rotate_ratio_fr)) * wheel_rpm_ratio;
-	wheel_rpm[1] = (0.707*(vx - vy) - (vw * rotate_ratio_fl)) * wheel_rpm_ratio;
-	wheel_rpm[2] = (0.707*(vx + vy) - (vw * rotate_ratio_bl)) * wheel_rpm_ratio;
-	wheel_rpm[3] = (0.707*(-vx + vy) - (vw * rotate_ratio_br)) * wheel_rpm_ratio;
+	wheel_rpm[0] = (0.707f*(-vx - vy) - (vw * rotate_ratio_fr)) * wheel_rpm_ratio;
+	wheel_rpm[1] = (0.707f*(vx - vy) - (vw * rotate_ratio_fl)) * wheel_rpm_ratio;
+	wheel_rpm[2] = (0.707f*(vx + vy) - (vw * rotate_ratio_bl)) * wheel_rpm_ratio;
+	wheel_rpm[3] = (0.707f*(-vx + vy) - (vw * rotate_ratio_br)) * wheel_rpm_ratio;
 	
 	//ÕýÔË¶¯Ñ§½âËã
 	float k = ((WHEELBASE + WHEELTRACK) / 2.0f - GIMBAL_X_OFFSET + GIMBAL_Y_OFFSET) / RADIAN_COEF;

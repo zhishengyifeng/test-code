@@ -5,7 +5,7 @@
 #include "chassis_task.h"
 
 #define Debug_Power				70//没有裁判系统时的功率限制
-#define Deta_Power				120//触发缓启动的功率差
+#define Deta_Power				60//触发缓启动的功率差
 
 extern float Charge_factor;
 

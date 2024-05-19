@@ -762,8 +762,10 @@ static void shoot_buff_ctrl_handler(void)
 	if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
 	{
 		last_vision_status = 1;
-		yaw_ctrl = gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw;
-		pit_ctrl = gimbal.sensor.pit_relative_angle+ pc_recv_mesg.aim_pitch;
+//		yaw_ctrl = gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw;
+//		pit_ctrl = gimbal.sensor.pit_relative_angle+ pc_recv_mesg.aim_pitch;
+		yaw_ctrl = pc_recv_mesg.aim_yaw;
+		pit_ctrl = pc_recv_mesg.aim_pitch;
 	}
 
 	/*视觉无效处理*/

@@ -11,8 +11,7 @@
 #define RIGHT      (rc.kb.bit.D)
 //      speed      key
 #define FAST_SPD   (rc.kb.bit.SHIFT)
-#define SLOW_SPD   (rc.kb.bit.E)
-//#define PC_DODGE   (rc.kb.bit.CTRL)
+#define SLOW_SPD   (rc.kb.bit.CTRL)
 
 
 //      function   key or mouse operate

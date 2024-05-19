@@ -88,7 +88,7 @@ void get_infantry_info(void)
 //			coordination_flag = 0;
 //		}
 		pc_send_mesg.task_mode = TRACK_AMOR_MODE;									  // 自瞄模式
-		pc_send_mesg.robot_pitch = -gimbal.sensor.pit_relative_angle;				  // 0
+		pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;				  // 0
 		pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle; // 发送陀螺仪的数据//0;(不发)
 		//pc_send_mesg.robot_yaw = single_coordination ;
 		/*反小陀螺-打哨兵模式按键 长按C发送1，长按V发送2*/

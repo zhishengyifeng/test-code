@@ -249,10 +249,17 @@ void keyboard_chassis_hook(void)
 {
 	if (km.kb_enable)
 	{
-		if (direction == 1)
-			chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
-		else
-			chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
+		#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
+			if (direction == 1)
+				chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
+			else
+				chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
+		#elif (INFANTRY_CLASS == INFANTRY_OMV)
+			if (direction == 1)
+				chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
+			else
+				chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
+		#endif
 	}
 	else
 	{
