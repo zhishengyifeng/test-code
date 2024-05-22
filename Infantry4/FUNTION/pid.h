@@ -27,6 +27,7 @@ typedef struct pid
 	float kd;
 	
 	float pout;
+	float iterm;
 	float iout;
 	float dout;
 	float out; 
@@ -46,8 +47,11 @@ typedef struct pid
 										float p,
 										float i,
 										float d);
-										
+	
+
 }pid_t;
+
+
 
 
 float pid_calc(pid_t *pid,float get,float set);

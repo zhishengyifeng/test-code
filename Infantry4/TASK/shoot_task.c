@@ -53,7 +53,7 @@ uint16_t Fric_Spd_Ajt;//3为初始未使用状态
 
 #define SPEED_LIMIT//
 
-#if(INFANTRY_CLASS == INFANTRY_OMV)
+#if (INFANTRY_NUM == INFANTRY_4)
 /*摩擦轮pid*/
 float fric_pid[3] = {24, 0, 0};
 
@@ -65,11 +65,9 @@ uint16_t speed = 6000;//8200
 float ccr_open  = 500;
 float ccr_close = 2350;
 /*拨叶叶树，每次转过角度*/
-#define shifter_fork_number 7 // 拨叶数量
-float Angle = 360.0f / (float)shifter_fork_number;
-uint32_t Shit_Count; // 由于屎山不得不继续拉 记录转过圈数
+#define shifter_fork_number 8 // 拨叶数量
 
-#elif(INFANTRY_CLASS == INFANTRY_MECANNUM)
+#elif (INFANTRY_NUM == INFANTRY_8 || INFANTRY_NUM == INFANTRY_24)
 /*摩擦轮pid*/
 float fric_pid[3] = {24, 0, 0};
 
@@ -84,14 +82,15 @@ float ccr_open  = 2500;//1550;
 float ccr_close = 500;//430;
 
 /*拨叶叶树，每次转过角度*/
-#define shifter_fork_number 8 // 拨叶数量
+#define shifter_fork_number 7 // 拨叶数量
 
-float Angle = 360.0f / (float)shifter_fork_number;
-uint32_t Shit_Count; // 由于屎山不得不继续拉 记录转过圈数
+//uint32_t Shit_Count; // 由于屎山不得不继续拉 记录转过圈数
 
 #else
-	#error "INFANTRY_CLASS define error!"
+	#error "INFANTRY_NUM define error!"
 #endif
+
+float Angle = 360.0f / (float)shifter_fork_number;//计算2006转过角度
 
 	int close_down  = 1;     //弹仓盖关闭完成标志位
 	int open_down   = 1;      //弹仓盖打开完成标志位
@@ -161,7 +160,7 @@ void shoot_task(void *parm)
 
 
 //					shoot_para_ctrl();						// 射击模式切换
-					ball_storage_ctrl();					// 舵机控制弹仓盖
+//					ball_storage_ctrl();					// 舵机控制弹仓盖
 //					fric_wheel_ctrl();						// 摩擦轮控制
 
 					if (shoot.fric_wheel_run)//若摩擦轮开启
@@ -186,6 +185,7 @@ void shoot_task(void *parm)
 					}
 					else
 					{
+						single_shoot_angle = moto_trigger.total_angle;
 						shoot.shoot_cmd   = 0;//单发标志位
 						shoot.c_shoot_cmd = 0;//连发标志位
 						shoot.fric_wheel_spd = 0;//给小值 eg：1000 摩擦轮持续加热
@@ -203,10 +203,10 @@ void shoot_task(void *parm)
 				}
 				else
 				{
+					single_shoot_angle = moto_trigger.total_angle;
 					glb_cur.trigger_cur = 0;
 					glb_cur.fric_cur[0] = 0;
 					glb_cur.fric_cur[1] = 0;
-				
 				}
 				
 								
@@ -275,23 +275,17 @@ void get_last_shoot_mode(void)
 //}
 
 /*弹仓盖控制*/
-static void ball_storage_ctrl(void)
-{
-  if (shoot.ball_storage_open)
-  {
-    TIM_SetCompare3(TIM8,ccr_open);
-  }
-  else
-  {
-    TIM_SetCompare3(TIM8,ccr_close);
-  }
-}
-
-void shoot_stop_reflashangle(void)
-{
-	single_shoot_angle = moto_trigger.total_angle;
-}
-
+//static void ball_storage_ctrl(void)
+//{
+//  if (shoot.ball_storage_open)
+//  {
+//    TIM_SetCompare3(TIM8,ccr_open);
+//  }
+//  else
+//  {
+//    TIM_SetCompare3(TIM8,ccr_close);
+//  }
+//}
 /**
  * @brief		拨盘角度变换，解决二连发问题，解决使用绝对值卡弹问题
  * @param[in]	state:该参数传入单发或者连发两种之一的状态
@@ -337,7 +331,6 @@ static void shoot_delay_hanlder(trig_state_e *state, float shoot_delay)
 	}
 	trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 }
-
 
 static void shoot_bullet_handler(void)
 {
@@ -481,14 +474,29 @@ static void shoot_bullet_handler(void)
 //			trig.angle_ref = single_shoot_angle;
 		}
 	}
+	else
+	{
+		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
+	}
 	
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
 		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)))
+//		trig.angle_ref = moto_trigger.total_angle;
 		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	
+//	if(trig.angle_ref%45!=0){//解决二连发问题  		//没解决，反而把机械拨盘叉数解决了 绷
+//	int i=trig.angle_ref%45;
+//		if(i>=25)trig.angle_ref+=45-i;
+//		else trig.angle_ref-=i;
+//	}
    //pid计算
   pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref);
 	
+	/*(trig.c_sta == TRIG_PRESS_DOWN && moto_trigger.speed_rpm==0)//若卡弹就反转
+	{
+	     pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref-Angle);
+	}
+	else*/
 	    trig.spd_ref = pid_trigger.out;
 	pid_calc(&pid_trigger_spd, moto_trigger.speed_rpm, trig.spd_ref);
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && judge_recv_mesg.game_robot_state.power_management_shooter_output == 0)//摩擦轮被裁判系统断电后让拨盘停转

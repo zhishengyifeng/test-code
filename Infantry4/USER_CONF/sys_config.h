@@ -8,7 +8,7 @@
 #define INFANTRY_OMV  2
 #define TEST_SHOOT 6
 
-#define INFANTRY_CLASS INFANTRY_MECANNUM // 可以修改步兵种类
+#define INFANTRY_CLASS INFANTRY_OMV // 可以修改步兵种类
 
 /**********************遥控 设置配置***************************/
 /* 摇杆最大值 */

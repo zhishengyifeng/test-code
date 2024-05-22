@@ -67,16 +67,16 @@ float pit_init_pid[6] = {55, 0.01, 30, 50, 0, 0};
 float yaw_init_pid[6] = {50, 0, 20, 90, 0, 5};
 
 // 普通参数（小陀螺与普通模式共用一套参数）
-float pit_pid[6] = {55, 0.01, 60, 40, 0, 0};
-float yaw_pid[6] = {20, 0, 2, 90, 0, 5};
+float pit_pid[6] = {95, 0.7, 120, 80, 0, 0};
+float yaw_pid[6] = {100, 0, 2, 100, 0, 5};
 
 // 自瞄参数
-float pit_vision_pid[6] = {18, 0.01, 5, 100, 0, 0};
-float yaw_vision_pid[6] = {23, 0, 5, 75, 0, 8};
+float pit_vision_pid[6] = {150, 0.0, 170, 150, 0, 0};
+float yaw_vision_pid[6] = {90, 0.1, 250, 200, 0, 10};//{23, 0, 5, 75, 0, 8};
 
 // 神符参数
-float pit_buff_pid[6] = {30, 0.1, 1, 30, 0, 0};//{27, 0.13, 5, 100, 0.1, 0};
-float yaw_buff_pid[6] = {30, 0.2, 20, 60, 0, 0};
+float pit_buff_pid[6] = {150, 0.0, 170, 150, 0, 0};//{27, 0.13, 5, 100, 0.1, 0};
+float yaw_buff_pid[6] = {90, 0.1, 250, 200, 0, 10};
 
 #elif (INFANTRY_CLASS == Test_Shoot)
 ////电机方向
@@ -114,8 +114,8 @@ float yaw_ctrl_ffc;
 FFC p_ffc;
 FFC y_ffc;
 
-#define PIT_ANGLE_MAX 30
-#define PIT_ANGLE_MIN -30
+#define PIT_ANGLE_MAX 28
+#define PIT_ANGLE_MIN -18
 #define YAW_ANGLE_MAX 50
 #define YAW_ANGLE_MIN -50
 
@@ -372,9 +372,9 @@ void gimbal_task(void *parm)
 					if (gimbal_mode == GIMBAL_TRACK_ARMOR)
 					{
 						/*自瞄 加前馈*/
-						 pit_ctrl_ffc = getFeedforwardControl(&p_ffc, gimbal.pid.pit_angle_ref) + pid_vision_pit_spd.out;//
+//						 pit_ctrl_ffc = getFeedforwardControl(&p_ffc, gimbal.pid.pit_angle_ref) + pid_vision_pit_spd.out;//
 						/*自瞄 加前馈加跟踪微分器*/
-						//pit_ctrl_ffc = getFeedforwardControl(&p_ffc, gimbal.pid.pit_angle_ref) + LADRC_Loop(&Vision_angle, pit_a, gimbal.pid.pit_angle_fdb);
+						pit_ctrl_ffc = getFeedforwardControl(&p_ffc, gimbal.pid.pit_angle_ref) + LADRC_Loop(&Vision_angle, pit_a, gimbal.pid.pit_angle_fdb);
 						yaw_ctrl_ffc = getFeedforwardControl(&y_ffc, gimbal.pid.yaw_angle_ref) + pid_vision_yaw_spd.out; //
 						glb_cur.gimbal_cur[0] = yaw_dir * yaw_ctrl_ffc;
 						glb_cur.gimbal_cur[1] = pit_dir * pid_vision_pit_spd.out;
@@ -627,6 +627,22 @@ extern float yaw_rec_real;
 extern WorldTime_RxTypedef PC_KF_Time;
 /*激励信号所需量*/
 float MyF = 0.5, Myt = 0, MyCnt = 0;
+
+
+/** @brief 	   LADRC 2024/5/21  自瞄模式
+**	@attention 
+**  @author
+**/
+LADRC_NUM Vision_Angle_Pit =
+{ 
+	.h=0.002,//定时时间及时间步长
+	.r=30,//跟踪速度参数
+};
+LADRC_NUM Vision_Angle_Yaw =
+{ 
+	.h=0.002,//定时时间及时间步长
+	.r=30,//跟踪速度参数
+};
 static void track_aimor_handler(void)
 {
 	/* 记录丢失角度 */
@@ -670,12 +686,20 @@ static void track_aimor_handler(void)
 	if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
 	{
 
-		if (chassis_mode == CHASSIS_DODGE_MODE)
-			yaw_ctrl = pc_recv_mesg.aim_yaw;//gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw; // 补偿小陀螺自瞄时底盘的反方向力
-		else
-//			yaw_ctrl = gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw;
-		yaw_ctrl =  pc_recv_mesg.aim_yaw;
-		pit_ctrl =  pc_recv_mesg.aim_pitch;
+//		if (chassis_mode == CHASSIS_DODGE_MODE)
+//			yaw_ctrl = pc_recv_mesg.aim_yaw;//gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw; // 补偿小陀螺自瞄时底盘的反方向力
+//		else
+////			yaw_ctrl = gimbal.sensor.yaw_gyro_angle+pc_recv_mesg.aim_yaw;
+		
+	/* TD跟踪微分处理 */
+	LADRC_TD(&Vision_Angle_Pit,  pc_recv_mesg.aim_pitch);
+	LADRC_TD(&Vision_Angle_Yaw,   pc_recv_mesg.aim_yaw);
+		
+//		yaw_ctrl =  pc_recv_mesg.aim_yaw;
+//		pit_ctrl =  pc_recv_mesg.aim_pitch;
+		yaw_ctrl = Vision_Angle_Yaw.v1; //v1为角度，v2为导数
+		pit_ctrl = Vision_Angle_Pit.v1;
+		
 		last_vision_status = 1;
 	}
 	/*视觉无效处理*/

@@ -73,7 +73,7 @@ float chassis_power_buffer_pid[3] = {1, 0, 0}; // 缓冲焦耳控制PID
 #ifndef POWER_NEW
 float chassis_vw_pid[3] = {0.1, 0, 0.1};	   // 小陀螺转速控制PID
 #else
-float chassis_vw_pid[3] = {0.0f, 0.5f, 0.0f};	   // 小陀螺转速控制PID
+float chassis_vw_pid[3] = {0.0f, 0.3f, 0.0f};	   // 小陀螺转速控制PID
 #endif
 
 float cap_store = 24;		  // 电容存储大小(给定初值为24)
