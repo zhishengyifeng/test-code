@@ -116,6 +116,7 @@ uint16_t continue_time = 420;//连发延时时间间隔初始值
 float surplus_heat;   //剩余热量
 float extra_time; 
 float shoot_delay;//发射延迟 
+uint8_t shoot_outbreak_flag = 0;
 uint8_t switch_freq = 1;//射频转换标志
 	
 void shoot_task(void *parm)
@@ -444,6 +445,11 @@ static void shoot_bullet_handler(void)
 //			}
 //			trig.angle_ref = single_shoot_angle;
 		}
+		else if(shoot_outbreak_flag == 1)//解除热量限制
+		{
+			shoot_delay = 100;
+			shoot_delay_hanlder(&trig.c_sta, shoot_delay);
+		}
 		else//爆发优先
 		{
 			extra_time = pid_heat_time.out;//小于0
@@ -479,10 +485,10 @@ static void shoot_bullet_handler(void)
 		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	}
 	
-	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
-		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)))
-//		trig.angle_ref = moto_trigger.total_angle;
-		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
+//	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
+//		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)))
+////		trig.angle_ref = moto_trigger.total_angle;
+//		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	
 //	if(trig.angle_ref%45!=0){//解决二连发问题  		//没解决，反而把机械拨盘叉数解决了 绷
 //	int i=trig.angle_ref%45;
@@ -505,7 +511,10 @@ static void shoot_bullet_handler(void)
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.game_robot_state.shooter_barrel_cooling_value == 0 || judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit == 0))
 		pid_trigger_spd.out = 0;
 	glb_cur.trigger_cur = pid_trigger_spd.out;
-	
+		if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
+		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)) && shoot_outbreak_flag == 0)
+		pid_trigger_spd.out = 0; // 热量限制不会超热量
+		
 }
 
 float speed_limit()

@@ -73,7 +73,10 @@ void get_keyboard(void)
 		PC_DODGE = 1;
 	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
-
+  if(rc.kb.bit.V && keyboard_flag)  //解除射击热量限制
+		shoot_outbreak_flag =1;
+	if (rc.kb.bit.V && rc.kb.bit.CTRL)
+		shoot_outbreak_flag =0;
 //	if (rc.kb.bit.F && rc.kb.bit.V)
 //		SOFT_RESET = 1;
 	if (

@@ -72,6 +72,7 @@ typedef enum
 } shoot_type_e;
 extern shoot_t   shoot;
 extern trigger_t trig;
+extern uint8_t shoot_outbreak_flag;
 
 void shoot_task(void *parm);
 static void shoot_para_ctrl(void);
