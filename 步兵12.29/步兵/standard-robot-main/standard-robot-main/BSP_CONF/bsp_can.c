@@ -4,16 +4,17 @@
 #include "gimbal_task.h"
 #include "chassis_task.h"
 #include "stdlib.h"
+
 #include "delay.h"
 
 CanRxMsg rx1_message;
 CanRxMsg rx2_message;
 
-moto_measure_t moto_chassis[4];        //µ×ÅÌ       3508
-moto_measure_t moto_pit;               //pitÖá      6020
-moto_measure_t moto_yaw;               //yawÖá      6020
-moto_measure_t moto_trigger;           //²¦ÅÌ       2006
-moto_measure_t moto_fric[2];           //Ä¦²ÁÂÖ     3508
+moto_measure_t moto_chassis[4];        //ï¿½ï¿½ï¿½ï¿½       3508
+moto_measure_t moto_pit;               //pitï¿½ï¿½      6020
+moto_measure_t moto_yaw;               //yawï¿½ï¿½      6020
+moto_measure_t moto_trigger;           //ï¿½ï¿½ï¿½ï¿½       2006
+moto_measure_t moto_fric[2];           //Ä¦ï¿½ï¿½ï¿½ï¿½     3508
 
 static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan,CanRxMsg *message)
 {
@@ -21,43 +22,43 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan,CanRxMsg *message)
 	{
 		switch(message->StdId)
 		{
-			case CAN_3508_M1_ID://µ×ÅÌËÄ¸öµç»ú½ÓÊÕCANÊý¾Ý
+			case CAN_3508_M1_ID://ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CANï¿½ï¿½ï¿½ï¿½
 			case CAN_3508_M2_ID:
 			case CAN_3508_M3_ID:
 			case CAN_3508_M4_ID:
 			{
 				static uint8_t i = 0;
-                //´¦Àíµç»úIDºÅ
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½
                 i = message->StdId - CAN_3508_M1_ID;
-                //´¦Àíµç»úÊý¾Ýºêº¯Êý
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýºêº¯ï¿½ï¿½
                 moto_chassis[i].msg_cnt++ <= 50 ? get_moto_offset(&moto_chassis[i], message) : encoder_data_handler(&moto_chassis[i], message);
-                //¼ÇÂ¼Ê±¼ä
+                //ï¿½ï¿½Â¼Ê±ï¿½ï¿½
                 err_detector_hook(CHASSIS_M1_OFFLINE + i);
 
 			}break;
 			
-			case CAN_YAW_MOTOR_ID://yawÖá½ÓÊÕCANÊý¾Ý
+			case CAN_YAW_MOTOR_ID://yawï¿½ï¿½ï¿½ï¿½ï¿½CANï¿½ï¿½ï¿½ï¿½
 			{
 				encoder_data_handler(&moto_yaw, message);
 				err_detector_hook(GIMBAL_YAW_OFFLINE);
 			}break;
 			
 			
-			case CAN_TRIGGER_MOTOR_ID://²¦ÅÌ½ÓÊÕCANÊý¾Ý
+			case CAN_TRIGGER_MOTOR_ID://ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½CANï¿½ï¿½ï¿½ï¿½
 			{
 				moto_trigger.msg_cnt++ <= 50 ? get_moto_offset(&moto_trigger, message) : encoder_data_handler(&moto_trigger, message);
         err_detector_hook(TRIGGER_MOTO_OFFLINE);  
 			}break;
 			
-			case CAN_SUPER_CAP_ID://³¬µç
+			case CAN_SUPER_CAP_ID://ï¿½ï¿½ï¿½ï¿½
 			{
-					chassis.CapData[0] = (float)((rx1_message.Data[1] << 8 | rx1_message.Data[0])/100.f);		//ÊäÈëµçÑ¹
-					chassis.CapData[1] = (float)((rx1_message.Data[3] << 8 | rx1_message.Data[2])/100.f);		//µçÈÝµçÑ¹
-					chassis.CapData[2] = (float)((rx1_message.Data[5] << 8 | rx1_message.Data[4])/100.f);		//ÊäÈëµçÁ÷
-					chassis.CapData[3] = (float)((rx1_message.Data[7] << 8 | rx1_message.Data[6])/100.f);		//Éè¶¨¹¦ÂÊ	
+					chassis.CapData[0] = (float)((rx1_message.Data[1] << 8 | rx1_message.Data[0])/100.f);		//ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹
+					chassis.CapData[1] = (float)((rx1_message.Data[3] << 8 | rx1_message.Data[2])/100.f);		//ï¿½ï¿½ï¿½Ýµï¿½Ñ¹
+					chassis.CapData[2] = (float)((rx1_message.Data[5] << 8 | rx1_message.Data[4])/100.f);		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+					chassis.CapData[3] = (float)((rx1_message.Data[7] << 8 | rx1_message.Data[6])/100.f);		//ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½	
 			}break;
 			
-			case CAN_PIT_MOTOR_ID://pitÖá
+			case CAN_PIT_MOTOR_ID://pitï¿½ï¿½
 			{
 				encoder_data_handler(&moto_pit, message);
 				err_detector_hook(GIMBAL_PIT_OFFLINE);
@@ -72,13 +73,13 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan,CanRxMsg *message)
 	{
 		switch(message->StdId)
     {
-      case CAN_FRIC_M1_ID://Ä¦²ÁÂÖ½ÓÊÕCANÊý¾Ý
+      case CAN_FRIC_M1_ID://Ä¦ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½CANï¿½ï¿½ï¿½ï¿½
       case CAN_FRIC_M2_ID:
       {
         static uint8_t i = 0;
-        //´¦Àíµç»úIDºÅ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½
         i = message->StdId - CAN_FRIC_M1_ID;
-        //´¦Àíµç»úÊý¾Ýº¯Êý
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýºï¿½ï¿½ï¿½
         moto_fric[i].msg_cnt++ <= 50 ? get_moto_offset(&moto_fric[i], message) : encoder_data_handler(&moto_fric[i], message);
         err_detector_hook(FRI_MOTO1_OFFLINE + i);
       }break; 
@@ -140,15 +141,15 @@ void get_moto_offset(moto_measure_t* ptr, CanRxMsg *message)
   * @brief  send current which pid calculate to esc. message to calibrate 6025 gimbal motor esc
   * @param  current value corresponding motor(yaw/pitch/trigger)
   */
-/*can·¢ËÍµçÁ÷º¯Êý*/
-/*¸Ãº¯Êýcan1·¢ËÍ²¦ÅÌµç»úºÍyawÖápitÖáµç»úµçÁ÷*/
+/*canï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+/*ï¿½Ãºï¿½ï¿½ï¿½can1ï¿½ï¿½ï¿½Í²ï¿½ï¿½Ìµï¿½ï¿½ï¿½ï¿½yawï¿½ï¿½pitï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 void send_gimbal_cur(int16_t pit_iq,int16_t yaw_iq, int16_t trigger_iq)
 {
     CanTxMsg TxMessage;
-    TxMessage.StdId = CAN_GIMBAL_ALL_ID;//±ê×¼±êÊ¶·û
-    TxMessage.IDE = CAN_ID_STD;         // ¶¨Òå±êÊ¶·ûµÄÀàÐÍÎª±ê×¼±êÊ¶·û
-    TxMessage.RTR = CAN_RTR_DATA;       //Êý¾ÝÖ¡
-    TxMessage.DLC = 0x08;               //Êý¾Ý³¤¶ÈÎª0x08
+    TxMessage.StdId = CAN_GIMBAL_ALL_ID;//ï¿½ï¿½×¼ï¿½ï¿½Ê¶ï¿½ï¿½
+    TxMessage.IDE = CAN_ID_STD;         // ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½×¼ï¿½ï¿½Ê¶ï¿½ï¿½
+    TxMessage.RTR = CAN_RTR_DATA;       //ï¿½ï¿½ï¿½ï¿½Ö¡
+    TxMessage.DLC = 0x08;               //ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½Îª0x08
     TxMessage.Data[0] = yaw_iq >> 8;
     TxMessage.Data[1] = yaw_iq;
     TxMessage.Data[2] = pit_iq>> 8;
@@ -160,7 +161,7 @@ void send_gimbal_cur(int16_t pit_iq,int16_t yaw_iq, int16_t trigger_iq)
 
     CAN_Transmit(GIMBAL_CAN, &TxMessage);
 }
-/*¸Ãº¯Êýcan1·¢ËÍµ×ÅÌËÄ¸ö3508µç»úµçÁ÷*/
+/*ï¿½Ãºï¿½ï¿½ï¿½can1ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ä¸ï¿½3508ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 void send_chassis_cur(int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4)
 {
     CanTxMsg TxMessage;
@@ -179,7 +180,7 @@ void send_chassis_cur(int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4)
 
     CAN_Transmit(CHASSIS_CAN, &TxMessage);
 }
-/*ÈôÄ¦²ÁÂÖÊ¹ÓÃ3508µç»ú£¬ÔòÊ¹ÓÃ¸Ãº¯Êý·¢ËÍµçÁ÷*/
+/*ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½3508ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã¸Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½*/
 void send_fric_cur(int16_t iq3, int16_t iq4)
 {
     CanTxMsg TxMessage;
@@ -199,7 +200,7 @@ void send_fric_cur(int16_t iq3, int16_t iq4)
     CAN_Transmit(FRIC_CAN, &TxMessage);
 }
 
-void send_cap_power_can(uint16_t power)        //·¢ËÍ³¬µç
+void send_cap_power_can(uint16_t power)        //ï¿½ï¿½ï¿½Í³ï¿½ï¿½ï¿½
 {
 	  CanTxMsg TxMessage;
     TxMessage.StdId = CAN_CAP_ID;
@@ -212,7 +213,7 @@ void send_cap_power_can(uint16_t power)        //·¢ËÍ³¬µç
 		 CAN_Transmit(CAN1, &TxMessage);
 }
 
-//can1ÖÐ¶Ï
+//can1ï¿½Ð¶ï¿½
 void CAN1_RX0_IRQHandler(void)
 {
     if (CAN_GetITStatus(CAN1, CAN_IT_FMP0) != RESET)
@@ -223,7 +224,7 @@ void CAN1_RX0_IRQHandler(void)
     }
 }
 
-//can2ÖÐ¶Ï
+//can2ï¿½Ð¶ï¿½
 void CAN2_RX0_IRQHandler(void)
 {
     if (CAN_GetITStatus(CAN2, CAN_IT_FMP0) != RESET)
