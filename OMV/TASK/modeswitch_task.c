@@ -17,6 +17,8 @@ UBaseType_t mode_switch_stack_surplus;
 
 extern TaskHandle_t info_get_Task_Handle;
 extern uint8_t twist_doge;
+extern int direction_change;
+extern int Direction;
 global_status global_mode;
 global_status last_global_mode;
 
@@ -74,8 +76,12 @@ void get_keyboard(void)
 	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
 
-//	if (rc.kb.bit.F && rc.kb.bit.V)
-//		SOFT_RESET = 1;
+	if (rc.kb.bit.F && keyboard_flag)
+	{
+		Direction = -Direction;
+		direction_change = 1;
+	}
+	
 	if (
 		!rc.kb.bit.Q &&
 		!rc.kb.bit.R &&
@@ -303,13 +309,18 @@ void get_chassis_mode(void)
 	/*******6.29逻辑待测*******/
 	case MANUAL_CTRL:
 	{
-
 		if (gimbal_mode == GIMBAL_SHOOT_BUFF)
 			chassis_mode = CHASSIS_STOP_MODE;
 		else if ((RC_DODGE_MODE || chassis.dodge_ctrl)) // 如果开启躲避模式，底盘进入小陀螺&&twist_doge
 			chassis_mode = CHASSIS_DODGE_MODE;
 		else // 底盘云台跟随模式
-			chassis_mode = CHASSIS_NORMAL_MODE;
+		{
+			if(direction_change == 1)
+				chassis_mode = CHASSIS_STOP_MODE;
+			else
+				chassis_mode = CHASSIS_NORMAL_MODE;
+		}
+			
 	}
 	break;
 

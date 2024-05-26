@@ -12,7 +12,7 @@ sw_record_t glb_sw;
 
 extern int KB_FRIC;
 extern int KB_BALL;
-extern int direction;
+extern int Direction;
 int16_t mouse_x_now = 0;
 int16_t mouse_x_last = 0;
 int16_t deviation = 0;
@@ -93,7 +93,7 @@ void remote_ctrl(rc_info_t *rc, uint8_t *dbus_buf)
 static void chassis_operation_func(int16_t forward_back, int16_t left_right, int16_t rotate)
 {
 	#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
-	if (direction == 1)
+	if (Direction == 1)
 	{ // 换头前后的操作不同
 		rm.vx = -forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
 		rm.vy = left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
@@ -104,7 +104,7 @@ static void chassis_operation_func(int16_t forward_back, int16_t left_right, int
 		rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
 	}
 	#elif (INFANTRY_CLASS == INFANTRY_OMV)
-	if (direction == 1)
+	if (Direction == 1)
 	{ // 换头前后的操作不同
 		rm.vx = forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
 		rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;

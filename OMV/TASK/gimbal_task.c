@@ -30,7 +30,7 @@ float yaw_a, pit_a;
 float kp = 40, last_pit_ctrl = 0, last_yaw_ctrl = 0;
 extern TaskHandle_t can_msg_send_Task_Handle;
 
-int direction = 1;
+int Direction = 1;
 int direction_change = 0;
 
 ramp_t pit_ramp;
@@ -68,7 +68,7 @@ float yaw_init_pid[6] = {50, 0, 20, 90, 0, 5};
 
 // 普通参数（小陀螺与普通模式共用一套参数）
 float pit_pid[6] = {95, 0.7, 120, 80, 0, 0};
-float yaw_pid[6] = {50, 0, 2, 100, 0, 5};
+float yaw_pid[6] = {50, 0, 20, 100, 0, 15};//{50, 0, 2, 100, 0, 5}
 
 // 自瞄参数
 float pit_vision_pid[6] = {80, 0.3, 5, 150, 0, 0};
@@ -524,6 +524,7 @@ uint32_t debug_time = 1000;
 // 普通模式
 static void nomarl_handler(void)
 {
+	static int i_change = 0;
 	if (last_gimbal_mode != GIMBAL_NORMAL_MODE)
 	{
 		input_flag = 0;
@@ -554,10 +555,19 @@ static void nomarl_handler(void)
 	if (direction_change == 1) // 检测到鼠标中间的滚轮向下滑动，则进行云台角度的变化
 	{
 		// 当进入此判断时，gimbal.yaw_offset_angle会在get_gimbal_info函数中变化编码值4096（即6020的半圈）
-		gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle - gimbal.yaw_offset_angle;
+		gimbal.pid.yaw_angle_fdb =  gimbal.sensor.yaw_relative_angle;
+		gimbal.pid.yaw_angle_ref = 0;
 		input_flag = 0;
-		if ((gimbal.pid.yaw_angle_ref - gimbal.pid.yaw_angle_fdb < 3) && (gimbal.pid.yaw_angle_ref - gimbal.pid.yaw_angle_fdb > -3))
+		if ((gimbal.pid.yaw_angle_fdb < 3) && (gimbal.pid.yaw_angle_fdb > -3))
+			i_change++;
+		else
+			i_change = 0;
+		if(i_change == 100)
+		{
+			gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
+			i_change = 0;
 			direction_change = 0;
+		}
 	}
 	else if ((gimbal.last_state == NO_ACTION) && (gimbal.state == NO_ACTION) && (HAL_GetTick() - no_action_time > debug_time))
 	{ 

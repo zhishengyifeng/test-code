@@ -28,7 +28,7 @@ extern TaskHandle_t chassis_Task_Handle;
 extern TaskHandle_t shoot_Task_Handle;
 
 extern cali_sys_t cali_param;
-extern int direction;
+extern int Direction;
 extern int direction_change;
 void info_get_task(void *parm)
 {
@@ -55,7 +55,7 @@ void info_get_task(void *parm)
 				taskEXIT_CRITICAL();			 // 退出临界保护
 				if (global_mode == RELEASE_CTRL) // 当遥控右边打到最下时，电机全部断电
 				{
-					direction = 1;
+					Direction = 1;
 					gimbal.pit_center_offset = cali_param.pitch_offset;
 					gimbal.yaw_center_offset = cali_param.yaw_offset;
 					MEMSET(&glb_cur, motor_current_t);
@@ -111,7 +111,6 @@ static void get_gimbal_info(void)
 		i++;
 		if (i == 1)
 		{
-			gimbal.pid.yaw_angle_ref += 180;
 			if (gimbal.yaw_center_offset > 4096)
 				gimbal.yaw_center_offset -= 4096;
 			else

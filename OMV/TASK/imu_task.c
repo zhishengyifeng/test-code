@@ -102,7 +102,7 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 {
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		gyro[i] = (bmi088->Gyro[0]+gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1]+gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2]+gyro_offset[2]) * gyro_scale_factor[i][2];
+		gyro[i] = bmi088->Gyro[0] * gyro_scale_factor[i][0] + bmi088->Gyro[1] * gyro_scale_factor[i][1] + bmi088->Gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
 		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2];
 //		mag[i] = ist8310->Mag[0] * mag_scale_factor[i][0] + ist8310->Mag[1] * mag_scale_factor[i][1] + ist8310->Mag[2] * mag_scale_factor[i][2] + mag_offset[i];
 	}

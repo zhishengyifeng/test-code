@@ -868,12 +868,11 @@ ARM Macro Assembler    Page 14
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=..\obj\startup_stm32f407xx.d -o..\obj\startup_stm32f407xx.o -IC
-:\Users\28434\Desktop\RM\²½±ø\test-code\Infantry4\USER\RTE -ID:\Keil_v5\ARM\PAC
-K\Keil\STM32F4xx_DFP\2.17.0 -ID:\Keil_v5\ARM\CMSIS\Include -ID:\Keil_v5\ARM\PAC
-K\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefi
-ne="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 514" --predefine="ST
-M32F407xx SETA 1" --list=.\listings\startup_stm32f407xx.lst ..\CORE\startup_stm
-32f407xx.s
+:\Users\28434\Desktop\RM\²½±ø\OMV\USER\RTE -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx
+_DFP\2.17.0 -ID:\Keil_v5\ARM\CMSIS\Include -ID:\Keil_v5\ARM\PACK\Keil\STM32F4xx
+_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__MICROLIB S
+ETA 1" --predefine="__UVISION_VERSION SETA 514" --predefine="STM32F407xx SETA 1
+" --list=.\listings\startup_stm32f407xx.lst ..\CORE\startup_stm32f407xx.s
 
 
 

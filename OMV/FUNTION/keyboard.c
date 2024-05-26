@@ -24,7 +24,7 @@ extern int SMALL_BUFF;
 extern int BIG_BUFF;
 extern int PC_DODGE;
 extern int normal_speed;
-extern int direction;
+extern int Direction;
 extern int direction_change;
 
 extern chassis_t chassis;
@@ -120,7 +120,7 @@ void keyboard_global_hook(void)
 			{
 				i = 0;
 				direction_change = 1;
-				direction = -direction;
+				Direction = -Direction;
 			}
 		}
 		else
@@ -280,12 +280,12 @@ void keyboard_chassis_hook(void)
 	if (km.kb_enable)
 	{
 		#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
-			if (direction == 1)
+			if (Direction == 1)
 				chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
 			else
 				chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
 		#elif (INFANTRY_CLASS == INFANTRY_OMV)
-			if (direction == 1)
+			if (Direction == 1)
 				chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
 			else
 				chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
