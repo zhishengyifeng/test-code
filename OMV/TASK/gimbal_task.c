@@ -71,8 +71,8 @@ float pit_pid[6] = {95, 0.7, 120, 80, 0, 0};
 float yaw_pid[6] = {50, 0, 20, 100, 0, 15};//{50, 0, 2, 100, 0, 5}
 
 // 自瞄参数
-float pit_vision_pid[6] = {80, 0.3, 5, 150, 0, 0};
-float yaw_vision_pid[6] = {70, 0.1, 2, 80, 0, 5};//{23, 0, 5, 75, 0, 8};
+float pit_vision_pid[6] = {120, 0.3, 5, 100, 0, 0};
+float yaw_vision_pid[6] = {80, 0.1, 2, 80, 0, 5};//{23, 0, 5, 75, 0, 8};
 
 // 神符参数
 float pit_buff_pid[6] = {110, 0.2, 20, 150, 0, 0};//{90, 0.05, 20, 150, 0, 0};
@@ -520,6 +520,12 @@ static gimbal_state_t remote_is_action(void)
 
 uint8_t input_flag;
 int no_action_time;
+LADRC_NUM ladrc_change_head = 
+{
+   .r = 30,     //速度因子
+   .h = 0.002,            //积分步长
+};
+
 uint32_t debug_time = 1000;
 // 普通模式
 static void nomarl_handler(void)
@@ -554,9 +560,12 @@ static void nomarl_handler(void)
 
 	if (direction_change == 1) // 检测到鼠标中间的滚轮向下滑动，则进行云台角度的变化
 	{
+	
 		// 当进入此判断时，gimbal.yaw_offset_angle会在get_gimbal_info函数中变化编码值4096（即6020的半圈）
 		gimbal.pid.yaw_angle_fdb =  gimbal.sensor.yaw_relative_angle;
 		gimbal.pid.yaw_angle_ref = 0;
+//		LADRC_TD(&ladrc_change_head,gimbal.sensor.yaw_relative_angle);
+//		gimbal.pid.yaw_angle_fdb =ladrc_change_head.v1;
 		input_flag = 0;
 		if ((gimbal.pid.yaw_angle_fdb < 3) && (gimbal.pid.yaw_angle_fdb > -3))
 			i_change++;
@@ -686,12 +695,15 @@ static void track_aimor_handler(void)
 	}
 	if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
 	{
-    /* TD跟踪微分处理 */
-		LADRC_TD(&Vision_Angle_Pit,  pc_recv_mesg.aim_pitch);
-		LADRC_TD(&Vision_Angle_Yaw,   pc_recv_mesg.aim_yaw);
+//    /* TD跟踪微分处理 */
+//		LADRC_TD(&Vision_Angle_Pit,  pc_recv_mesg.aim_pitch);
+//		LADRC_TD(&Vision_Angle_Yaw,   pc_recv_mesg.aim_yaw);
 		
-		yaw_ctrl = Vision_Angle_Yaw.v1; //v1为角度，v2为导数
-		pit_ctrl = Vision_Angle_Pit.v1;		
+//		yaw_ctrl = Vision_Angle_Yaw.v1; //v1为角度，v2为导数
+//		pit_ctrl = Vision_Angle_Pit.v1;		
+		
+		yaw_ctrl = pc_recv_mesg.aim_yaw;
+		pit_ctrl = pc_recv_mesg.aim_pitch;	
 
 	}
 	/*视觉无效处理*/

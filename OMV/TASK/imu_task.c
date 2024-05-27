@@ -62,7 +62,7 @@ fp32 mag_cali_offset[3];
 // static const fp32 imu_temp_PID[3] = {TEMPERATURE_PID_KP, TEMPERATURE_PID_KI, TEMPERATURE_PID_KD};
 // static pid_type_def imu_temp_pid;
 
-static const float timing_time = 0.001f; // tast run time , unit s.任务运行的时间 单位 s
+//static const float timing_time = 0.001f; // tast run time , unit s.任务运行的时间 单位 s
 
 static fp32 accel_fliter_1[3] = {0.0f, 0.0f, 0.0f};
 static fp32 accel_fliter_2[3] = {0.0f, 0.0f, 0.0f};
@@ -102,7 +102,7 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 {
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		gyro[i] = bmi088->Gyro[0] * gyro_scale_factor[i][0] + bmi088->Gyro[1] * gyro_scale_factor[i][1] + bmi088->Gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
+		gyro[i] = (bmi088->Gyro[0]+gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1]+gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2]+gyro_offset[2]) * gyro_scale_factor[i][2];
 		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2];
 //		mag[i] = ist8310->Mag[0] * mag_scale_factor[i][0] + ist8310->Mag[1] * mag_scale_factor[i][1] + ist8310->Mag[2] * mag_scale_factor[i][2] + mag_offset[i];
 	}
@@ -111,6 +111,8 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 void imu_task(void const *argu)
 {
 	u8 i_filter = 0;
+	float dt;
+	uint32_t time_last = 0;
 	uint32_t imu_wake_time = osKernelSysTick();
 	imu_Task_Handle = xTaskGetHandle(pcTaskGetName(NULL));
 	imu_start_flag = 1;
@@ -170,7 +172,8 @@ void imu_task(void const *argu)
 				gyro_filter[1] = INS_gyro[1];
 				gyro_filter[2] = INS_gyro[2];
 		#endif
-		AHRS_update(INS_quat, timing_time, gyro_filter, accel_fliter_3, INS_mag);
+		dt = DWT_GetDeltaT(&time_last);
+		AHRS_update(INS_quat, dt, gyro_filter, accel_fliter_3, INS_mag);
 		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);
 
 		INS_angle_final[0] = INS_angle[0] * RAD_TO_ANGLE;

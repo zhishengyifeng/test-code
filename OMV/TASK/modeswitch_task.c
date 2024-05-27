@@ -76,11 +76,11 @@ void get_keyboard(void)
 	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
 
-	if (rc.kb.bit.F && keyboard_flag)
-	{
-		Direction = -Direction;
-		direction_change = 1;
-	}
+//	if (rc.kb.bit.F && keyboard_flag)
+//	{
+//		Direction = -Direction;
+//		direction_change = 1;
+//	}
 	
 	if (
 		!rc.kb.bit.Q &&
