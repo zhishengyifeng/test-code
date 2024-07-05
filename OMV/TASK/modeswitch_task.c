@@ -82,6 +82,9 @@ void get_keyboard(void)
 //		direction_change = 1;
 //	}
 	
+	if (rc.kb.bit.F && rc.kb.bit.V)
+		SOFT_RESET = 1;
+	
 	if (
 		!rc.kb.bit.Q &&
 		!rc.kb.bit.R &&

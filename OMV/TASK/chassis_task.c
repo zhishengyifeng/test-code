@@ -392,7 +392,7 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 {
     static  float max = 3000;
     static float min = 1150;//1000;
-    static float Cap_low = 15.0f;      // 何时停止加速
+    static float Cap_low = CAP_LOW;      // 何时停止加速
 		float Ref_temp = 0;//功率换启动临时变量
 
 		*power_yaw_speed = 0.01f;
@@ -427,17 +427,6 @@ void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,floa
 					else//没接裁判系统
 						pid_calc(power_pid,ob_total_power,(Debug_Power+5)*Charge_factor);//没有连接裁判系统，小车底盘期望功率达到45w			
 				}
-				else if (Speed_up == 0)//按下加速功率多100w
-				{
-					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)
-					{
-						pid_calc(&pid_chassis_vw,ob_total_power,(judge_recv_mesg.game_robot_state.chassis_power_limit+105));
-					}
-					else//没接裁判系统
-					{
-						pid_calc(&pid_chassis_vw,ob_total_power,105+Debug_Power);//没有连接裁判系统，小车底盘期望功率达到150w
-					}
-				}	
 			
 		}
 		

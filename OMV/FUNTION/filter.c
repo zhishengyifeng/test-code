@@ -16,7 +16,7 @@ float Filter0(float data , float* windows)
 		data_input[i] = data_input[i-1];
 	}
 	data_input[0] = data;
-	for(i=0;i<ORDER;i++)
+	for(i=0;i<ORDER+1;i++)
 	{
 		output += data_input[i]*windows[i];
 	}
@@ -33,7 +33,7 @@ float Filter1(float data , float* windows)
 		data_input[i] = data_input[i-1];
 	}
 	data_input[0] = data;
-	for(i=0;i<ORDER;i++)
+	for(i=0;i<ORDER+1;i++)
 	{
 		output += data_input[i]*windows[i];
 	}
@@ -50,7 +50,7 @@ float Filter2(float data , float* windows)
 		data_input[i] = data_input[i-1];
 	}
 	data_input[0] = data;
-	for(i=0;i<ORDER;i++)
+	for(i=0;i<ORDER+1;i++)
 	{
 		output += data_input[i]*windows[i];
 	}

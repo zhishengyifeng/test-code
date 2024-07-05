@@ -77,6 +77,7 @@ static fp32 gyro_filter[3] = {0.0f, 0.0f, 0.0f};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f}; // euler angle, unit rad.??? ?? rad
 fp32 INS_angle_final[3] = {0.0f, 0.0f, 0.0f}; // 转换单位后的角度
 
+
 void imu_temp_keep(void)
 {
 	PID_Struct_Init(&pid_imu_tmp, imu_pid[0], imu_pid[1], imu_pid[2], 5000, 1000, INIT);
@@ -102,7 +103,7 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 {
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		gyro[i] = (bmi088->Gyro[0]+gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1]+gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2]+gyro_offset[2]) * gyro_scale_factor[i][2];
+		gyro[i] = (bmi088->Gyro[0] + gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1] + gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2] + gyro_offset[2]) * gyro_scale_factor[i][2];
 		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2];
 //		mag[i] = ist8310->Mag[0] * mag_scale_factor[i][0] + ist8310->Mag[1] * mag_scale_factor[i][1] + ist8310->Mag[2] * mag_scale_factor[i][2] + mag_offset[i];
 	}
@@ -174,17 +175,16 @@ void imu_task(void const *argu)
 		#endif
 		dt = DWT_GetDeltaT(&time_last);
 		AHRS_update(INS_quat, dt, gyro_filter, accel_fliter_3, INS_mag);
-		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);
-
+		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);			
 		INS_angle_final[0] = INS_angle[0] * RAD_TO_ANGLE;
 		INS_angle_final[1] = INS_angle[1] * RAD_TO_ANGLE;
 		INS_angle_final[2] = INS_angle[2] * RAD_TO_ANGLE;
-
-
-			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
-			gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
-			gimbal.sensor.yaw_palstance = INS_gyro[2]*100;		//加速度
-			gimbal.sensor.pit_palstance = INS_gyro[1]*100;	//加速度
+		
+			
+		gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
+		gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
+		gimbal.sensor.yaw_palstance = INS_gyro[2]*100;		//加速度
+		gimbal.sensor.pit_palstance = INS_gyro[1]*100;	//加速度
 
 		err_detector_hook(IMU_OFFLINE);
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);

@@ -3,6 +3,7 @@
 #include "BMI088Middleware.h"
 #include "bsp_dwt.h"
 #include <math.h>
+#include "stm32f4xx.h"
 
 fp32 BMI088_ACCEL_SEN = BMI088_ACCEL_3G_SEN;
 fp32 BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
@@ -127,7 +128,8 @@ uint8_t BMI088_init(void)
 			BMI088_delay_ms(1);
 		}
 	}
-	
+	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
+	GPIO_SetBits(GPIOH,GPIO_Pin_11);
 	return error;
 }
 

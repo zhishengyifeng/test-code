@@ -68,7 +68,7 @@ float yaw_init_pid[6] = {50, 0, 20, 90, 0, 5};
 
 // 普通参数（小陀螺与普通模式共用一套参数）
 float pit_pid[6] = {95, 0.7, 120, 80, 0, 0};
-float yaw_pid[6] = {50, 0, 20, 100, 0, 15};//{50, 0, 2, 100, 0, 5}
+float yaw_pid[6] = {50, 0, 20, 100, 0, 15};//{50, 0, 20, 100, 0, 15}
 
 // 自瞄参数
 float pit_vision_pid[6] = {120, 0.3, 5, 100, 0, 0};
@@ -669,7 +669,10 @@ static void track_aimor_handler(void)
 	static float pit_ctrl;
 	pid_yaw.iout = 0;										// 清空其他模式yaw角度环iout累加值
 	input_flag = 1;
-	gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle; // 备份陀螺仪数据，以免退出自瞄时冲突
+	if (last_gimbal_mode != GIMBAL_TRACK_ARMOR)
+	{
+		gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;	
+	}
 	gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
 	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle;  // yaw轴用陀螺仪
 	/*输入激励信号过程*/
@@ -704,13 +707,21 @@ static void track_aimor_handler(void)
 		
 		yaw_ctrl = pc_recv_mesg.aim_yaw;
 		pit_ctrl = pc_recv_mesg.aim_pitch;	
-
+		gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;		
 	}
 	/*视觉无效处理*/
 	else if (pc_recv_mesg.mode_Union.info.visual_valid == 0)
 	{
-    pit_ctrl = gimbal.pid.pit_angle_fdb;
-		yaw_ctrl = gimbal.pid.yaw_angle_fdb;
+		if(chassis_mode == CHASSIS_DODGE_MODE)
+		{
+			yaw_ctrl = gimbal.yaw_offset_angle;
+		}
+		else if(chassis_mode == CHASSIS_NORMAL_MODE)
+		{
+			pit_ctrl = gimbal.pid.pit_angle_fdb;
+			yaw_ctrl = gimbal.pid.yaw_angle_fdb;
+		}
+
 	}
 	// PC通讯出现问题
 	if (pc_recv_mesg.aim_yaw >= 180 || pc_recv_mesg.aim_yaw <= -180)

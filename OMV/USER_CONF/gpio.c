@@ -34,7 +34,7 @@ void GPIO_INIT(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Low_Speed;
 	GPIO_Init(GPIOH, &GPIO_InitStructure);
 	// 由原理图可知，引脚拉低，LED亮，所以一开始全部拉高电平
-	GPIO_SetBits(GPIOH, GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12);
+	GPIO_SetBits(GPIOH,GPIO_Pin_12);
 
 	/*KEY按键*/
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
