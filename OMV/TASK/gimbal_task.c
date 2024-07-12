@@ -24,6 +24,8 @@
 #include "chassis_task.h"
 
 #include "ladrc.h"
+//外部调试
+#include "bsp_vofa.h"
 
 UBaseType_t gimbal_stack_surplus;
 float yaw_a, pit_a;
@@ -399,7 +401,11 @@ void gimbal_task(void *parm)
 					gimbal_mode = GIMBAL_RELEASE;
 //					pid_trigger.iout = 0;
 				}
-
+					
+				vofa_debug[0] = gimbal.pid.yaw_angle_ref;		
+				vofa_debug[1] = gimbal.pid.yaw_angle_fdb;
+				JustFloat_Send(vofa_debug,2,USART1);
+				
 				last_gimbal_mode = gimbal_mode; // 获取上一次云台状态
 				xTaskGenericNotify((TaskHandle_t)can_msg_send_Task_Handle,
 								   (uint32_t)GIMBAL_MOTOR_MSG_SIGNAL,

@@ -24,7 +24,8 @@
 #include "ahrs.h"
 #include "modeswitch_task.h"
 #include "filter.h"
-
+//外部调试
+#include "bsp_vofa.h"
 
 #include "stdio.h"
 
@@ -185,7 +186,8 @@ void imu_task(void const *argu)
 		gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
 		gimbal.sensor.yaw_palstance = INS_gyro[2]*100;		//加速度
 		gimbal.sensor.pit_palstance = INS_gyro[1]*100;	//加速度
-
+		
+			
 		err_detector_hook(IMU_OFFLINE);
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);
 	}

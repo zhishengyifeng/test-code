@@ -754,6 +754,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER_CONF\I2C.c</FilePath>
             </File>
+            <File>
+              <FileName>iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER_CONF\iwdg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -933,6 +938,11 @@
               <FileName>pc_tx_data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\PROTOCOL\pc_tx_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_vofa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PROTOCOL\bsp_vofa.c</FilePath>
             </File>
           </Files>
         </Group>

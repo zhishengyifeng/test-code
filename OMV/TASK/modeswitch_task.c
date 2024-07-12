@@ -12,6 +12,7 @@
 #include "chassis_task.h"
 #include "shoot_task.h"
 #include "judge_rx_data.h"
+#include "iwdg.h"
 
 UBaseType_t mode_switch_stack_surplus;
 
@@ -161,6 +162,8 @@ void mode_switch_task(void *parm)
 			}
 		}
 		/************************************************/
+		
+		IWDG_Feed();//Î¹¹·
 
 		xTaskGenericNotify((TaskHandle_t)info_get_Task_Handle,
 						   (uint32_t)MODE_SWITCH_INFO_SIGNAL,

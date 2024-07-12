@@ -30,6 +30,7 @@
 #include "usart.h"
 #include "spi.h"
 #include "tim.h"
+#include "iwdg.h"
 #include "STM32_TIM_BASE.h"
 /*bsp*/
 #include "bsp_flash.h"
@@ -95,14 +96,18 @@ int main(void)
 //	Kalman
 //	Kalman_Init();
 	DWT_Init(168);
+	IWDG_Config(IWDG_Prescaler_64 ,625);//1s不喂狗自动复位,在modeswitch里边喂
 	/*算法补偿角初始化*/
 //  pc_send_mesg.pc_need_information.pit_set = -0.6f;
 //	pc_send_mesg.pc_need_information.yaw_set = -0.5f;
 	/*从板载FLASH读出云台归中位置数据*/
 	flash_cali();
-	while (BMI088_init())
-	{
-	};
+	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == RESET)//若不是看门狗复位，则初始化IMU
+  {
+		while (BMI088_init())
+		{
+		};
+	}
 	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
 	
 	TASK_START();		   // 创建各个任务，设定优先级和堆栈大小
