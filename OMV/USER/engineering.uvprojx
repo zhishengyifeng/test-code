@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.17.1</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32F4xx_DFP.2.5.0</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>..\OBJ\</OutputDirectory>
-          <OutputName>engineering</OutputName>
+          <OutputName>engineering.elf</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -186,7 +186,6 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,ARM_MATH_CM4,__FPU_PRESENT=1,USE_USB_OTG_FS,__TARGET_FPU_VFP,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING</Define>
               <Undefine></Undefine>
               <IncludePath>..\CORE;..\FWLIB\inc;..\USER;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\USER_CONF;..\BSP_CONF;..\TASK;..\FUNTION;..\PROTOCOL;.\include;..\BMI088\algorithm;..\BMI088\devices;..\BMI088\rm_lib;..\USB_LIB\STM32_USB_Device_Library\Class\cdc\inc;..\USB_LIB\STM32_USB_Device_Library\Core\inc;..\USB_LIB\STM32_USB_OTG_Driver\inc;..\IST8310</IncludePath>

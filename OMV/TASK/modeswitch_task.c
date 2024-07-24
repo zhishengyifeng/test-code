@@ -18,8 +18,6 @@ UBaseType_t mode_switch_stack_surplus;
 
 extern TaskHandle_t info_get_Task_Handle;
 extern uint8_t twist_doge;
-extern int direction_change;
-extern int Direction;
 global_status global_mode;
 global_status last_global_mode;
 
@@ -77,11 +75,6 @@ void get_keyboard(void)
 	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
 
-//	if (rc.kb.bit.F && keyboard_flag)
-//	{
-//		Direction = -Direction;
-//		direction_change = 1;
-//	}
 	
 	if (rc.kb.bit.F && rc.kb.bit.V)
 		SOFT_RESET = 1;
@@ -321,10 +314,7 @@ void get_chassis_mode(void)
 			chassis_mode = CHASSIS_DODGE_MODE;
 		else // µ×ÅÌÔÆÌ¨¸úËæÄ£Ê½
 		{
-			if(direction_change == 1)
-				chassis_mode = CHASSIS_STOP_MODE;
-			else
-				chassis_mode = CHASSIS_NORMAL_MODE;
+			chassis_mode = CHASSIS_NORMAL_MODE;
 		}
 			
 	}

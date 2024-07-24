@@ -58,6 +58,9 @@
 void flash_cali(void);
 void Config_SystemClock(uint32_t PLLM, uint32_t PLLN, uint32_t PLLP, uint32_t PLLQ);
 
+
+
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_dev __ALIGN_END;
 
 int main(void)
@@ -96,20 +99,29 @@ int main(void)
 //	Kalman
 //	Kalman_Init();
 	DWT_Init(168);
-	IWDG_Config(IWDG_Prescaler_64 ,625);//1s不喂狗自动复位,在modeswitch里边喂
+
 	/*算法补偿角初始化*/
 //  pc_send_mesg.pc_need_information.pit_set = -0.6f;
 //	pc_send_mesg.pc_need_information.yaw_set = -0.5f;
 	/*从板载FLASH读出云台归中位置数据*/
+
 	flash_cali();
-	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == RESET)//若不是看门狗复位，则初始化IMU
-  {
-		while (BMI088_init())
-		{
-		};
+	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
+    {
 	}
-	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
+	else	
+	{
+      while(BMI088_init())
+	  {};
+
+	}
+	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
+	GPIO_SetBits(GPIOH,GPIO_Pin_11);
+		RCC_ClearFlag();
 	
+	
+	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
+	IWDG_Config(IWDG_Prescaler_64 ,1250);//1s不喂狗自动复位,在modeswitch里边喂
 	TASK_START();		   // 创建各个任务，设定优先级和堆栈大小
 	vTaskStartScheduler(); // 开启任务调度
 	while (1)

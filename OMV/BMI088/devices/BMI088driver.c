@@ -128,8 +128,8 @@ uint8_t BMI088_init(void)
 			BMI088_delay_ms(1);
 		}
 	}
-	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
-	GPIO_SetBits(GPIOH,GPIO_Pin_11);
+//	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
+//	GPIO_SetBits(GPIOH,GPIO_Pin_11);
 	return error;
 }
 

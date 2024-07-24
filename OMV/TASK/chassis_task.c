@@ -42,6 +42,7 @@ extern TaskHandle_t can_msg_send_Task_Handle;
 
 extern pid_t pid_chassis_vw;
 extern pid_t pid_chassis_power_buffer;
+extern int direction_change;
 
 chassis_t chassis;
 
@@ -388,7 +389,7 @@ static void chassis_dodge_handler(void)
 
 #else
 //新功率算法
-void chassis_power_contorl(pid_t *power_pid,float *power_vx,float *power_vy,float *power_yaw_speed,float real_time_Cap_remain,float real_time_Cap_can_store,float judge_power_limit)
+void chassis_power_contorl(pid_t *power_pid, float *power_vx, float *power_vy, float *power_yaw_speed, float real_time_Cap_remain, float real_time_Cap_can_store, float judge_power_limit)
 {
     static  float max = 3000;
     static float min = 1150;//1000;
@@ -569,22 +570,34 @@ static void chassis_normal_handler(void)
 	float nor_chassis_vx, nor_chassis_vy;
 	// 计算底盘x、y轴上的速度
 	chassis_power_contorl(&pid_power, &nor_chassis_vx, &nor_chassis_vy, &yaw_speed, chassis.CapData[1], cap_store, (float)judge_recv_mesg.game_robot_state.chassis_power_limit);
-
-	int position_ref = 0;
+	
 	if (chassis_mode == CHASSIS_NORMAL_MODE)
 	{
 		if (input_flag == 1)
 		// w轴方向跟着云台动
 		{
-			chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, position_ref));
+			if(direction_change)//换头中不旋转，只能前后左右移动，等待头甩完才跟头，优化逃跑轨迹
+			{
+				chassis.vw = 0;
+				chassis.vy = -nor_chassis_vy;
+				chassis.vx = -nor_chassis_vx;
+			}
+			else
+			{
+				chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, gimbal.sensor.yaw_gyro_angle - gimbal.yaw_offset_angle));//底盘禁止时底盘锁住最后一刻陀螺仪方向。						
+				chassis.vy = (nor_chassis_vx * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) + nor_chassis_vy * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
+				chassis.vx = (nor_chassis_vx * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) - nor_chassis_vy * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
+			}
+				
 		}
-		else
+		else//打符模式
 		{
 			chassis.vw = 0;
+			chassis.vy = nor_chassis_vy;
+			chassis.vx = nor_chassis_vx;
+
 		}
 	}
-	chassis.vx = nor_chassis_vx;
-	chassis.vy = nor_chassis_vy;
 }
 
 
