@@ -112,42 +112,6 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 		}
 		break;
 
-//		case CAN_MPU_ID: // 陀螺仪接收CAN数据及解算
-//		{
-
-//			uint8_t *px = rx2_message.Data;
-//			for (int i = 0; i < 4; i++)
-//			{
-//				*((uint8_t *)p_angle + i) = *(px + i);
-//			}
-
-//			//        gimbal.sensor.yaw_gyro_angle = angle;
-//			//        bmi160_yaw_angle=angle;
-//			//				gimbal.sensor.yaw_palstance = (int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-//			//				bmi160_yaw_acc=(int16_t)(rx2_message.Data[5] << 8 | rx2_message.Data[4]);
-//			//				bmi160_yaw_acc/= 16.384f;
-//			//        gimbal.sensor.yaw_palstance /= 16.384f;
-//			//
-//			//        gimbal.sensor.pit_palstance = -(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-//			//        gimbal.sensor.pit_palstance /=-16.384f;//左上为正是+号。左下为正为-号
-//			//				bmi160_pit_acc=(int16_t)(rx2_message.Data[7] << 8 | rx2_message.Data[6]);
-//			//				bmi160_pit_acc /=16.384f;
-//			//        err_detector_hook(IMU_OFFLINE);
-//		}
-//		break;
-
-//		case CAN_BULLET_RATE:
-//		{
-//			uint8_t uc[4];
-//			uc[0] = rx2_message.Data[3];
-//			uc[1] = rx2_message.Data[2];
-//			uc[2] = rx2_message.Data[1];
-//			uc[3] = rx2_message.Data[0];
-
-//			memcpy((void *)&shoot.bullet_rate, (void *)uc, 4);
-//		}
-//		break;
-
 		default:
 		{
 		}

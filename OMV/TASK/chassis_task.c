@@ -43,6 +43,7 @@ extern TaskHandle_t can_msg_send_Task_Handle;
 extern pid_t pid_chassis_vw;
 extern pid_t pid_chassis_power_buffer;
 extern int direction_change;
+extern u8 INS_Init_Done;
 
 chassis_t chassis;
 
@@ -98,65 +99,71 @@ void chassis_task(void *parm)
 			
 			if (Signal & INFO_GET_CHASSIS_SIGNAL)
 			{
-				/*底盘vw旋转的pid*/
-				PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
-				PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
-				PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 650, 650, DONE);
-
-				/*底盘vx,vy平移的pid*/
-				for (int i = 0; i < 4; i++)
-					PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16384, 1500, DONE);
-				
-				Cap_refresh();
-				if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // 云台归中之后底盘才能动
+				if(INS_Init_Done == 1)
 				{
-					switch (chassis_mode)
-					{
-					/*云台底盘跟随模式*/
-					case CHASSIS_NORMAL_MODE:
-					{
-						chassis_normal_handler();
-					}
-					break;
-					/*小陀螺模式*/
-					case CHASSIS_DODGE_MODE:
-					{
-						chassis_dodge_handler();
-					}
-					break;
-					/*底盘停止模式*/
-					case CHASSIS_STOP_MODE:
-					{
-						chassis_stop_handler();
-					}
-					break;
+					/*底盘vw旋转的pid*/
+					PID_Struct_Init(&pid_chassis_angle, chassis_pid[0], chassis_pid[1], chassis_pid[2], MAX_CHASSIS_VR_SPEED, 50, DONE);
+					PID_Struct_Init(&pid_chassis_power_buffer, chassis_power_buffer_pid[0], chassis_power_buffer_pid[1], chassis_power_buffer_pid[2], 50, 10, DONE);
+					PID_Struct_Init(&pid_chassis_vw, chassis_vw_pid[0], chassis_vw_pid[1], chassis_vw_pid[2], 650, 650, DONE);
 
-					default:
-					{
-					}
-					break;
-					}
-
-					cx = chassis.vx;
-					cy = chassis.vy;
-					cw = chassis.vw;
-
-					// 将缓启动的数据代入解算（前后缓启动，左右以及小陀螺不进行缓启动）
-					mecanum_calc(cx, chassis.vy, chassis.vw, chassis.wheel_spd_ref);
-
+					/*底盘vx,vy平移的pid*/
 					for (int i = 0; i < 4; i++)
-						chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
-					#ifdef POWER_NEW
-						ob_total_power = Chassis_Power_Control(&chassis); // 功率控制
-					#endif
+						PID_Struct_Init(&pid_spd[i], chassis_spd_pid[i][0], chassis_spd_pid[i][1], chassis_spd_pid[i][2], 16384, 1500, DONE);
+					
+					Cap_refresh();
+					if (chassis_mode != CHASSIS_RELEASE && gimbal.state != GIMBAL_INIT_NEVER) // 云台归中之后底盘才能动
+					{
+						switch (chassis_mode)
+						{
+						/*云台底盘跟随模式*/
+						case CHASSIS_NORMAL_MODE:
+						{
+							chassis_normal_handler();
+						}
+						break;
+						/*小陀螺模式*/
+						case CHASSIS_DODGE_MODE:
+						{
+							chassis_dodge_handler();
+						}
+						break;
+						/*底盘停止模式*/
+						case CHASSIS_STOP_MODE:
+						{
+							chassis_stop_handler();
+						}
+						break;
 
-					if (!chassis_is_controllable())
-						memset(chassis.current, 0, sizeof(chassis.current));
+						default:
+						{
+						}
+						break;
+						}
 
-					memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
+						cx = chassis.vx;
+						cy = chassis.vy;
+						cw = chassis.vw;
+
+						// 将缓启动的数据代入解算（前后缓启动，左右以及小陀螺不进行缓启动）
+						mecanum_calc(cx, chassis.vy, chassis.vw, chassis.wheel_spd_ref);
+
+						for (int i = 0; i < 4; i++)
+							chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
+						#ifdef POWER_NEW
+							ob_total_power = Chassis_Power_Control(&chassis); // 功率控制
+						#endif
+
+						if (!chassis_is_controllable())
+							memset(chassis.current, 0, sizeof(chassis.current));
+
+						memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
+					}
+					else
+						memset(glb_cur.chassis_cur, 0, sizeof(glb_cur.chassis_cur));
 				}
-				else
+				else//四元数未更新好
 					memset(glb_cur.chassis_cur, 0, sizeof(glb_cur.chassis_cur));
+				
 				xTaskGenericNotify((TaskHandle_t)can_msg_send_Task_Handle,
 								   (uint32_t)CHASSIS_MOTOR_MSG_SIGNAL,
 								   (eNotifyAction)eSetBits,
@@ -584,7 +591,7 @@ static void chassis_normal_handler(void)
 			}
 			else
 			{
-				chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, gimbal.sensor.yaw_gyro_angle - gimbal.yaw_offset_angle));//底盘禁止时底盘锁住最后一刻陀螺仪方向。						
+				chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, gimbal.sensor.yaw_total_angle - gimbal.yaw_offset_angle));//底盘禁止时底盘锁住最后一刻陀螺仪方向。						
 				chassis.vy = (nor_chassis_vx * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) + nor_chassis_vy * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
 				chassis.vx = (nor_chassis_vx * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) - nor_chassis_vy * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
 			}

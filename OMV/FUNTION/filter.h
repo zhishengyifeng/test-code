@@ -3,7 +3,7 @@
 
 #include "stm32f4xx.h"
 
-#define ORDER 6
+#define ORDER 0
 
 #if (ORDER == 20)
 #define WINDOWS Fir_hanning_20_30Hz
@@ -27,8 +27,8 @@ extern float Fir_hanning_2_30Hz[ORDER+1];
 #endif
 
 
-float Filter0(float data , float* windows);
-float Filter1(float data , float* windows);
-float Filter2(float data , float* windows);
+float Filter(float data , float* data_input , float* windows);
+
 
 #endif
+

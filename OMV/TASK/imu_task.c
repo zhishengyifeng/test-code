@@ -36,8 +36,6 @@
 UBaseType_t imu_stack_surplus;
 extern TaskHandle_t imu_Task_Handle;
 
-volatile uint8_t imu_start_flag = 0;
-
 extern IMU_Data_t BMI088;
 
 float EulerAngle[3] = {0};
@@ -75,8 +73,11 @@ static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 static fp32 gyro_filter[3] = {0.0f, 0.0f, 0.0f};
+static float gyro_filter_input[3][ORDER+1] = {0};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f}; // euler angle, unit rad.??? ?? rad
 fp32 INS_angle_final[3] = {0.0f, 0.0f, 0.0f}; // 转换单位后的角度
+
+uint8_t INS_Init_Done = 0;
 
 
 void imu_temp_keep(void)
@@ -112,12 +113,13 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 
 void imu_task(void const *argu)
 {
+	u16 i_init = 0;
 	u8 i_filter = 0;
-	float dt;
+	float dt = 0;
+	float yaw_angle_last = 0;
 	uint32_t time_last = 0;
 	uint32_t imu_wake_time = osKernelSysTick();
 	imu_Task_Handle = xTaskGetHandle(pcTaskGetName(NULL));
-	imu_start_flag = 1;
 
 	AHRS_init(INS_quat, INS_accel, INS_mag);
 
@@ -127,6 +129,11 @@ void imu_task(void const *argu)
 
 	while (1)
 	{	
+		if(i_init < 1000)
+			i_init++;
+		else
+			INS_Init_Done = 1;
+		
 		BMI088_read(BMI088.Gyro, BMI088.Accel, &BMI088.Temperature);
 		
 		
@@ -156,18 +163,18 @@ void imu_task(void const *argu)
 			if(i_filter<ORDER+1)
 			{
 				i_filter++;
-				Filter0(INS_gyro[0],WINDOWS);
-				Filter1(INS_gyro[1],WINDOWS);
-				Filter2(INS_gyro[2],WINDOWS);
+				Filter(INS_gyro[0],gyro_filter_input[0],WINDOWS);
+				Filter(INS_gyro[1],gyro_filter_input[1],WINDOWS);
+				Filter(INS_gyro[2],gyro_filter_input[2],WINDOWS);
 				gyro_filter[0] = INS_gyro[0];
 				gyro_filter[1] = INS_gyro[1];
 				gyro_filter[2] = INS_gyro[2];
 			}
 			else
 			{
-				gyro_filter[0] = Filter0(INS_gyro[0],WINDOWS);
-				gyro_filter[1] = Filter1(INS_gyro[1],WINDOWS);
-				gyro_filter[2] = Filter2(INS_gyro[2],WINDOWS);
+				gyro_filter[0] = Filter(INS_gyro[0],gyro_filter_input[0],WINDOWS);
+				gyro_filter[1] = Filter(INS_gyro[1],gyro_filter_input[1],WINDOWS);
+				gyro_filter[2] = Filter(INS_gyro[2],gyro_filter_input[2],WINDOWS);
 			}
 		#else
 				gyro_filter[0] = INS_gyro[0];
@@ -184,10 +191,25 @@ void imu_task(void const *argu)
 			
 		gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
 		gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
-		gimbal.sensor.yaw_palstance = INS_gyro[2]*100;		//加速度
-		gimbal.sensor.pit_palstance = INS_gyro[1]*100;	//加速度
+		gimbal.sensor.roll_gyro_angle = INS_angle_final[2];		//陀螺仪角度	
+		gimbal.sensor.yaw_palstance = gyro_filter[2];		//角速度
+		gimbal.sensor.pit_palstance = gyro_filter[1];	//角速度
 		
-			
+		if(gimbal_mode != GIMBAL_RELEASE)
+		{
+			if(gimbal.sensor.yaw_gyro_angle - yaw_angle_last < -180)
+			{
+				gimbal.sensor.yaw_cnt++;
+			}
+			else if(gimbal.sensor.yaw_gyro_angle - yaw_angle_last > 180)
+			{
+				gimbal.sensor.yaw_cnt--;
+			}
+			gimbal.sensor.yaw_total_angle = 360.0f*gimbal.sensor.yaw_cnt + gimbal.sensor.yaw_gyro_angle;
+		}
+		
+		yaw_angle_last = gimbal.sensor.yaw_gyro_angle;
+		
 		err_detector_hook(IMU_OFFLINE);
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);
 	}

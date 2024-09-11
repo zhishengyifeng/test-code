@@ -160,12 +160,6 @@ void shoot_task(void *parm)
 					PID_Struct_Init(&pid_trigger, trig_pid[0], trig_pid[1], trig_pid[2], 16000, 0, DONE);
 					PID_Struct_Init(&pid_trigger_spd, trig_pid[3], trig_pid[4], trig_pid[5], 16000, 3000, DONE);
 
-
-
-//					shoot_para_ctrl();						// Éä»÷Ä£Ê½ÇĞ»»
-//					ball_storage_ctrl();					// ¶æ»ú¿ØÖÆµ¯²Ö¸Ç
-//					fric_wheel_ctrl();						// Ä¦²ÁÂÖ¿ØÖÆ
-
 					if (shoot.fric_wheel_run)//ÈôÄ¦²ÁÂÖ¿ªÆô
 					{
 						
