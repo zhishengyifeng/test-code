@@ -34,22 +34,27 @@ void can_msg_send_task(void *parm)
 								(TickType_t)portMAX_DELAY);
 		if (STAUS == pdTRUE)
 		{
-			//		if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)//根据裁判系统选择控制板功率输出
-			//		{
+			#ifndef POWER_NEW
+					if(judge_recv_mesg.game_robot_state.chassis_power_limit>=45&&judge_recv_mesg.game_robot_state.chassis_power_limit<=220)//根据裁判系统选择控制板功率输出
+					{
 
-			//			pid_calc(&pid_chassis_power_buffer,judge_recv_mesg.power_heat_data.chassis_power_buffer,60-5);//60是正常情况下的缓冲焦耳，这个5可以根据实际情况调节
-			// 其余情况则控制在55J（原因在于控制板无法精准控制功率，会有波动震荡，控制在55J可以最大程度的利用这部分被浪费的功率
+						pid_calc(&pid_chassis_power_buffer,judge_recv_mesg.power_heat_data.buffer_energy,60-5);//60是正常情况下的缓冲焦耳，这个5可以根据实际情况调节
+						// 其余情况则控制在55J（原因在于控制板无法精准控制功率，会有波动震荡，控制在55J可以最大程度的利用这部分被浪费的功率
 
-			// if(pid_chassis_power_buffer.out>0)pid_chassis_power_buffer.out=0;
+						if(pid_chassis_power_buffer.out>0)
+							pid_chassis_power_buffer.out=0;
 
-			// 不用说控制在30W去防止超功率，除了功率控制板限不住的情况
+						// 不用说控制在30W去防止超功率，除了功率控制板限不住的情况
 
-			// 此处就是为了防止功率控制板限不住所作的保险
-			//			if(judge_recv_mesg.power_heat_data.chassis_power_buffer<=10)pid_chassis_power_buffer.out=judge_recv_mesg.game_robot_state.chassis_power_limit;
-			//
-			//			send_cap_power_can((judge_recv_mesg.game_robot_state.chassis_power_limit-pid_chassis_power_buffer.out)*100);//发给功率控制板的值
-			//		}else
-			//			send_cap_power_can(15000);//没接入裁判系统或则检录模式的时候给定39W
+						// 此处就是为了防止功率控制板限不住所作的保险
+						if(judge_recv_mesg.power_heat_data.buffer_energy<=10)
+							pid_chassis_power_buffer.out=judge_recv_mesg.game_robot_state.chassis_power_limit;
+			
+						send_cap_power_can((judge_recv_mesg.game_robot_state.chassis_power_limit-pid_chassis_power_buffer.out)*100);//发给功率控制板的值
+					}
+					else
+						send_cap_power_can(5000);//没接入裁判系统或则检录模式的时候给定50w
+			#endif
 
 			if (Signal & GIMBAL_MOTOR_MSG_SIGNAL) // 发送云台电流
 				send_gimbal_cur(glb_cur.gimbal_cur[1], glb_cur.gimbal_cur[0]);

@@ -32,9 +32,13 @@ typedef struct
   float yaw_relative_angle;
   float pit_gyro_angle;
   float yaw_gyro_angle;
+	float roll_gyro_angle;
   /* ���ٶ� */
   float yaw_palstance;
   float pit_palstance;
+	/* 多圈累加 */
+	float yaw_total_angle;
+	int32_t yaw_cnt;
 } gim_sensor_t;
 
 typedef struct
@@ -80,17 +84,6 @@ typedef struct
   float lambda, pre_v1;
 } TD_LADRC;
 
-/*ǰ�����Ʋ���*/
-typedef struct
-{
-  // ǰ����������
-  float a;
-  float b;
-  // �������
-  float rin;
-  float lastRin;
-  float perrRin;
-} FFC;
 
 extern gimbal_t gimbal;
 extern uint8_t input_flag;
@@ -106,9 +99,9 @@ static void separate_handler(void);
 static void dodge_handler(void);
 static void track_aimor_handler(void);
 static void shoot_buff_ctrl_handler(void);
+//前馈控制
+float FFC_OUT(float x_n);
 
 float target_speed_calc(speed_calc_data_t *S, uint32_t time, float position);
-void initFeedforwardParam(FFC *vFFC, float a, float b);
-float getFeedforwardControl(FFC *vFFC, float v);
 
 #endif

@@ -50,4 +50,7 @@ static uint16_t VCP_DataRx(uint8_t *Buf, uint32_t Len);
 #endif /* __USBD_CDC_VCP_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+
 #endif
+

@@ -12,7 +12,31 @@ static void abs_limit(float *x, int32_t limit)
 	if (*x < -limit)
 		*x = -limit;
 }
+static void f_Integral_Limit(pid_t *pid)
+{
+      if(fabs(pid->out) > pid->maxout) //判断PID增益是否大于最大限幅
+      {
+        if (pid->error[NOW_ERR] * pid->iout > 0) //若超调且误差与Ki输出同号
+        {
+            //在取消积分作用前，同样需要先判断当前周期内积分是否积累
+            //如果积分为减小趋势则不需要限制其减小
+            //如果iterm积分项在增大则令积分项为零
+            pid->iterm = 0;
+        }
+      }
+      //判断并抉择当前Ki 总增益是否大于最大Ki 增益限幅，若大于则限制为最大项
+      if (pid->iout > pid->integral_limit) //积分限幅
+      {
+          pid->iterm = 0;
+          pid->iout = pid->integral_limit;
+      }
+      if (pid->iout  < - pid->integral_limit)
+      {
+          pid->iterm = 0;
+          pid->iout = -pid->integral_limit;
+      }
 
+}
 static void pid_init(pid_t *pid, float p, float i, float d, int32_t max_out, int32_t integral_limit)
 {
 	pid->kp = p;
@@ -41,17 +65,21 @@ float pid_calc(pid_t *pid, float get, float set)
 	pid->set = set;
 	pid->error[NOW_ERR] = set - get;
 
-#if (PID_MODE == POSITION_PID)
-	pid->pout = pid->kp * pid->error[NOW_ERR];
-	pid->iout += pid->ki * pid->error[NOW_ERR];
-	pid->dout = pid->kd * (pid->error[NOW_ERR] - pid->error[LAST_ERR]);
+  #if (PID_MODE == POSITION_PID)
+      pid->pout = pid->kp * pid->error[NOW_ERR]; // Kp总增益
+     // pid->iout += pid->ki * pid->error[NOW_ERR];
+      pid->iterm = pid->ki * pid->error[NOW_ERR];//Ki ITerm项
+      pid->iout = pid->iout + pid->iterm;        //Ki 总增益
+      pid->dout = pid->kd * (pid->error[NOW_ERR] - pid->error[LAST_ERR]); //Kd 总增益
 
-	abs_limit(&(pid->iout), pid->integral_limit);
-	if (pid->error[NOW_ERR] < 200)
-		pid->out = pid->pout + pid->iout + pid->dout;
-	else
-		pid->out = pid->pout + pid->dout;
-	abs_limit(&(pid->out), pid->maxout);
+      pid->out = pid->pout + pid->iout + pid->dout; //PID增益
+      /*积分限幅*/
+      f_Integral_Limit(pid);
+    
+      /*PID输出限幅*/
+      abs_limit(&(pid->out),pid->maxout);//判断并抉择当前 PID 总增益是否大于最大 PID 增益限幅，若大于则限制为最大项
+
+
 #elif (PID_MODE == DELTA_PID)
 	pid->pout = pid->kp * (pid->error[NOW_ERR] - pid->error[LAST_ERR]);
 	pid->iout = pid->ki * pid->error[NOW_ERR];

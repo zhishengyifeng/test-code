@@ -15,7 +15,7 @@ extern TaskHandle_t judge_rx_Task_Handle;
 
 UBaseType_t judge_tx_stack_surplus;
 UBaseType_t judge_rx_stack_surplus;
-uint8_t DATA[113] = {"AwakeLion!!!"}; // ¸ÃÊı×éÓÃÀ´´¢´æ»úÆ÷ÈË½»»¥µÄÊı¾İ£¬¿ÉÓÃ»§×ÔĞĞĞŞ¸Ä
+uint8_t DATA[113] = {"AwakeLion!!!"}; // è¯¥æ•°ç»„ç”¨æ¥å‚¨å­˜æœºå™¨äººäº¤äº’çš„æ•°æ®ï¼Œå¯ç”¨æˆ·è‡ªè¡Œä¿®æ”¹
 void judge_tx_task(void *parm)
 {
 	uint32_t judge_wake_time = osKernelSysTick();
@@ -73,35 +73,35 @@ void judge_rx_task(void *parm)
 		{
 			if (Signal & JUDGE_UART_IDLE_SIGNAL)
 			{
-				USART_ClearFlag(USART1, USART_FLAG_IDLE);				  // Çå³ı¿ÕÏĞÖĞ¶Ï±êÖ¾Î»
-				dma_buffer_to_unpack_buffer(&judge_rx_obj, UART_IDLE_IT); // Í¨¹ıÖ¸ÕëÈ¡Ö·µÄ·½·¨°Ñ´®¿Ú½ÓÊÕµÄÊı¾İ·Å½øFIFO
-				unpack_fifo_data(&judge_unpack_obj, DN_REG_ID);			  // Í¬ÑùÔÙÍ¨¹ıÖ¸ÕëÈ¡Ö·µÄ·½·¨°ÑFIFOÀïµÄÊı¾İÄÃ³öÀ´·Å½øÒ»¸öÊı×éÀï
+				USART_ClearFlag(USART1, USART_FLAG_IDLE);				  // æ¸…é™¤ç©ºé—²ä¸­æ–­æ ‡å¿—ä½
+				dma_buffer_to_unpack_buffer(&judge_rx_obj, UART_IDLE_IT); // é€šè¿‡æŒ‡é’ˆå–å€çš„æ–¹æ³•æŠŠä¸²å£æ¥æ”¶çš„æ•°æ®æ”¾è¿›FIFO
+				unpack_fifo_data(&judge_unpack_obj, DN_REG_ID);			  // åŒæ ·å†é€šè¿‡æŒ‡é’ˆå–å€çš„æ–¹æ³•æŠŠFIFOé‡Œçš„æ•°æ®æ‹¿å‡ºæ¥æ”¾è¿›ä¸€ä¸ªæ•°ç»„é‡Œ
 			}
 		}
 		judge_rx_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
 	}
 }
 
-/*USART6 ÖĞ¶Ïº¯Êı*/
+/*USART6 ä¸­æ–­å‡½æ•°*/
 void USART6_IRQHandler(void)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	if (USART_GetFlagStatus(USART6, USART_FLAG_IDLE) != RESET // ÅĞ¶ÏÊÇ·ñ¿ÕÏĞ×ÜÏß              USART_FLAG_TC
-		&& USART_GetITStatus(USART6, USART_IT_IDLE) != RESET) // ÅĞ¶ÏÊÇ·ñ¿ÕÏĞ×ÜÏßÖĞ¶Ï
+	if (USART_GetFlagStatus(USART6, USART_FLAG_IDLE) != RESET // åˆ¤æ–­æ˜¯å¦ç©ºé—²æ€»çº¿              USART_FLAG_TC
+		&& USART_GetITStatus(USART6, USART_IT_IDLE) != RESET) // åˆ¤æ–­æ˜¯å¦ç©ºé—²æ€»çº¿ä¸­æ–­
 	{
 		USART_ReceiveData(USART6);
-		USART_ClearFlag(USART6, USART_FLAG_IDLE); // Çå³ı¿ÕÏĞÖĞ¶Ï±êÖ¾Î»
+		USART_ClearFlag(USART6, USART_FLAG_IDLE); // æ¸…é™¤ç©ºé—²ä¸­æ–­æ ‡å¿—ä½
 		USART_ClearITPendingBit(USART6, USART_IT_RXNE);
 		err_detector_hook(JUDGE_SYS_OFFLINE);
 
-		if (judge_rx_Task_Handle != NULL) // ±ÜÃâÈÎÎñÃ»À´µÃ¼°´´½¨¾Í·¢ËÍĞÅºÅÁ¿£¬µ¼ÖÂ¿¨ÔÚ¶ÏÑÔ»úÖÆÖĞ
+		if (judge_rx_Task_Handle != NULL) // é¿å…ä»»åŠ¡æ²¡æ¥å¾—åŠåˆ›å»ºå°±å‘é€ä¿¡å·é‡ï¼Œå¯¼è‡´å¡åœ¨æ–­è¨€æœºåˆ¶ä¸­
 		{
 			xTaskNotifyFromISR((TaskHandle_t)judge_rx_Task_Handle,
 							   (uint32_t)JUDGE_UART_IDLE_SIGNAL,
 							   (eNotifyAction)eSetBits,
 							   (BaseType_t *)&xHigherPriorityTaskWoken);
-			/*½øĞĞÉÏÏÂÎÄÇĞ»»*/
+			/*è¿›è¡Œä¸Šä¸‹æ–‡åˆ‡æ¢*/
 			if (xHigherPriorityTaskWoken != pdFALSE)
 				portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}

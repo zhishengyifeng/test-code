@@ -30,6 +30,7 @@
 #include "usart.h"
 #include "spi.h"
 #include "tim.h"
+#include "iwdg.h"  
 #include "STM32_TIM_BASE.h"
 /*bsp*/
 #include "bsp_flash.h"
@@ -57,6 +58,9 @@
 void flash_cali(void);
 void Config_SystemClock(uint32_t PLLM, uint32_t PLLN, uint32_t PLLP, uint32_t PLLQ);
 
+
+
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_dev __ALIGN_END;
 
 int main(void)
@@ -71,7 +75,6 @@ int main(void)
 
 	TIM_BASE_Init(10 - 1, 8400 - 1); // 配置定时器4为1ms中断一次，做来系统詗诵屑剖阌谥笫迪忠恍┭邮辈僮?
 	GPIO_INIT();					 // 板载LED、归中按键、24V电源输出、板载陀螺仪SPI等引脚的初始化，具体看A板的原理图
-	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
 //	TIM1_DEVICE(2500 - 1, 168 - 1);	 // 摩擦轮
 //	TIM12_DEVICE(400-1,90-1);//蜂鸣器，PWM频率在2700HZ时声音最大，且占空比需要设置成5％的高电平，此处设置为2500HZ
 //	TIM10_DEVICE(5000 - 1, 0);												 // 提供一路PWM使得加热电阻升温，用于恒温加热IMU
@@ -96,20 +99,29 @@ int main(void)
 //	Kalman
 //	Kalman_Init();
 	DWT_Init(168);
+
 	/*算法补偿角初始化*/
 //  pc_send_mesg.pc_need_information.pit_set = -0.6f;
 //	pc_send_mesg.pc_need_information.yaw_set = -0.5f;
 	/*从板载FLASH读出云台归中位置数据*/
+
 	flash_cali();
-	while (BMI088_init())
+	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
+    {
+	}
+	else	
 	{
-	};
+      while(BMI088_init())
+	  {};
+
+	}
+	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
+	GPIO_SetBits(GPIOH,GPIO_Pin_11);
+		RCC_ClearFlag();
 	
-	/* 研究了半天，发现效果不如没有的好，绷不住了 */
-//	while (IST8310_INIT())
-//	{
-//	};
 	
+	TIM8_DEVICE(20000 - 1, 168 - 1); // 舵机PWM周期需要配置成20ms，舵机0-180°对应为高电平持续时间0.5ms-2.5ms
+	IWDG_Config(IWDG_Prescaler_64 ,1250);//1s不喂狗自动复位,在modeswitch里边喂
 	TASK_START();		   // 创建各个任务，设定优先级和堆栈大小
 	vTaskStartScheduler(); // 开启任务调度
 	while (1)

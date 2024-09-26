@@ -34,7 +34,7 @@ void GPIO_INIT(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Low_Speed;
 	GPIO_Init(GPIOH, &GPIO_InitStructure);
 	// 由原理图可知，引脚拉低，LED亮，所以一开始全部拉高电平
-	GPIO_SetBits(GPIOH, GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12);
+	GPIO_SetBits(GPIOH,GPIO_Pin_12);
 
 	/*KEY按键*/
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
@@ -73,8 +73,8 @@ void GPIO_INIT(void)
 
 static void BMI088_INT_GPIO_Init(void)
 {
-	NVIC_InitTypeDef NVIC_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
+//	NVIC_InitTypeDef NVIC_InitStructure;
+//	EXTI_InitTypeDef EXTI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -89,17 +89,31 @@ static void BMI088_INT_GPIO_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+//	//加速度计中断
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
 
-	EXTI_InitStructure.EXTI_Line = EXTI_Line4;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+//	EXTI_InitStructure.EXTI_Line = EXTI_Line4;
+//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
+//	
+//	//陀螺仪中断
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
+
+//	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
 }
 
 /*****************************************************************

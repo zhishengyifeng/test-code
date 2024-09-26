@@ -12,6 +12,7 @@
 #include "chassis_task.h"
 #include "shoot_task.h"
 #include "judge_rx_data.h"
+#include "iwdg.h"
 
 UBaseType_t mode_switch_stack_surplus;
 
@@ -59,23 +60,25 @@ void get_keyboard(void)
 	if (rc.kb.bit.R && rc.kb.bit.CTRL)
 		KB_BALL = 0;
 
-//	if (rc.kb.bit.B && keyboard_flag)
-//		SMALL_BUFF = 1;
-//	if (rc.kb.bit.B && rc.kb.bit.V)
-//		SMALL_BUFF = 0;
+	if (rc.kb.bit.B && keyboard_flag)
+		SMALL_BUFF = 1;
+	if (rc.kb.bit.B && rc.kb.bit.CTRL)
+		SMALL_BUFF = 0;
 
-//	if (rc.kb.bit.G && keyboard_flag)
-//		BIG_BUFF = 1;
-//	if (rc.kb.bit.G && rc.kb.bit.V)
-//		BIG_BUFF = 0;
+	if (rc.kb.bit.G && keyboard_flag)
+		BIG_BUFF = 1;
+	if (rc.kb.bit.G && rc.kb.bit.CTRL)
+		BIG_BUFF = 0;
 
 	if (rc.kb.bit.E && keyboard_flag)
 		PC_DODGE = 1;
 	if (rc.kb.bit.E && rc.kb.bit.CTRL)
 		PC_DODGE = 0;
 
-//	if (rc.kb.bit.F && rc.kb.bit.V)
-//		SOFT_RESET = 1;
+	
+	if (rc.kb.bit.F && rc.kb.bit.V)
+		SOFT_RESET = 1;
+	
 	if (
 		!rc.kb.bit.Q &&
 		!rc.kb.bit.R &&
@@ -90,7 +93,6 @@ void get_keyboard(void)
 	else
 		keyboard_flag = 0; // 松手后才执行
 }
-
 rc_status remote_get_bit(void)
 {
 	if (rc.kb.bit.W)
@@ -153,6 +155,8 @@ void mode_switch_task(void *parm)
 			}
 		}
 		/************************************************/
+		
+		IWDG_Feed();//喂狗
 
 		xTaskGenericNotify((TaskHandle_t)info_get_Task_Handle,
 						   (uint32_t)MODE_SWITCH_INFO_SIGNAL,
@@ -174,7 +178,7 @@ void get_last_mode(void)
 void get_main_mode(void)
 {
 	if (global_err.list[REMOTE_CTRL_OFFLINE].err_exist == 1 ||
-		global_err.list[GIMBAL_YAW_OFFLINE].err_exist == 1 ||
+//		global_err.list[GIMBAL_YAW_OFFLINE].err_exist == 1 ||
 		global_err.list[GIMBAL_PIT_OFFLINE].err_exist == 1)
 	{
 		global_mode = RELEASE_CTRL;
@@ -304,13 +308,15 @@ void get_chassis_mode(void)
 	/*******6.29逻辑待测*******/
 	case MANUAL_CTRL:
 	{
-
 		if (gimbal_mode == GIMBAL_SHOOT_BUFF)
 			chassis_mode = CHASSIS_STOP_MODE;
 		else if ((RC_DODGE_MODE || chassis.dodge_ctrl)) // 如果开启躲避模式，底盘进入小陀螺&&twist_doge
 			chassis_mode = CHASSIS_DODGE_MODE;
 		else // 底盘云台跟随模式
+		{
 			chassis_mode = CHASSIS_NORMAL_MODE;
+		}
+			
 	}
 	break;
 

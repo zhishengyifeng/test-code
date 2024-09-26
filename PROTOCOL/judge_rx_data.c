@@ -86,9 +86,8 @@ void judgement_data_handler(uint8_t *p_frame)
           /*ÓÃ»§´úÂë*/
       }
 			
-			if(judge_recv_mesg.game_state.game_progress == 4 )//&& judge_recv_mesg.game_state.stage_remain_time >= 0 )
+			if(judge_recv_mesg.game_state.game_progress == 4)
 			{
-				
 			}
     }
     break;

@@ -20,6 +20,8 @@
 #include "math.h"
 #include "remote_ctrl.h"
 
+uint16_t shoot_speed = 40;//无裁判系统射频，1000/shoot_speed = 每秒发弹量
+
 float debug1,debug2;
 
 UBaseType_t shoot_stack_surplus;
@@ -32,6 +34,7 @@ trigger_t trig;
 uint8_t last_fric_wheel_run;
 uint16_t normal_speed;
 uint16_t Fric_Spd_Ajt;//3为初始未使用状态
+int CHECK;
 
 	/*
 		RMUC2024规则
@@ -53,43 +56,44 @@ uint16_t Fric_Spd_Ajt;//3为初始未使用状态
 
 #define SPEED_LIMIT//
 
-#if(INFANTRY_NUM == INFANTRY_4)
+#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
 /*摩擦轮pid*/
 float fric_pid[3] = {24, 0, 0};
 
 // 拨盘参数
-float trig_pid[6] = {250, 0.01, 30, 10, 0.01, 10};
+float trig_pid[6] = {250, 0, 30, 10, 0, 10};
 /* 摩擦轮转速 */
 uint16_t speed = 6000;//8200
 /*弹仓盖开关*/
 float ccr_open  = 500;
 float ccr_close = 2350;
 /*拨叶叶树，每次转过角度*/
-float Angle = 360.0f/8.0f;
+#define shifter_fork_number 8 // 拨叶数量
 
-#elif(INFANTRY_NUM == INFANTRY_5)
+#elif (INFANTRY_CLASS == INFANTRY_OMV)
 /*摩擦轮pid*/
 float fric_pid[3] = {24, 0, 0};
 
 // 拨盘参数
-float trig_pid[6] = {250, 0.01, 30, 10, 0.01, 10};
+float trig_pid[6] = {250, 0, 30, 10, 0, 10};
 
 /* 摩擦轮转速 */
-int16_t speed = 6000;//8200
+int16_t speed = 6500;//8200
 
 ///*弹仓盖开关*/
 float ccr_open  = 2500;//1550;
 float ccr_close = 500;//430;
 
 /*拨叶叶树，每次转过角度*/
-#define shifter_fork_number 7 // 拨叶数量
+#define shifter_fork_number 8 // 拨叶数量
 
-float Angle = 360.0f / (float)shifter_fork_number;
-uint32_t Shit_Count; // 由于屎山不得不继续拉 记录转过圈数
+//uint32_t Shit_Count; // 由于屎山不得不继续拉 记录转过圈数
 
 #else
-	#error "INFANTRY_NUM define error!"
+	#error "INFANTRY_CLASS define error!"
 #endif
+
+float Angle = 360.0f / (float)shifter_fork_number;//计算2006转过角度
 
 	int close_down  = 1;     //弹仓盖关闭完成标志位
 	int open_down   = 1;      //弹仓盖打开完成标志位
@@ -153,14 +157,8 @@ void shoot_task(void *parm)
 					}
 				  PID_Struct_Init(&pid_Spd_limit, speedlimit[0], speedlimit[1], speedlimit[2], 8000, 500, DONE );
 					/* 拨盘 电机的PID参数 */
-					PID_Struct_Init(&pid_trigger, trig_pid[0], trig_pid[1], trig_pid[2], 8000, 0, DONE);
-					PID_Struct_Init(&pid_trigger_spd, trig_pid[3], trig_pid[4], trig_pid[5], 8000, 3000, DONE);
-
-
-
-//					shoot_para_ctrl();						// 射击模式切换
-//					ball_storage_ctrl();					// 舵机控制弹仓盖
-//					fric_wheel_ctrl();						// 摩擦轮控制
+					PID_Struct_Init(&pid_trigger, trig_pid[0], trig_pid[1], trig_pid[2], 16000, 0, DONE);
+					PID_Struct_Init(&pid_trigger_spd, trig_pid[3], trig_pid[4], trig_pid[5], 16000, 3000, DONE);
 
 					if (shoot.fric_wheel_run)//若摩擦轮开启
 					{
@@ -184,6 +182,7 @@ void shoot_task(void *parm)
 					}
 					else
 					{
+						single_shoot_angle = moto_trigger.total_angle;
 						shoot.shoot_cmd   = 0;//单发标志位
 						shoot.c_shoot_cmd = 0;//连发标志位
 						shoot.fric_wheel_spd = 0;//给小值 eg：1000 摩擦轮持续加热
@@ -201,10 +200,10 @@ void shoot_task(void *parm)
 				}
 				else
 				{
+					single_shoot_angle = moto_trigger.total_angle;
 					glb_cur.trigger_cur = 0;
 					glb_cur.fric_cur[0] = 0;
 					glb_cur.fric_cur[1] = 0;
-				
 				}
 				
 								
@@ -292,14 +291,35 @@ void get_last_shoot_mode(void)
  */
 static void shoot_delay_hanlder(trig_state_e *state, float shoot_delay)
 {
+	static int16_t stop_time;
+	static uint8_t ngtv_flag;
 	if (*state == TRIG_INIT)
 	{
 		trig.one_time = HAL_GetTick();
 		/* 卡弹角度锁定不正常则不自增角度 */
 		if (fabs(moto_trigger.total_angle - single_shoot_angle) <= 10)
 		{
-			single_shoot_angle += Angle; // 发射（single_shoot_angle设为当前角度加上Angle）
+			stop_time = 0;
+			if(ngtv_flag)
+			{
+				ngtv_flag = 0;
+				single_shoot_angle += 15; // 发射（single_shoot_angle设为当前角度加上Angle）				
+			}
+			else
+				single_shoot_angle += Angle; // 发射（single_shoot_angle设为当前角度加上Angle）
 			*state = TRIG_PRESS_DOWN;	 // 发射按键已按下
+		}
+		else if(stop_time == 300)
+		{
+			single_shoot_angle -= (Angle + 15);
+			ngtv_flag = 1;
+			stop_time++;
+			CHECK++;
+		}
+		else
+		{
+			if(KEY_GetFlag())
+				stop_time++;
 		}
 	}
 	/* 发射延时 */
@@ -320,86 +340,30 @@ static void shoot_delay_hanlder(trig_state_e *state, float shoot_delay)
 		// 连发和单发都必须重置连发状态
 		trig.c_sta = TRIG_INIT; // 连发状态设为初始化
 		shoot.shoot_bullets++;	// 发射子弹计数
-		/* 每圈重新校准 */
-//		if (shoot.shoot_bullets % shifter_fork_number == 0)
-//		{
-//			Shit_Count++; // 圈数自增
-//			single_shoot_angle = (float)(360 * Shit_Count);
-//		}
 	}
 	trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 }
 
-
 static void shoot_bullet_handler(void)
 {
 
-  if (shoot.shoot_cmd)//单发
-  {
+	if (shoot.shoot_cmd)//单发
+	{
 		if(global_err.list[JUDGE_SYS_OFFLINE].err_exist == 1)//没连接裁判系统时
-			single_time = 100;
+			single_time = shoot_speed;
 		else
 			single_time = 500/(judge_recv_mesg.game_robot_state.shooter_barrel_cooling_value/10 + judge_recv_mesg.game_robot_state.robot_level);
   
-//        shoot_delay = single_time;
-//		if (trig.one_sta == TRIG_INIT)
-//		{
-//			trig.one_time = HAL_GetTick();
-//			single_shoot_angle = moto_trigger.total_angle + Angle;//发射（single_shoot_angle设为当前角度加上Angle）
-//			trig.one_sta = TRIG_PRESS_DOWN;//发射按键已按下
-//        }
-//		/* 发射延时 */
-//    else if (trig.one_sta == TRIG_PRESS_DOWN)//若发射按键已按下便进行延时
-//    {		
-//      if (HAL_GetTick() - trig.one_time >= shoot_delay)
-//      {
-//        trig.one_sta = TRIG_ONE_DONE;//延时完毕后，状态才为发射已完成
-//      }
-//    }
-//     
-//    if (trig.one_sta == TRIG_ONE_DONE)//若发射状态为已完成
-//    {
-//		single_shoot_angle = moto_trigger.total_angle;
-//        shoot.shoot_cmd = 0;//单发标志位置零
-//		trig.one_sta = TRIG_INIT;//单发状态设为初始化
-//		trig.c_sta = TRIG_INIT;//连发状态设为初始化
-//      shoot.shoot_bullets++;//发射子弹计数
-//    }
-//	trig.angle_ref = single_shoot_angle;//拨盘目标角度设为single_shoot_angle
 		shoot_delay_hanlder(&trig.one_sta, single_time);
 		
   }
 	
-	else if (shoot.c_shoot_cmd)//连发做多次单发
-  {
+	else if (shoot.c_shoot_cmd && !gimbal.big_buff_ctrl && !gimbal.small_buff_ctrl)//连发做多次单发，如果在打符模式不连发
+	{
         //计算延时时间
 		if(global_err.list[JUDGE_SYS_OFFLINE].err_exist == 1)//没连接裁判系统时
 		{
-//            if (trig.c_sta == TRIG_INIT)
-//			{
-//				trig.one_time = HAL_GetTick();
-//				single_shoot_angle = moto_trigger.total_angle + Angle;
-//				trig.c_sta = TRIG_PRESS_DOWN;
-//			}
-//			/* 发射处理 */
-//			else if (trig.c_sta == TRIG_PRESS_DOWN)
-//			{
-//				if (HAL_GetTick() - trig.one_time >= 200)  //延时
-//				{
-//					trig.c_sta = TRIG_ONE_DONE;
-//				}
-			shoot_delay_hanlder(&trig.c_sta, 200);
-				
-//			}
-//			/* 发射完成 */
-//			if (trig.c_sta == TRIG_ONE_DONE)
-//			{
-//				single_shoot_angle = moto_trigger.total_angle;
-//				trig.c_sta = TRIG_INIT;
-//				shoot.shoot_bullets++;//发射子弹计数
-//			}
-
-//			trig.angle_ref = single_shoot_angle;
+			shoot_delay_hanlder(&trig.c_sta, shoot_speed);
         }
         else if ((judge_recv_mesg.game_robot_state.robot_level== 1 &&judge_recv_mesg.game_robot_state.shooter_barrel_cooling_value  ==40)|| 
 			      		(judge_recv_mesg.game_robot_state.robot_level == 2 && judge_recv_mesg.game_robot_state.shooter_barrel_cooling_value ==45)||
@@ -418,80 +382,25 @@ static void shoot_bullet_handler(void)
 			else
 				shoot_delay = 500/((judge_recv_mesg.game_robot_state.shooter_barrel_cooling_value/10)-judge_recv_mesg.game_robot_state.robot_level);
 			shoot_delay_hanlder(&trig.c_sta, shoot_delay);
-			
-
-//			if (trig.c_sta == TRIG_INIT)
-//			{
-//				trig.one_time = HAL_GetTick();
-//				single_shoot_angle = moto_trigger.total_angle + Angle;
-//				trig.c_sta = TRIG_PRESS_DOWN;
-//			}
-//			/* 发射处理 */
-//			else if (trig.c_sta == TRIG_PRESS_DOWN)
-//			{
-//				if (HAL_GetTick() - trig.one_time >= shoot_delay)  //延时
-//				{
-//					trig.c_sta = TRIG_ONE_DONE;
-//				}
-//			}
-//			/* 发射完成 */
-//			if (trig.c_sta == TRIG_ONE_DONE)//若发射状态为已完成
-//			{
-//				single_shoot_angle = moto_trigger.total_angle;
-//				trig.c_sta = TRIG_INIT;
-//				shoot.shoot_bullets++;//发射子弹计数
-//			}
-//			trig.angle_ref = single_shoot_angle;
 		}
 		else//爆发优先
 		{
 			extra_time = pid_heat_time.out;//小于0
 			shoot_delay_hanlder(&trig.c_sta, continue_time + extra_time);
-			
-//			if (trig.c_sta == TRIG_INIT)
-//			{
-//				trig.one_time = HAL_GetTick();
-//				single_shoot_angle = moto_trigger.total_angle + Angle;
-//				trig.c_sta = TRIG_PRESS_DOWN;
-//			}
-//			/* 发射处理 */
-//			else if (trig.c_sta == TRIG_PRESS_DOWN)
-//			{
-//				if (HAL_GetTick() - trig.one_time >= continue_time + extra_time)  //延时
-//				{
-//					trig.c_sta = TRIG_ONE_DONE;
-//				}
-//			}
-//			/* 发射完成 */
-//			if (trig.c_sta == TRIG_ONE_DONE)
-//			{
-////				single_shoot_angle = moto_trigger.total_angle;
-//				trig.c_sta = TRIG_INIT;
-//				shoot.shoot_bullets++;//发射子弹计数
-
-//			}
-//			trig.angle_ref = single_shoot_angle;
 		}
+	}
+	else
+	{
+		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	}
 	
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && (judge_recv_mesg.power_heat_data.shooter_17mm_1_barrel_heat 
 		>= (judge_recv_mesg.game_robot_state.shooter_barrel_heat_limit-10)))
-//		trig.angle_ref = moto_trigger.total_angle;
 		trig.angle_ref = single_shoot_angle; // 拨盘目标角度设为single_shoot_angle
 	
-//	if(trig.angle_ref%45!=0){//解决二连发问题  		//没解决，反而把机械拨盘叉数解决了 绷
-//	int i=trig.angle_ref%45;
-//		if(i>=25)trig.angle_ref+=45-i;
-//		else trig.angle_ref-=i;
-//	}
    //pid计算
   pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref);
 	
-	/*(trig.c_sta == TRIG_PRESS_DOWN && moto_trigger.speed_rpm==0)//若卡弹就反转
-	{
-	     pid_calc(&pid_trigger,moto_trigger.total_angle,trig.angle_ref-Angle);
-	}
-	else*/
 	    trig.spd_ref = pid_trigger.out;
 	pid_calc(&pid_trigger_spd, moto_trigger.speed_rpm, trig.spd_ref);
 	if(!global_err.list[JUDGE_SYS_OFFLINE].err_exist && judge_recv_mesg.game_robot_state.power_management_shooter_output == 0)//摩擦轮被裁判系统断电后让拨盘停转

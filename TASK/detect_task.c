@@ -185,7 +185,7 @@ void module_offline_callback(void)
 
 uint8_t gimbal_is_controllable(void)
 {
-	if (gimbal_mode == GIMBAL_RELEASE || global_err.list[REMOTE_CTRL_OFFLINE].err_exist || global_err.list[GIMBAL_YAW_OFFLINE].err_exist || global_err.list[GIMBAL_PIT_OFFLINE].err_exist)
+	if (gimbal_mode == GIMBAL_RELEASE || global_err.list[REMOTE_CTRL_OFFLINE].err_exist)// || global_err.list[GIMBAL_YAW_OFFLINE].err_exist || global_err.list[GIMBAL_PIT_OFFLINE].err_exist)
 		return 0;
 	else
 		return 1;

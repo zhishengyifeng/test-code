@@ -28,8 +28,6 @@ extern TaskHandle_t chassis_Task_Handle;
 extern TaskHandle_t shoot_Task_Handle;
 
 extern cali_sys_t cali_param;
-extern int direction;
-extern int direction_change;
 void info_get_task(void *parm)
 {
 	uint32_t Signal;
@@ -55,7 +53,6 @@ void info_get_task(void *parm)
 				taskEXIT_CRITICAL();			 // 退出临界保护
 				if (global_mode == RELEASE_CTRL) // 当遥控右边打到最下时，电机全部断电
 				{
-					direction = 1;
 					gimbal.pit_center_offset = cali_param.pitch_offset;
 					gimbal.yaw_center_offset = cali_param.yaw_offset;
 					MEMSET(&glb_cur, motor_current_t);
@@ -99,29 +96,12 @@ static void get_chassis_info(void)
 }
 int debug_yaw_spd = 1;
 int debug_pit_spd = -1; // 左上为正是+号。左下为正为-号
-
 static void get_gimbal_info(void)
 {
 	/* 转换成相对角度 */
 	static float yaw_ecd_ratio = YAW_MOTO_POSITIVE_DIR * YAW_DECELE_RATIO / ENCODER_ANGLE_RATIO;
 	static float pit_ecd_ratio = PIT_MOTO_POSITIVE_DIR * PIT_DECELE_RATIO / ENCODER_ANGLE_RATIO;
 
-	static int i = 0;
-	if (direction_change == 1)
-	{ // 检测到换头指令
-		i++;
-		if (i == 1)
-		{
-			gimbal.pid.yaw_angle_ref += 180;
-			if (gimbal.yaw_center_offset > 4096)
-				gimbal.yaw_center_offset -= 4096;
-			else
-				gimbal.yaw_center_offset += 4096;
-		}
-		i = 1;
-	}
-	else
-		i = 0;
 	// 计算相对角度
 	/*根据航向角的编码器值 moto_yaw.ecd 和航向角的中心偏移值 gimbal.yaw_center_offset，
 	调用 get_relative_pos 函数来获取航向角的相对位置。而yaw_ecd_ratio是相对位置（编码器值）

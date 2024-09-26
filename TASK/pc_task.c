@@ -65,6 +65,10 @@ extern uint32_t USB_USART_RX_STA;
 #endif
 void pc_rx_task(void *parm)
 {
+#ifndef USE_USB_OTG_FS
+	uint32_t Signal;
+	BaseType_t STAUS;
+#endif
 	while (1)
 	{
 #ifdef USE_USB_OTG_FS

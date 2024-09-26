@@ -1143,4 +1143,6 @@ void map_data_packet_pack(uint8_t *p_data) //未修改完
 		//该函数的功能为将需要发送的数据打包，便于下一步通过串口3发送给裁判系统
 	data_packet_pack(MAP_DATA_ID, (uint8_t *)&judge_send_mesg.map_data,
 									 sizeof(judge_send_mesg.map_data), DN_REG_ID);
+
+
 }

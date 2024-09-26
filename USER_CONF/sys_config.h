@@ -3,12 +3,12 @@
 
 #include "stm32f4xx.h"
 
-#define INFANTRY_3 3
-#define INFANTRY_4 4
-#define INFANTRY_5 5
+
+#define INFANTRY_MECANNUM  1
+#define INFANTRY_OMV  2
 #define TEST_SHOOT 6
 
-#define INFANTRY_NUM INFANTRY_5 // 可以修改步兵号数
+#define INFANTRY_CLASS INFANTRY_OMV // 可以修改步兵种类
 
 /**********************遥控 设置配置***************************/
 /* 摇杆最大值 */
@@ -32,33 +32,7 @@
 
 /************************ 底盘硬件 配置 ****************************/
 
-
-#if (INFANTRY_NUM == INFANTRY_5)
-
-/* 全向轮半径(mm) */
-#define RADIUS 77.0f
-/* 全向轮周长(mm) */
-#define PERIMETER 483.0f
-/*全向轮距（左右）*/
-#define WHEELTRACK 275.5f // 415
-/*全向轴距（前后）*/
-#define WHEELBASE 275.5f	 // 406
-
-/**************************云台 配置*******************************/
-/* 遥控模式 云台速度控制 */
-/* pitch 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
-/* yaw 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_YAW 1.6f
-
-/* 键盘模式 云台速度控制 */
-/* pitch 轴 速度 */
-#define GIMBAL_PC_MOVE_RATIO_PIT -0.6f
-/* yaw 轴 速度 */
-#define GIMBAL_PC_MOVE_RATIO_YAW -0.5f
-
-#else 
-
+#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
 /* 麦轮半径(mm) */
 #define RADIUS 77.0f
 /* 麦轮周长(mm) */
@@ -68,7 +42,34 @@
 /*麦轮轴距（前后）*/
 #define WHEELBASE 320.0f // 406
 
+#elif (INFANTRY_CLASS == INFANTRY_OMV)
+/* 全向轮半径(mm) */
+#define RADIUS 77.0f
+/* 全向轮周长(mm) */
+#define PERIMETER 483.0f
+/*全向轮距（左右）*/
+#define WHEELTRACK 275.5f // 415
+/*全向轴距（前后）*/
+#define WHEELBASE 275.5f	 // 406
+#endif
+
+
 /**************************云台 配置*******************************/
+#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
+/* 遥控模式 云台速度控制 */
+/* pitch 轴 速度 */
+#define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
+/* yaw 轴 速度 */
+#define GIMBAL_RC_MOVE_RATIO_YAW 1.6f
+
+/* 键盘模式 云台速度控制 */
+/* pitch 轴 速度 */
+#define GIMBAL_PC_MOVE_RATIO_PIT 0.6f
+/* yaw 轴 速度 */
+#define GIMBAL_PC_MOVE_RATIO_YAW 0.6f
+
+/**************************云台 配置*******************************/
+#elif (INFANTRY_CLASS == INFANTRY_OMV)
 /* 遥控模式 云台速度控制 */
 /* pitch 轴 速度 */
 #define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
@@ -77,7 +78,7 @@
 
 /* 键盘模式 云台速度控制 */
 /* pitch 轴 速度 */
-#define GIMBAL_PC_MOVE_RATIO_PIT -0.6f
+#define GIMBAL_PC_MOVE_RATIO_PIT 0.6f
 /* yaw 轴 速度 */
 #define GIMBAL_PC_MOVE_RATIO_YAW 0.6f
 

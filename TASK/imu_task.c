@@ -20,9 +20,14 @@
 #include "dma.h"
 #include "detect_task.h"
 #include "kalman_filter.h"
-
+#include "BMI088Middleware.h"
 #include "ahrs.h"
 #include "modeswitch_task.h"
+#include "filter.h"
+//外部调试
+#include "bsp_vofa.h"
+
+#include "stdio.h"
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
@@ -31,12 +36,8 @@
 UBaseType_t imu_stack_surplus;
 extern TaskHandle_t imu_Task_Handle;
 
-volatile uint8_t imu_start_flag = 0;
-
 extern IMU_Data_t BMI088;
 
-uint32_t time = 0;
-float dt = 0;
 float EulerAngle[3] = {0};
 
 float totalangle_transfer(float angle);
@@ -60,7 +61,7 @@ fp32 mag_cali_offset[3];
 // static const fp32 imu_temp_PID[3] = {TEMPERATURE_PID_KP, TEMPERATURE_PID_KI, TEMPERATURE_PID_KD};
 // static pid_type_def imu_temp_pid;
 
-static const float timing_time = 0.001f; // tast run time , unit s.任务运行的时间 单位 s
+//static const float timing_time = 0.001f; // tast run time , unit s.任务运行的时间 单位 s
 
 static fp32 accel_fliter_1[3] = {0.0f, 0.0f, 0.0f};
 static fp32 accel_fliter_2[3] = {0.0f, 0.0f, 0.0f};
@@ -71,8 +72,13 @@ static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+static fp32 gyro_filter[3] = {0.0f, 0.0f, 0.0f};
+static float gyro_filter_input[3][ORDER+1] = {0};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f}; // euler angle, unit rad.??? ?? rad
 fp32 INS_angle_final[3] = {0.0f, 0.0f, 0.0f}; // 转换单位后的角度
+
+uint8_t INS_Init_Done = 0;
+
 
 void imu_temp_keep(void)
 {
@@ -99,17 +105,21 @@ static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], IMU_Data_t 
 {
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		gyro[i] = bmi088->Gyro[0] * gyro_scale_factor[i][0] + bmi088->Gyro[1] * gyro_scale_factor[i][1] + bmi088->Gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
-		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2] + accel_offset[i];
+		gyro[i] = (bmi088->Gyro[0] + gyro_offset[0]) * gyro_scale_factor[i][0] + (bmi088->Gyro[1] + gyro_offset[1]) * gyro_scale_factor[i][1] + (bmi088->Gyro[2] + gyro_offset[2]) * gyro_scale_factor[i][2];
+		accel[i] = bmi088->Accel[0] * accel_scale_factor[i][0] + bmi088->Accel[1] * accel_scale_factor[i][1] + bmi088->Accel[2] * accel_scale_factor[i][2];
 //		mag[i] = ist8310->Mag[0] * mag_scale_factor[i][0] + ist8310->Mag[1] * mag_scale_factor[i][1] + ist8310->Mag[2] * mag_scale_factor[i][2] + mag_offset[i];
 	}
 }
 
 void imu_task(void const *argu)
 {
+	u16 i_init = 0;
+	u8 i_filter = 0;
+	float dt = 0;
+	float yaw_angle_last = 0;
+	uint32_t time_last = 0;
 	uint32_t imu_wake_time = osKernelSysTick();
 	imu_Task_Handle = xTaskGetHandle(pcTaskGetName(NULL));
-	imu_start_flag = 1;
 
 	AHRS_init(INS_quat, INS_accel, INS_mag);
 
@@ -118,65 +128,91 @@ void imu_task(void const *argu)
 	accel_fliter_1[2] = accel_fliter_2[2] = accel_fliter_3[2] = INS_accel[2];
 
 	while (1)
-	{
+	{	
+		if(i_init < 1000)
+			i_init++;
+		else
+			INS_Init_Done = 1;
+		
 		BMI088_read(BMI088.Gyro, BMI088.Accel, &BMI088.Temperature);
-		// ReadIST8310Data(IST8310.Mag);//发现读了还是会温漂，而且会导致程序运行变慢，不如不读
+		
 		
 		/* rotate and zero drift */
 		imu_cali_slove(INS_gyro, INS_accel, INS_mag, &BMI088);
 
-		/* accel low-pass filter */
-		for (uint8_t i = 0; i < 3; ++i)
-		{
-			accel_fliter_1[i] = accel_fliter_2[i];
-			accel_fliter_2[i] = accel_fliter_3[i];
-			accel_fliter_3[i] = accel_fliter_2[i] * fliter_num[0] + accel_fliter_1[i] * fliter_num[1] + INS_accel[i] * fliter_num[2];
-		}
+		//加速度计低通滤波--3阶低通滤波
+		//accel low-pass filter
+		accel_fliter_1[0] = accel_fliter_2[0];
+		accel_fliter_2[0] = accel_fliter_3[0];
 
-		AHRS_update(INS_quat, timing_time, INS_gyro, accel_fliter_3, INS_mag);
-		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);
+		accel_fliter_3[0] = accel_fliter_2[0] * fliter_num[0] + accel_fliter_1[0] * fliter_num[1] + INS_accel[0] * fliter_num[2];
 
+		accel_fliter_1[1] = accel_fliter_2[1];
+		accel_fliter_2[1] = accel_fliter_3[1];
+
+		accel_fliter_3[1] = accel_fliter_2[1] * fliter_num[0] + accel_fliter_1[1] * fliter_num[1] + INS_accel[1] * fliter_num[2];
+
+		accel_fliter_1[2] = accel_fliter_2[2];
+		accel_fliter_2[2] = accel_fliter_3[2];
+
+		accel_fliter_3[2] = accel_fliter_2[2] * fliter_num[0] + accel_fliter_1[2] * fliter_num[1] + INS_accel[2] * fliter_num[2];
+		
+		
+		#if (ORDER>0)
+			//陀螺仪低通滤波
+			if(i_filter<ORDER+1)
+			{
+				i_filter++;
+				Filter(INS_gyro[0],gyro_filter_input[0],WINDOWS);
+				Filter(INS_gyro[1],gyro_filter_input[1],WINDOWS);
+				Filter(INS_gyro[2],gyro_filter_input[2],WINDOWS);
+				gyro_filter[0] = INS_gyro[0];
+				gyro_filter[1] = INS_gyro[1];
+				gyro_filter[2] = INS_gyro[2];
+			}
+			else
+			{
+				gyro_filter[0] = Filter(INS_gyro[0],gyro_filter_input[0],WINDOWS);
+				gyro_filter[1] = Filter(INS_gyro[1],gyro_filter_input[1],WINDOWS);
+				gyro_filter[2] = Filter(INS_gyro[2],gyro_filter_input[2],WINDOWS);
+			}
+		#else
+				gyro_filter[0] = INS_gyro[0];
+				gyro_filter[1] = INS_gyro[1];
+				gyro_filter[2] = INS_gyro[2];
+		#endif
+		dt = DWT_GetDeltaT(&time_last);
+		AHRS_update(INS_quat, dt, gyro_filter, accel_fliter_3, INS_mag);
+		get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);			
 		INS_angle_final[0] = INS_angle[0] * RAD_TO_ANGLE;
 		INS_angle_final[1] = INS_angle[1] * RAD_TO_ANGLE;
 		INS_angle_final[2] = INS_angle[2] * RAD_TO_ANGLE;
-
-		/////////////////////////////////////////////////
-//		if (INFANTRY_NUM == INFANTRY_5) // 步兵五即小全向的pit电机、陀螺仪普通麦轮步兵装配不同
-//		{
-//			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
-//			gimbal.sensor.pit_gyro_angle = INS_angle_final[2];		//陀螺仪角度	
-//			gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;     //加速度
-//			gimbal.sensor.pit_palstance = BMI088.Gyro[1] * 100;    //加速度
-//		}
-//		else
-//		{
-			gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
-			gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度			
-			gimbal.sensor.yaw_palstance = BMI088.Gyro[2] * 100;		//加速度
-			gimbal.sensor.pit_palstance = BMI088.Gyro[1] * 100;	//加速度
-//		}
-		/////////////////////////////////////////////////
-
+		
+			
+		gimbal.sensor.yaw_gyro_angle = INS_angle_final[0];		//陀螺仪角度
+		gimbal.sensor.pit_gyro_angle = INS_angle_final[1];		//陀螺仪角度	
+		gimbal.sensor.roll_gyro_angle = INS_angle_final[2];		//陀螺仪角度	
+		gimbal.sensor.yaw_palstance = gyro_filter[2];		//角速度
+		gimbal.sensor.pit_palstance = gyro_filter[1];	//角速度
+		
+		if(gimbal_mode != GIMBAL_RELEASE)
+		{
+			if(gimbal.sensor.yaw_gyro_angle - yaw_angle_last < -180)
+			{
+				gimbal.sensor.yaw_cnt++;
+			}
+			else if(gimbal.sensor.yaw_gyro_angle - yaw_angle_last > 180)
+			{
+				gimbal.sensor.yaw_cnt--;
+			}
+			gimbal.sensor.yaw_total_angle = 360.0f*gimbal.sensor.yaw_cnt + gimbal.sensor.yaw_gyro_angle;
+		}
+		
+		yaw_angle_last = gimbal.sensor.yaw_gyro_angle;
+		
 		err_detector_hook(IMU_OFFLINE);
-		imu_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
-
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);
 	}
 }
 
-void EXTI4_IRQHandler(void)
-{
-	if (EXTI_GetITStatus(EXTI_Line4) == 1)
-	{
-		if (imu_start_flag)
-		{
-			if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-			{
-				static BaseType_t xHigherPriorityTaskWoken;
-				vTaskNotifyGiveFromISR(imu_Task_Handle, &xHigherPriorityTaskWoken);
-				portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-			}
-		}
-	}
-	EXTI_ClearITPendingBit(EXTI_Line4);
-}
+

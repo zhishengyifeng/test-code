@@ -35,11 +35,14 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 
 
 	get_buffer(&chassis_power_buffer);							   // 获取缓冲焦耳
-	pid_calc(&pid_chassis_power_buffer, chassis_power_buffer, 30); // 缓冲能量环，把缓冲焦耳压至30J，结果为负
+	pid_calc(&pid_chassis_power_buffer, chassis_power_buffer, 55); // 缓冲能量环，把缓冲焦耳压至55J，结果为负
 	get_chassis_max_power(&max_power_limit);					   // 获取当前等级的功率限制
 	input_power = max_power_limit - pid_chassis_power_buffer.out;  // 更新当前电管最大输出功率
 
-	send_cap_power_can(input_power * 100); // 将限制功率发送给功控板(单位:w)
+	if(judge_recv_mesg.power_heat_data.buffer_energy<=10)
+			send_cap_power_can(0);
+	else
+		send_cap_power_can(input_power * 100); // 将限制功率发送给功控板(单位:w)
 
 	// 选择是否消耗电容
 	if (FAST_SPD || rc.ch2 == 660)
@@ -51,11 +54,11 @@ float Chassis_Power_Control(chassis_t *chassis_power_control)
 		cap_state = 0;
 	}
 
-	if (chassis_power_control->CapData[1] > 15) // 电容电压>15V
+	if (chassis_power_control->CapData[1] > CAP_LOW) // 电容>16V
 	{
 		if (cap_state == 0) // 关闭电容加速
 		{
-				chassis_max_power = (input_power + 5)*Charge_factor; // 给定底盘的最大给定功率略大于限制功率，防止电容一直满电导致功率浪费
+			chassis_max_power = (input_power + 5)*Charge_factor; // 给定底盘的最大给定功率略大于限制功率，防止电容一直满电导致功率浪费
 		}
 		else // 开启电容加速
 		{
@@ -130,7 +133,7 @@ void get_buffer(float *chassis_power_buffer)
 	if (judge_recv_mesg.game_robot_state.chassis_power_limit >= 45 && judge_recv_mesg.game_robot_state.chassis_power_limit <= 220)
 		*chassis_power_buffer = judge_recv_mesg.power_heat_data.buffer_energy;
 	else
-		*chassis_power_buffer = 30; // 让焦耳环pid输出为0
+		*chassis_power_buffer = 55; // 让焦耳环pid输出为0
 }
 void get_chassis_max_power(uint16_t *max_power_limit)
 {

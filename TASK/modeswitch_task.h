@@ -7,15 +7,15 @@
 
 #define MEMSET(flag,type) (memset((type*)flag,0,sizeof(type)))
 
-/*��Ҫ����ģʽ*/
+/*主要控制模式*/
 typedef enum
 {
   RELEASE_CTRL,                   
-  MANUAL_CTRL,                    //�ֶ�
-  SEMI_AUTOMATIC_CTRL,            //���Զ�
-  FULL_AUTOMATIC_CTRL,            //ȫ�Զ�
+  MANUAL_CTRL,                    //手动
+  SEMI_AUTOMATIC_CTRL,            //半自动
+  FULL_AUTOMATIC_CTRL,            //全自动
 }global_status;
-/*��̨����ģʽ*/
+/*云台控制模式*/
 typedef enum
 {
   GIMBAL_RELEASE,
@@ -25,7 +25,7 @@ typedef enum
   GIMBAL_SHOOT_BUFF,
   GIMBAL_TRACK_ARMOR,
 }gimbal_status;
-/*���̿���ģʽ*/
+/*底盘控制模式*/
 typedef enum
 {
   CHASSIS_RELEASE,

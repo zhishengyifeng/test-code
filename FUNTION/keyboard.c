@@ -9,7 +9,7 @@
 #include "shoot_task.h"
 #include "modeswitch_task.h"
 #include "judge_rx_data.h"
-
+#include "ladrc.h"
 extern int keyboard_flag;
 extern int KB_FRIC;
 extern int KB_BALL;
@@ -24,7 +24,6 @@ extern int SMALL_BUFF;
 extern int BIG_BUFF;
 extern int PC_DODGE;
 extern int normal_speed;
-extern int direction;
 extern int direction_change;
 
 extern chassis_t chassis;
@@ -120,7 +119,6 @@ void keyboard_global_hook(void)
 			{
 				i = 0;
 				direction_change = 1;
-				direction = -direction;
 			}
 		}
 		else
@@ -136,14 +134,14 @@ static void chassis_direction_ctrl(uint8_t forward, uint8_t back,
 {
 	if (back)
 	{
-		km.vx = 1;
+		km.vx = -1;
 		rm.vx = 0;
 		rm.vy = 0;
 		rm.vw = 0;
 	}
 	else if (forward)
 	{
-		km.vx = -1;
+		km.vx = 1;
 		rm.vx = 0;
 		rm.vy = 0;
 		rm.vw = 0;
@@ -158,14 +156,14 @@ static void chassis_direction_ctrl(uint8_t forward, uint8_t back,
 
 	if (right)
 	{
-		km.vy = 1;
+		km.vy = -1;
 		rm.vx = 0;
 		rm.vy = 0;
 		rm.vw = 0;
 	}
 	else if (left)
 	{
-		km.vy = -1;
+		km.vy = 1;
 		rm.vx = 0;
 		rm.vy = 0;
 		rm.vw = 0;
@@ -227,6 +225,19 @@ static void kb_shoot_spd_ctrl(uint16_t Shoot_Spd_UP, uint16_t Shoot_Spd_DOWN)
 	}
 }
 
+static uint8_t  KM_LADRC  = 1;
+LADRC_NUM kb_pit_ref = 
+{
+   .r = 30,     //速度因子
+   .h = 0.002,            //积分步长
+};
+LADRC_NUM kb_yaw_ref = 
+{
+   .r = 30,     //速度因子
+   .h = 0.002,            //积分步长
+};
+
+
 /*控制pit,yaw速度*/
 float yaw_speed = 0.01;
 static void gimbal_speed_ctrl(int16_t pit_ref_spd, int16_t yaw_ref_spd)
@@ -234,14 +245,24 @@ static void gimbal_speed_ctrl(int16_t pit_ref_spd, int16_t yaw_ref_spd)
 	// 鼠标往左yaw_ref_spd为正
 	//	km.pit_v =  pit_ref_spd * 0.015;
 	////////////////////////////////////
+	if(KM_LADRC)
+	{
+		/* TD跟踪微分处理 */
+		LADRC_TD(&kb_pit_ref, -pit_ref_spd * 0.007f  );
+		LADRC_TD(&kb_yaw_ref, -yaw_ref_spd * 0.007f  );
+		
+		km.pit_v = kb_pit_ref.v1;
+		km.yaw_v = kb_yaw_ref.v1;
 
-	km.pit_v = -pit_ref_spd * 0.015;
-
-	////////////////////////////////////
-	if (INFANTRY_NUM == INFANTRY_5) // 步兵五即小全向的pit电机与普通麦轮步兵装配不同
-		km.yaw_v = yaw_ref_spd * yaw_speed;
+	}
 	else
-		km.yaw_v = -yaw_ref_spd * yaw_speed;
+	{
+		  km.pit_v = -pit_ref_spd *0.007f  ;
+		km.yaw_v = -yaw_ref_spd * 0.007f  ;
+	}
+	
+//	km.pit_v = -pit_ref_spd * 0.015;
+//	km.yaw_v = -yaw_ref_spd * yaw_speed;
 }
 
 /*实现软件复位*/
@@ -250,14 +271,17 @@ static void sofe_reset(uint16_t Soft_Reset)
 	if (Soft_Reset == 1)
 		Software_Reset();
 }
+
 void keyboard_chassis_hook(void)
 {
+	
 	if (km.kb_enable)
 	{
-		if (direction == 1)
+		#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
 			chassis_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
-		else
+		#elif (INFANTRY_CLASS == INFANTRY_OMV)
 			chassis_direction_ctrl(BACK, FORWARD, RIGHT, LEFT);
+		#endif
 	}
 	else
 	{
@@ -286,6 +310,7 @@ void keyboard_shoot_hook(void)
 		}
 	}
 
+	
 	shoot_cmd_ctrl(KB_SINGLE_SHOOT, KB_CONTINUE_SHOOT);
 }
 void keyboard_gimbal_hook(void)

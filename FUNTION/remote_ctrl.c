@@ -12,7 +12,6 @@ sw_record_t glb_sw;
 
 extern int KB_FRIC;
 extern int KB_BALL;
-extern int direction;
 int16_t mouse_x_now = 0;
 int16_t mouse_x_last = 0;
 int16_t deviation = 0;
@@ -92,34 +91,14 @@ void remote_ctrl(rc_info_t *rc, uint8_t *dbus_buf)
 
 static void chassis_operation_func(int16_t forward_back, int16_t left_right, int16_t rotate)
 {
-//	if(INFANTRY_NUM == INFANTRY_5)
-//	{
-//		if (direction == 1)
-//		{ // 换头前后的操作不同
-//			rm.vx = forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
-//			rm.vy = left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
-//		}
-//		else
-//		{
-//			rm.vx = -forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
-//			rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
-//		}
-//		rm.vw = rotate / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_R;
-//	}
-//	else
-//	{		
-		if (direction == 1)
-		{ // 换头前后的操作不同
-			rm.vx = forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
-			rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
-		}
-		else
-		{
-			rm.vx = -forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
-			rm.vy = left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
-		}
-		rm.vw = rotate / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_R;
-//	}
+	#if (INFANTRY_CLASS == INFANTRY_MECANNUM)
+		rm.vx = -forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
+		rm.vy = left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
+	#elif (INFANTRY_CLASS == INFANTRY_OMV)
+		rm.vx = forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
+		rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
+	#endif
+	rm.vw = rotate / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_R;
 }
 
 void remote_ctrl_chassis_hook(void)
@@ -130,7 +109,7 @@ void remote_ctrl_chassis_hook(void)
 static void gimbal_operation_func(int16_t pit_ctrl, int16_t yaw_ctrl)
 {
 	/* gimbal coordinate system is right hand coordinate system */
-	rm.pit_v = -pit_ctrl * 0.0005f * GIMBAL_RC_MOVE_RATIO_PIT;
+	rm.pit_v = pit_ctrl * 0.0005f * GIMBAL_RC_MOVE_RATIO_PIT;
 	rm.yaw_v = -yaw_ctrl * 0.0005f * GIMBAL_RC_MOVE_RATIO_YAW;
 }
 

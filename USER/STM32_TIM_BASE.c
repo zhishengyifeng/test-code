@@ -5,6 +5,7 @@
 #include "task.h"
 
 __IO uint32_t uwTick;
+uint8_t timer_flag;
 
 /*10-1,8400-1*/
 void TIM_BASE_Init(u16 per, u16 psc)
@@ -68,12 +69,21 @@ uint32_t osKernelSysTick(void)
 	}
 }
 
+uint8_t KEY_GetFlag(void)
+{
+	uint8_t temp = timer_flag;
+	timer_flag = 0;
+	return temp;
+}
+
+
 /*用定时器4记录代码运行时间*/
 void TIM4_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update))
 	{
 		HAL_IncTick();
+		timer_flag = 1;
 	}
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 }

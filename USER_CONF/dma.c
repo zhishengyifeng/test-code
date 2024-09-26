@@ -118,7 +118,7 @@ void SPI1_DMA(void)
 
 	//    NVIC_InitTypeDef NVIC_InitStructure;
 	//    DMA_InitTypeDef DMA_InitStructure;
-	//    /* -------------- Enable Module Clock Source ----------------------------*/
+	    /* -------------- Enable Module Clock Source ----------------------------*/
 	//    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
 	//		SPI_DMACmd(SPI1,SPI_I2S_DMAReq_Rx,ENABLE);
 	//		SPI_DMACmd(SPI1,SPI_I2S_DMAReq_Tx,ENABLE);

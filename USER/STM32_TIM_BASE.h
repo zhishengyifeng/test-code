@@ -8,6 +8,7 @@ void TIM_BASE_Init(u16 per,u16 psc);
 void HAL_IncTick(void);
 uint32_t HAL_GetTick(void);
 uint32_t osKernelSysTick(void);
+uint8_t KEY_GetFlag(void);
 
 
 #endif
