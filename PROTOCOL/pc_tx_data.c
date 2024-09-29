@@ -82,26 +82,9 @@ void get_infantry_info(void)
 	{
 	case GIMBAL_TRACK_ARMOR:
 	{
-//			if(coordination_flag)//进入自瞄模式后坐标系不变，一直给电脑发进入时的坐标系
-//		{
-//			single_coordination = gimbal.sensor.yaw_gyro_angle;
-//			coordination_flag = 0;
-//		}
-		pc_send_mesg.task_mode = TRACK_AMOR_MODE;									  // 自瞄模式
-		pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;				  // 0
-		pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle; // 发送陀螺仪的数据//0;(不发)
-		//pc_send_mesg.robot_yaw = single_coordination ;
-		/*反小陀螺-打哨兵模式按键 长按C发送1，长按V发送2*/
-		/* 松手发送0               向左补偿    向右补偿 */
-		// direction:2 拓展装甲板标志位
-		if (Left_offset == 1)
-			pc_send_mesg.direction = 1;
-		else if (Right_offset == 1)
-			pc_send_mesg.direction = 2;
-		else if (SENTRY_MODE == 1)
-			pc_send_mesg.direction = 3;
-		else
-			pc_send_mesg.direction = 0;
+		pc_send_mesg.robot_roll = gimbal.sensor.roll_gyro_angle;
+		pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
+		pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle;
 	}
 	break;
 
@@ -109,22 +92,22 @@ void get_infantry_info(void)
 	{
 		if (gimbal.small_buff_ctrl)
 		{
-			pc_send_mesg.task_mode = SMALL_BUFF_MODE; // 小能量机关
 			// 发送编码位角度？看视觉需求，用电机还是陀螺仪
+			pc_send_mesg.robot_roll = gimbal.sensor.roll_gyro_angle;
 			pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
 			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_relative_angle;
 		}
 		else if (gimbal.big_buff_ctrl)
 		{
 			// 发送编码位角度？看视觉需求，用电机还是陀螺仪
-			pc_send_mesg.task_mode = BIG_BUFF_MODE; // 大能量机关
+			pc_send_mesg.robot_roll = gimbal.sensor.roll_gyro_angle;
 			pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
 			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_relative_angle;
 		}
 		else
 		{
 			// 发送编码位角度？看视觉需求，用电机还是陀螺仪
-			pc_send_mesg.task_mode = NORMAL_CTRL_MODE; // 普通模式
+			pc_send_mesg.robot_roll = gimbal.sensor.roll_gyro_angle;
 			pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
 			pc_send_mesg.robot_yaw = gimbal.sensor.yaw_relative_angle;
 		}
@@ -133,7 +116,7 @@ void get_infantry_info(void)
 
 	default:
 	{
-		pc_send_mesg.task_mode = NORMAL_CTRL_MODE;
+		pc_send_mesg.robot_roll = gimbal.sensor.roll_gyro_angle;
 		pc_send_mesg.robot_pitch = gimbal.sensor.pit_relative_angle;
 		pc_send_mesg.robot_yaw = gimbal.sensor.yaw_gyro_angle; // 默认发送陀螺仪角度
 	}
