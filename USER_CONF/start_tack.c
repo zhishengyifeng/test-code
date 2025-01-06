@@ -192,8 +192,8 @@ void start_task(void *parm)
 					(TaskHandle_t *)&pc_rx_Task_Handle);
 	}
 
-	vTaskDelete(start_Task_Handle); // ɾ����ʼ�����������������ɾ������ ɾ����������Ҳ��ʹ��NULL��
-	taskEXIT_CRITICAL();			// �˳��ٽ���
+	vTaskDelete(start_Task_Handle); // 删除开始任务（利用任务句柄完成删除操作 删除自身任务也可使用NULL）
+	taskEXIT_CRITICAL();			// 退出临界区
 }
 
 void TASK_START(void)

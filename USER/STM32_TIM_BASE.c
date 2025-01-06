@@ -14,27 +14,27 @@ void TIM_BASE_Init(u16 per, u16 psc)
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); // ʹ��TIM4ʱ��
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); // 使能TIM4时钟
 
-	TIM_TimeBaseInitStructure.TIM_Period = per;	   // �Զ�װ��ֵ
-	TIM_TimeBaseInitStructure.TIM_Prescaler = psc; // ��Ƶϵ��
+	TIM_TimeBaseInitStructure.TIM_Period = per;	   // 自动装载值
+	TIM_TimeBaseInitStructure.TIM_Prescaler = psc; // 分频系数
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // �������ϼ���ģʽ
+	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  // 设置向上计数模式
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseInitStructure);
 
-	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); // ������ʱ���ж�
+	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); // 开启定时器中断
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;			  // ��ʱ���ж�ͨ��
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // ��ռ���ȼ�
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		  // �����ȼ�
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			  // IRQͨ��ʹ��
+	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;			  // 定时器中断通道
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // 抢占优先级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		  // 子优先级
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			  // IRQ通道使能
 	NVIC_Init(&NVIC_InitStructure);
 
-	TIM_Cmd(TIM4, ENABLE); // ʹ�ܶ�ʱ��
+	TIM_Cmd(TIM4, ENABLE); // 使能定时器
 }
 
-// ÿ��1ms��uwTick�������+1
+// 每过1ms，uwTick这个变量+1
 __weak void HAL_IncTick(void)
 {
 	uwTick++;
@@ -42,21 +42,21 @@ __weak void HAL_IncTick(void)
 		uwTick = 0;
 }
 
-// ���ص�ǰϵͳ����ֵ
+// 返回当前系统计数值
 __weak uint32_t HAL_GetTick(void)
 {
 	return uwTick;
 }
 
-/*ȷ�������Ǵ����߳�ģʽ���Ǵ�������ģʽ��*/
+/*确定我们是处于线程模式还是处理程序模式。*/
 static int inHandlerMode(void)
 {
 	return __get_IPSR() != 0;
 }
 
 /******************************************
-��ȡ�ں�SysTick��ʱ����ֵ(����ϵͳ���õδ�ʱ����Ϊʱ��Դ)
-osKernelSysTickӦ����ÿ��CMSIS-RTOS�б���һ��
+获取内核SysTick计时器的值(操作系统是用滴答定时器作为时间源)
+osKernelSysTick应该在每个CMSIS-RTOS中保持一致
 *******************************************/
 uint32_t osKernelSysTick(void)
 {
@@ -78,7 +78,7 @@ uint8_t KEY_GetFlag(void)
 }
 
 
-/*�ö�ʱ��4��¼��������ʱ��*/
+/*用定时器4记录代码运行时间*/
 void TIM4_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update))
