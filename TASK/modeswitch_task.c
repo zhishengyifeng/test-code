@@ -14,6 +14,10 @@
 #include "judge_rx_data.h"
 #include "iwdg.h"
 
+//Íâ²¿µ÷ÊÔ
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 UBaseType_t mode_switch_stack_surplus;
 
 extern TaskHandle_t info_get_Task_Handle;

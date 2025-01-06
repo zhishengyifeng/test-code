@@ -25,7 +25,7 @@ typedef enum
  */
 #pragma pack(1)
 typedef struct
-{
+{ 
   uint8_t robot_color : 1;
   uint8_t visual_valid : 1; 
   uint8_t reserved : 6; 

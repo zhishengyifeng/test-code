@@ -21,7 +21,7 @@
  *                                                        *
  *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        *
  *                                                        *
- *               ·ğ×æ±£ÓÓ         ÓÀÎŞBUG                 *
+ *               ä½›ç¥–ä¿ä½‘         æ°¸æ— BUG                 *
  **********************************************************/
 
 #include "start_task.h"
@@ -42,43 +42,43 @@
 #include "judge_task.h"
 #include "pc_task.h"
 
-#define START_TASK_SIZE 128
+#define START_TASK_SIZE 512
 #define START_TASK_PRIO 2
 
-#define GIMBAL_TASK_SIZE 128
+#define GIMBAL_TASK_SIZE 512
 #define GIMBAL_TASK_PRIO 5
 
-#define CHASSIS_TASK_SIZE 128
+#define CHASSIS_TASK_SIZE 512
 #define CHASSIS_TASK_PRIO 5
 
-#define SHOOT_TASK_SIZE 128
+#define SHOOT_TASK_SIZE 512
 #define SHOOT_TASK_PRIO 5
 
-#define CAN_MSG_SEND_TASK_SIZE 128
+#define CAN_MSG_SEND_TASK_SIZE 512
 #define CAN_MSG_SEND_TASK_PRIO 6
 
-#define MODE_SWITCH_TASK_SIZE 128
+#define MODE_SWITCH_TASK_SIZE 512
 #define MODE_SWITCH_TASK_PRIO 4
 
-#define INFO_GET_TASK_SIZE 128
+#define INFO_GET_TASK_SIZE 512
 #define INFO_GET_TASK_PRIO 4
 
-#define DETECT_TASK_SIZE 128
+#define DETECT_TASK_SIZE 512
 #define DETECT_TASK_PRIO 4
 
-#define IMU_TASK_SIZE 128
+#define IMU_TASK_SIZE 1024
 #define IMU_TASK_PRIO 4
 
-#define JUDEG_TX_TASK_SIZE 256
+#define JUDEG_TX_TASK_SIZE 1024
 #define JUDEG_TX_TASK_PRIO 4
 
-#define JUDEG_RX_TASK_SIZE 256
+#define JUDEG_RX_TASK_SIZE 1024
 #define JUDEG_RX_TASK_PRIO 4
 
-#define PC_TX_TASK_SIZE 256
+#define PC_TX_TASK_SIZE 1024
 #define PC_TX_TASK_PRIO 4
 
-#define PC_RX_TASK_SIZE 256
+#define PC_RX_TASK_SIZE 1024
 #define PC_RX_TASK_PRIO 4
 
 TaskHandle_t start_Task_Handle;
@@ -192,8 +192,8 @@ void start_task(void *parm)
 					(TaskHandle_t *)&pc_rx_Task_Handle);
 	}
 
-	vTaskDelete(start_Task_Handle); // É¾³ı¿ªÊ¼ÈÎÎñ£¨ÀûÓÃÈÎÎñ¾ä±úÍê³ÉÉ¾³ı²Ù×÷ É¾³ı×ÔÉíÈÎÎñÒ²¿ÉÊ¹ÓÃNULL£©
-	taskEXIT_CRITICAL();			// ÍË³öÁÙ½çÇø
+	vTaskDelete(start_Task_Handle); // É¾ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½Ê¹ï¿½ï¿½NULLï¿½ï¿½
+	taskEXIT_CRITICAL();			// ï¿½Ë³ï¿½ï¿½Ù½ï¿½ï¿½ï¿½
 }
 
 void TASK_START(void)

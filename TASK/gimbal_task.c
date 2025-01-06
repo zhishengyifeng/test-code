@@ -33,14 +33,19 @@ UBaseType_t gimbal_stack_surplus;
 extern TaskHandle_t can_msg_send_Task_Handle;
 extern u8 INS_Init_Done;
 
-int direction_change = 0;
+int direction_change = 0;//换头检测用
 
 ramp_t pit_ramp;
 ramp_t yaw_ramp;
 
 //LADRC_NUM Vision_angle;
 
+
+/*调双环PID时先调内环，赋值1可断外环，调内环*/
+uint8_t PID_Inner_Parameters;;
+
 #if (INFANTRY_CLASS == INFANTRY_MECANNUM)
+{
 ////电机方向
 // float pit_dir = 1.f;
 // float yaw_dir = 1.f;
@@ -59,25 +64,44 @@ float yaw_vision_pid[6] = {23, 0, 5, 75, 0, 8};
 // 神符参数
 float pit_buff_pid[6] = {30, 0.1, 1, 30, 0, 0};//{27, 0.13, 5, 100, 0.1, 0};
 float yaw_buff_pid[6] = {30 , 0.2, 20, 60, 0, 0};
-
+}
 #elif (INFANTRY_CLASS == INFANTRY_OMV)
+
+#ifdef DM_MOTOR_PITCH
 //  归中参数
 float pit_init_pid[6] = {0.3f, 0.001f, 0, 22000, 0, 0};
-float yaw_init_pid[6] = {0.25f, 0.0f, 0, 40000, 0, 0}; 
+float yaw_init_pid[6] = {0.25f, 0.0f, 0, 20000, 0, 0}; 
 
 // 普通参数（小陀螺与普通模式共用一套参数）
-float pit_pid[6] = {0.3f, 0.001f, 0, 22000, 0, 0};//IMU反馈
-float yaw_pid[6] = {0.5f, 0.0f, 0.0f, 40000, 0, 0};//{0.25f, 0, 0.5f, 40000, 0, 0};
-
+float pit_pid[6] = {0.5, 0.01f, 1, 7, 0, 0};//IMU反馈
+float yaw_pid[6] = { 2, 0, 20, 3000, 0, 0};//{ 0.8f, 0.0f, 0.5f, 30000, 0, 0};//{0.25f, 0, 0.5f, 40000, 0, 0};
 // 自瞄参数
-float pit_vision_pid[6] = {0.3f, 0.001f, 0, 22000, 0, 0};
-float yaw_vision_pid[6] = {0.25f, 0.0f, 0.5f, 40000, 0, 0};//{1.0f, 0.0f, 0.5f, 40000, 0, 0}
+float pit_vision_pid[6] = {0.8f, 0.05f, 0.3f, 6, 0, 0};
+float yaw_vision_pid[6] = { 3, 0, 30, 3000, 0, 0};// {0.2f, 0.0f, 0.0f, 20000, 0, 0};
 
 // 神符参数
-float pit_buff_pid[6] = {0.3f, 0.001f, 0, 22000, 0, 0};
-float yaw_buff_pid[6] = {0.25f, 0.0f, 0.5f, 40000, 0, 0};
+float pit_buff_pid[6] = {0.8f, 0.05f, 0.3f, 6, 0, 0};
+float yaw_buff_pid[6] = {0.1f, 0.0f, 0.0f, 10000, 0, 0};
+#else
+//  归中参数
+float pit_init_pid[6] = {0.3f, 0.005f, 0, 12000, 0, 0};
+float yaw_init_pid[6] = {0.25f, 0.0f, 0, 20000, 0, 0}; 
+
+// 普通参数（小陀螺与普通模式共用一套参数）
+float pit_pid[6] = {0.3f, 0.005f, 0, 15000, 0, 0};//IMU反馈
+float yaw_pid[6] = { 2, 0, 20, 3000, 0, 0};//{ 0.8f, 0.0f, 0.5f, 30000, 0, 0};//{0.25f, 0, 0.5f, 40000, 0, 0};
+
+// 自瞄参数
+float pit_vision_pid[6] = {0.3f, 0.001f, 0.2f, 15000, 0, 0};//IMU反馈
+float yaw_vision_pid[6] = { 3, 0, 20, 3000, 0, 0};// {0.2f, 0.0f, 0.0f, 20000, 0, 0};
+
+// 神符参数
+float pit_buff_pid[6] = {0.3f, 0.001f, 0, 12000, 0, 0};
+float yaw_buff_pid[6] = {0.1f, 0.0f, 0.0f, 10000, 0, 0};
+#endif
 
 #elif (INFANTRY_CLASS == Test_Shoot)
+{
 ////电机方向
 // float pit_dir = 1.0f;
 // float yaw_dir = 1.0f;
@@ -101,6 +125,7 @@ float pit_buff_pid[6] = {27, 0.13, 5, 100, 0.1, 0};
 float yaw_buff_pid[6] = {30, 0.1, 5, 80, 0, 5};
 // 拨盘参数
 float trig_pid[6] = {130, 0, 10, 11, 0, 5};
+}
 #endif
 
 
@@ -178,29 +203,29 @@ void gimbal_task(void *parm)
 
 					if (gimbal_mode == GIMBAL_TRACK_ARMOR)
 					{
-						PID_Struct_Init(&pid_vision_pit, pit_vision_pid[0], pit_vision_pid[1], pit_vision_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_vision_pit_spd, pit_vision_pid[3], pit_vision_pid[4], pit_vision_pid[5], 20000, 3000, DONE);
+						PID_Struct_Init(&pid_vision_pit, pit_vision_pid[0], pit_vision_pid[1], pit_vision_pid[2], 30, 5, DONE);
+						PID_Struct_Init(&pid_vision_pit_spd, pit_vision_pid[3], pit_vision_pid[4], pit_vision_pid[5], 25000, 0, DONE);
 
 						PID_Struct_Init(&pid_vision_yaw, yaw_vision_pid[0], yaw_vision_pid[1], yaw_vision_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_vision_yaw_spd, yaw_vision_pid[3], yaw_vision_pid[4], yaw_vision_pid[5], 20000, 3000, DONE);
+						PID_Struct_Init(&pid_vision_yaw_spd, yaw_vision_pid[3], yaw_vision_pid[4], yaw_vision_pid[5], 25000, 0, DONE);
 					}
 					else if (gimbal_mode == GIMBAL_SHOOT_BUFF)
 					{
 						PID_Struct_Init(&pid_buff_pit, pit_buff_pid[0], pit_buff_pid[1], pit_buff_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_buff_pit_spd, pit_buff_pid[3], pit_buff_pid[4], pit_buff_pid[5], 20000, 3000, DONE);
+						PID_Struct_Init(&pid_buff_pit_spd, pit_buff_pid[3], pit_buff_pid[4], pit_buff_pid[5], 25000, 0, DONE);
 
 						PID_Struct_Init(&pid_buff_yaw, yaw_buff_pid[0], yaw_buff_pid[1], yaw_buff_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_buff_yaw_spd, yaw_buff_pid[3], yaw_buff_pid[4], yaw_buff_pid[5], 20000, 3000, DONE);
+						PID_Struct_Init(&pid_buff_yaw_spd, yaw_buff_pid[3], yaw_buff_pid[4], yaw_buff_pid[5], 20000, 0, DONE);
 					}
 					else
 					{
 						/* pit 轴电机的PID参数 */
 						PID_Struct_Init(&pid_pit, pit_pid[0], pit_pid[1], pit_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_pit_spd, pit_pid[3], pit_pid[4], pit_pid[5], 20000, 4000, DONE);
+						PID_Struct_Init(&pid_pit_spd, pit_pid[3], pit_pid[4], pit_pid[5], 25000, 0, DONE);
 
 						/* yaw 轴电机的PID参数 */
-						PID_Struct_Init(&pid_yaw, yaw_pid[0], yaw_pid[1], yaw_pid[2], 30, 10, DONE);
-						PID_Struct_Init(&pid_yaw_spd, yaw_pid[3], yaw_pid[4], yaw_pid[5], 20000, 3000, DONE);
+						PID_Struct_Init(&pid_yaw, yaw_pid[0], yaw_pid[1], yaw_pid[2], 50, 10, DONE);
+						PID_Struct_Init(&pid_yaw_spd, yaw_pid[3], yaw_pid[4], yaw_pid[5], 25000, 0, DONE);
 					}
 					if (gimbal_mode != GIMBAL_RELEASE)
 					{
@@ -220,30 +245,19 @@ void gimbal_task(void *parm)
 							init_mode_handler(); // 云台回中
 						}
 						break;
-						/*云台底盘跟随模式*/
+
+						/*dodge和normal合并为手动控制模式*/
 						case GIMBAL_NORMAL_MODE:
-						{
-							if (last_gimbal_mode != GIMBAL_NORMAL_MODE)
-							{
-								PID_Clear(&pid_pit);
-								PID_Clear(&pid_yaw);
-								PID_Clear(&pid_pit_spd);
-								PID_Clear(&pid_yaw_spd);
-							}
-							nomarl_handler();
-						}
-						break;
-						/*小陀螺模式*/
 						case GIMBAL_DODGE_MODE:
 						{
-							if (last_gimbal_mode != GIMBAL_DODGE_MODE)
+							if ((last_gimbal_mode != GIMBAL_DODGE_MODE) && (last_gimbal_mode != GIMBAL_NORMAL_MODE))
 							{
 								PID_Clear(&pid_pit);
 								PID_Clear(&pid_yaw);
 								PID_Clear(&pid_pit_spd);
 								PID_Clear(&pid_yaw_spd);
 							}
-							dodge_handler();
+							nomarl_dodge_handler();
 						}
 						break;
 						/*打能量机关模式*/
@@ -320,8 +334,16 @@ void gimbal_task(void *parm)
 					}
 					else
 					{
-						gimbal.pid.yaw_spd_ref = pid_yaw.out;
-						gimbal.pid.pit_spd_ref = pid_pit.out;
+						if(PID_Inner_Parameters)//断外环，调内环
+						{
+							gimbal.pid.yaw_spd_ref = rm.yaw_v*5;
+							gimbal.pid.pit_spd_ref = rm.pit_v*5;
+						}
+						else
+						{
+							gimbal.pid.yaw_spd_ref = pid_yaw.out;
+							gimbal.pid.pit_spd_ref = pid_pit.out;
+						}
 						gimbal.pid.yaw_spd_fdb = gimbal.sensor.yaw_palstance;
 						gimbal.pid.pit_spd_fdb = gimbal.sensor.pit_palstance;
 					}
@@ -330,7 +352,7 @@ void gimbal_task(void *parm)
 					if (gimbal_mode == GIMBAL_TRACK_ARMOR)
 					{
 						//Yaw轴加前馈
-						gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
+						//gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
 						if(gimbal.pid.yaw_spd_ref > 30)
 							gimbal.pid.yaw_spd_ref = 30;
 						if(gimbal.pid.yaw_spd_ref < -30)
@@ -342,7 +364,7 @@ void gimbal_task(void *parm)
 					else if (gimbal_mode == GIMBAL_SHOOT_BUFF)
 					{	
 						//Yaw轴加前馈
-						gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
+						//gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
 						if(gimbal.pid.yaw_spd_ref > 30)
 							gimbal.pid.yaw_spd_ref = 30;
 						if(gimbal.pid.yaw_spd_ref < -30)
@@ -354,11 +376,11 @@ void gimbal_task(void *parm)
 					else
 					{		
 						//Yaw轴加前馈
-						gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
-						if(gimbal.pid.yaw_spd_ref > 30)
-							gimbal.pid.yaw_spd_ref = 30;
-						if(gimbal.pid.yaw_spd_ref < -30)
-							gimbal.pid.yaw_spd_ref = -30;
+						//gimbal.pid.yaw_spd_ref += FFC_OUT(gimbal.pid.yaw_angle_ref/100);
+//						if(gimbal.pid.yaw_spd_ref > 30)
+//							gimbal.pid.yaw_spd_ref = 30;
+//						if(gimbal.pid.yaw_spd_ref < -30)
+//							gimbal.pid.yaw_spd_ref = -30;
 												
 						pid_calc(&pid_yaw_spd, gimbal.pid.yaw_spd_fdb, gimbal.pid.yaw_spd_ref);
 						pid_calc(&pid_pit_spd, gimbal.pid.pit_spd_fdb, gimbal.pid.pit_spd_ref);
@@ -393,11 +415,22 @@ void gimbal_task(void *parm)
 					memset(glb_cur.gimbal_cur, 0, sizeof(glb_cur.gimbal_cur));
 					gimbal_mode = GIMBAL_RELEASE;
 				} 
-				
-				vofa_debug[0] = gimbal.pid.yaw_angle_ref;
-				vofa_debug[1] = gimbal.pid.yaw_angle_fdb;
-				JustFloat_Send(vofa_debug,2,USART1);
-				
+				if (PID_Inner_Parameters)//断外环，调内环,发速度期望
+				{
+					vofa_gimbal[0] = gimbal.pid.pit_spd_fdb;
+					vofa_gimbal[1] = rm.pit_v*5;
+					vofa_gimbal[2] = gimbal.pid.yaw_spd_fdb;
+					vofa_gimbal[3] = rm.yaw_v*5;
+				}
+				else
+				{
+					vofa_gimbal[0] = gimbal.pid.pit_angle_fdb;
+					vofa_gimbal[1] = gimbal.pid.pit_angle_ref;
+					vofa_gimbal[2] = gimbal.pid.yaw_angle_fdb;
+					vofa_gimbal[3] = gimbal.pid.yaw_angle_ref;
+				}
+				JustFloat_Send(vofa_gimbal,4,USART1);
+
 				last_gimbal_mode = gimbal_mode; // 获取上一次云台状态
 				xTaskGenericNotify((TaskHandle_t)can_msg_send_Task_Handle,
 									 (uint32_t)GIMBAL_MOTOR_MSG_SIGNAL,
@@ -406,6 +439,7 @@ void gimbal_task(void *parm)
 			}
 		}
 		gimbal_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+
 	}
 }
 
@@ -430,8 +464,8 @@ void gimbal_param_init(void)
 	PID_Struct_Init(&pid_pit, pit_buff_pid[0], pit_buff_pid[1], pit_buff_pid[2], 30, 10, INIT);
 	PID_Struct_Init(&pid_pit_spd, pit_buff_pid[3], pit_buff_pid[4], pit_buff_pid[5], 20000, 3000, INIT);
 
-	PID_Struct_Init(&pid_yaw, yaw_buff_pid[0], yaw_buff_pid[1], yaw_buff_pid[2], 30, 10, INIT);
-	PID_Struct_Init(&pid_yaw_spd, yaw_buff_pid[3], yaw_buff_pid[4], yaw_buff_pid[5], 20000, 3000, INIT);
+	PID_Struct_Init(&pid_yaw, yaw_buff_pid[0], yaw_buff_pid[1], yaw_buff_pid[2], 23000, 10, INIT);
+	PID_Struct_Init(&pid_yaw_spd, yaw_buff_pid[3], yaw_buff_pid[4], yaw_buff_pid[5], 23000, 3000, INIT);
 
 	/* pit 轴电机的PID参数 */
 	PID_Struct_Init(&pid_pit, pit_pid[0], pit_pid[1], pit_pid[2], 30, 10, INIT);
@@ -459,12 +493,12 @@ static void init_mode_handler(void)
 	// 目标值设为零（斜坡函数需要时可加）
 	gimbal.pid.pit_angle_ref = 0;
 	// 将当前相对角度赋给反馈值
-	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle;
+	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;
 	// 目标值设为当前相对角度
-	gimbal.pid.yaw_angle_ref = gimbal.sensor.yaw_gyro_angle;
+	gimbal.pid.yaw_angle_ref = gimbal.sensor.yaw_total_angle;
 
-	gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;
-
+	gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
+	
 	gimbal.state = GIMBAL_INIT_DONE;
 }
 
@@ -481,7 +515,6 @@ static gimbal_state_t remote_is_action(void)
 	}
 }
 
-uint8_t input_flag;
 LADRC_NUM ladrc_change_head = 
 {
    .r = 30,     //速度因子
@@ -489,17 +522,14 @@ LADRC_NUM ladrc_change_head =
 };
 
 uint32_t debug_time = 1000;
-// 普通模式
-static void nomarl_handler(void)
+
+
+/* creat manual control funtion.  add time:2025.1.5*/   
+static void manual_control_funtion(gimbal_status NOW_MODE)
 {
-	if (last_gimbal_mode != GIMBAL_NORMAL_MODE && last_gimbal_mode != GIMBAL_DODGE_MODE )
-	{
-		// 刷新yaw零轴
-		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
-	}
 	gimbal.state = remote_is_action();												   // 判断yaw轴是否有输入
 
-	if (direction_change) // 检测到鼠标中间的滚轮向下滑动，则进行云台角度的变化
+	if ((NOW_MODE != GIMBAL_TRACK_ARMOR) && (direction_change)) // 检测到鼠标中间的滚轮向下滑动，则进行云台角度的变化
 	{
 		// 当进入此判断时，gimbal.yaw_offset_angle会在get_gimbal_info函数中变化编码值4096（即6020的半圈）
 //		gimbal.pid.yaw_angle_fdb =  gimbal.sensor.yaw_gyro_angle;
@@ -513,7 +543,6 @@ static void nomarl_handler(void)
 		}
 //		LADRC_TD(&ladrc_change_head,gimbal.sensor.yaw_relative_angle);
 //		gimbal.pid.yaw_angle_fdb =ladrc_change_head.v1;
-//		input_flag = 1;
 		if ((abs((int)(gimbal.sensor.yaw_total_angle - gimbal.pid.yaw_angle_ref))%360) < 3)
 		{
 			direction_change++;
@@ -522,23 +551,58 @@ static void nomarl_handler(void)
 		{
 			direction_change = 2;
 		}
-		if(direction_change == 102)
+		if(direction_change == 102)//100ms delay
 		{
-			gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
+			if(NOW_MODE == GIMBAL_NORMAL_MODE)//普通模式则底盘跟随甩头
+				gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
 			direction_change = 0;
 		}
-	}
-	else if ((gimbal.last_state == NO_ACTION) && (gimbal.state == NO_ACTION))// && (HAL_GetTick() - no_action_time > debug_time))
+	}																																																																	
+	else if ((gimbal.last_state == NO_ACTION) && (gimbal.state == NO_ACTION))// && (HAL_GetTick() - no_action_time > debug_time)) 
 	{
-		//gimbal.pid.yaw_angle_ref = gimbal.yaw_offset_angle; // yaw轴到达归中位置
-
+		switch(gimbal.trace_state)
+		{
+			case REF_CONFIRM://判断正反转
+			{
+				if(gimbal.pid.yaw_angle_ref>gimbal.pid.last_yaw_angle_ref)//判断当前为正转
+					gimbal.trace_state = REF_ADD;
+				else if(gimbal.pid.yaw_angle_ref<gimbal.pid.last_yaw_angle_ref)//判断当前为反转
+					gimbal.trace_state = REF_SUB;
+				gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴
+			}break;
+			case REF_ADD://正转，目标值向上阶跃
+			{
+				if(gimbal.sensor.yaw_palstance<0)
+				{
+					gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
+					gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴
+					gimbal.trace_state = REF_KEEP;//反馈跟随目标阶段
+				}
+			}break;
+			case REF_SUB://反转，目标值向下阶跃
+			{
+				if(gimbal.sensor.yaw_palstance>0)
+				{
+					gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
+					gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴
+					gimbal.trace_state = REF_KEEP;//反馈跟随目标阶段
+				}
+			}break;
+			default:break;//完全停止后不刷新底盘0轴，此时底盘云台分开锁死
+		}
+		
 	}
-	else// if (gimbal.last_state == IS_ACTION && gimbal.state == NO_ACTION)
+	else if (gimbal.last_state == IS_ACTION && gimbal.state == NO_ACTION)//进入目标值跟踪阶段，消除动态超调
 	{
-		// 当yaw轴停止操作
+		gimbal.trace_state = REF_CONFIRM;
+		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴
+	}
+	else
+	{
+		gimbal.pid.last_yaw_angle_ref = gimbal.pid.yaw_angle_ref;
 		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 在yaw轴动的情况下刷新0轴
+		gimbal.trace_state = REF_KEEP;//反馈跟随目标阶段
 	}
-	input_flag = 1;
 
 	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;
 	gimbal.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
@@ -549,32 +613,24 @@ static void nomarl_handler(void)
 	/* 软件限制pitch轴角度 */
 	VAL_LIMIT(gimbal.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
 	gimbal.last_state = gimbal.state; // 获取上次输入的状态
+	
 }
 
-// 小陀螺
-static void dodge_handler(void) // 反馈量是绝对角度
-{
-	input_flag = 1;			
-	if (last_gimbal_mode != GIMBAL_NORMAL_MODE && last_gimbal_mode != GIMBAL_DODGE_MODE ) // 切换模式到小陀螺时，刷新零轴
+/* merge normal and dodge together.  modification time:2025.1.5*/   
+static void nomarl_dodge_handler(void)
+{	
+	if (last_gimbal_mode != GIMBAL_NORMAL_MODE && last_gimbal_mode != GIMBAL_DODGE_MODE )
 	{
 		// 刷新yaw零轴
+		gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;
+		gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
 		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
+		gimbal.trace_state = REF_KEEP;//反馈跟随目标阶段
+		gimbal.state = NO_ACTION;
+		gimbal.last_state = NO_ACTION;
 	}
-	gimbal.state = remote_is_action();								 // 判断yaw轴是否有输入
-	if (gimbal.last_state == NO_ACTION && gimbal.state == NO_ACTION) // yaw轴未操作
-		gimbal.pid.yaw_angle_ref = gimbal.yaw_offset_angle;
-	else// if (gimbal.last_state == IS_ACTION && gimbal.state == NO_ACTION) // yaw轴停止操作
-		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 可在后面加减度数抵消小陀螺时yaw轴停止运动时的位移
-	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;
-	gimbal.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
-
-	/*pitch轴*/
-	gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_gyro_angle;
-	gimbal.pid.pit_angle_ref += rm.pit_v * GIMBAL_RC_MOVE_RATIO_PIT + km.pit_v * GIMBAL_PC_MOVE_RATIO_PIT;
-	/* 软件限制pitch轴角度 */
-	VAL_LIMIT(gimbal.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
-
-	gimbal.last_state = gimbal.state; // 获取上次输入的状态
+	else
+		manual_control_funtion(gimbal_mode);
 }
 
 float single_coordination = 0;
@@ -586,17 +642,17 @@ float MyF = 0.5, Myt = 0, MyCnt = 0;
 
 static void track_aimor_handler(void)
 {
-	/*控制角度*/
-	static float yaw_ctrl;
-	static float pit_ctrl;
 	pid_yaw.iout = 0;										// 清空其他模式yaw角度环iout累加值
-	input_flag = 1;
+	
 	if (last_gimbal_mode != GIMBAL_TRACK_ARMOR)
-	{
-		gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;	
+	{		
+		gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;
+		gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
+		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;
+		gimbal.trace_state = REF_KEEP;//反馈跟随目标阶段
+		gimbal.state = NO_ACTION;
+		gimbal.last_state = NO_ACTION;
 	}
-	gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
-	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_gyro_angle;  // yaw轴用陀螺仪
 	/*输入激励信号过程*/
 	if (MyF < 10)
 	{
@@ -613,62 +669,42 @@ static void track_aimor_handler(void)
 	/* 跟踪微分器 */
 	// PRE_LADRC_TD(&td_pit, pit_rec_real);
 	// PRE_LADRC_TD(&td_yaw, yaw_rec_real);
-	if (last_gimbal_mode != GIMBAL_TRACK_ARMOR) // 进自瞄时，防止疯转冲突
-	{
-		pit_ctrl = gimbal.pid.pit_angle_fdb;
-		yaw_ctrl = gimbal.pid.yaw_angle_fdb;
-	}
 	if (pc_recv_mesg.mode_Union.info.visual_valid == 1)
 	{
 //    /* TD跟踪微分处理 */
 //		LADRC_TD(&Vision_Angle_Pit,  pc_recv_mesg.aim_pitch);
 //		LADRC_TD(&Vision_Angle_Yaw,   pc_recv_mesg.aim_yaw);
 		
-//		yaw_ctrl = Vision_Angle_Yaw.v1; //v1为角度，v2为导数
-//		pit_ctrl = Vision_Angle_Pit.v1;		
+//		gimbal.pid.yaw_angle_ref = Vision_Angle_Yaw.v1; //v1为角度，v2为导数
+//		gimbal.pid.pit_angle_ref = Vision_Angle_Pit.v1;	
 		
-		yaw_ctrl = pc_recv_mesg.aim_yaw;
-		pit_ctrl = pc_recv_mesg.aim_pitch;	
-		gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle;		
-	}
-	/*视觉无效处理*/
-	else if (pc_recv_mesg.mode_Union.info.visual_valid == 0)
-	{
-		if(chassis_mode == CHASSIS_DODGE_MODE)
-		{
-			yaw_ctrl = gimbal.yaw_offset_angle;
-		}
-		else if(chassis_mode == CHASSIS_NORMAL_MODE)
-		{
-			pit_ctrl = gimbal.pid.pit_angle_fdb;
-			yaw_ctrl = gimbal.pid.yaw_angle_fdb;
-		}
+		gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_gyro_angle;
+		gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_total_angle;  // yaw轴用陀螺仪
+		
+		gimbal.pid.yaw_angle_ref = 360.0f*gimbal.sensor.yaw_cnt + pc_recv_mesg.aim_yaw;
+		gimbal.pid.pit_angle_ref = pc_recv_mesg.aim_pitch;
+		gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle;		
+	}	
+	/*2025.01.04 new visual invalid processing */
+	else if (pc_recv_mesg.mode_Union.info.visual_valid == 0)//无效时可手动控制，防止变成呆瓜
+		manual_control_funtion(gimbal_mode);
 
-	}
-	// PC通讯出现问题
+	// PC通讯出现问题,直接无法控制
 	if (pc_recv_mesg.aim_yaw >= 180 || pc_recv_mesg.aim_yaw <= -180)
-		yaw_ctrl = gimbal.pid.yaw_angle_fdb;
+		gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
 	if (pc_recv_mesg.aim_pitch >= 180 || pc_recv_mesg.aim_pitch <= -180)
-		pit_ctrl = gimbal.pid.pit_angle_fdb;
+		gimbal.pid.pit_angle_ref = gimbal.pid.pit_angle_fdb;
 
 	//   /*跟踪微分器*/
 	//   LADRC_TD(&Vision_angle,MyCnt);
 	//   gimbal.pid.pit_angle_ref = Vision_angle.v1;
-	//   gimbal.pid.yaw_angle_ref = yaw_ctrl;
-
-	/*自瞄给定*/
-
-	gimbal.pid.yaw_angle_ref = yaw_ctrl;
-	gimbal.pid.pit_angle_ref = pit_ctrl;
+	//   gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_ref;
 
 	/*输入激励信号代替自瞄，作用为向云台稳定输入激励信号采用数据用于系统辨识。使用时要把上面自瞄给定设0*/
 
 	//		gimbal.pid.yaw_angle_ref = MyCnt;
 	//		//想采样哪一周就把哪一轴给定设MyCnt.
 	//		gimbal.pid.pit_angle_ref = 0;
-
-	/* 软件限制pitch轴角度 */
-//	VAL_LIMIT(gimbal.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
 }
 
 static void shoot_buff_ctrl_handler(void)
@@ -678,7 +714,7 @@ static void shoot_buff_ctrl_handler(void)
 	static float pit_ctrl;
 
 	/*获取反馈值*/
-	gimbal.yaw_offset_angle = gimbal.sensor.yaw_gyro_angle; // 备份陀螺仪数据，以免退出自瞄时冲突
+	gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 备份陀螺仪数据，以免退出自瞄时冲突
 	gimbal.pid.pit_angle_fdb = gimbal.sensor.pit_relative_angle;
 	gimbal.pid.yaw_angle_fdb = gimbal.sensor.yaw_relative_angle;
 

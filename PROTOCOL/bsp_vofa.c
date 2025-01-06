@@ -1,5 +1,15 @@
 #include "bsp_vofa.h"
-float vofa_debug[3] = {0};
+float vofa_debug[10] = {0};
+float vofa_gimbal[4] = 0;
+float vofa_chassis = 0;
+float vofa_comm = 0;
+float vofa_detect = 0;
+float vofa_info = 0;
+float vofa_judge = 0;
+float vofa_mode = 0;
+float vofa_pcrx = 0;
+float vofa_shoot = 0;
+float vofa_imu = 0;
 
 const uint8_t tail [4] = {0x00, 0x00, 0x80, 0x7f};	//ึกฮฒ
 uint8_t c_data[4];//สýพÝึก
@@ -32,3 +42,4 @@ void JustFloat_Send(float * fdata,uint16_t fdata_num,USART_TypeDef *Usart_choose
 		}
 
 }
+
