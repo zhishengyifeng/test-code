@@ -11,8 +11,18 @@ typedef enum
   IS_ACTION,
 } gimbal_state_t;
 
+typedef enum//普通模式则底盘跟随甩头
+{
+  REF_KEEP,
+	REF_CONFIRM,
+  REF_ADD,
+  REF_SUB,
+} trace_fdb_t;
+
 typedef struct
 {
+	/*be used to trace feedback to reduce trace overshoot. add:2025.1.5*/
+  float last_yaw_angle_ref;
   /* �ǶȻ��ĸ����ͷ��� */
   float yaw_angle_ref;
   float pit_angle_ref;
@@ -53,7 +63,9 @@ typedef struct
   gim_sensor_t sensor;
   gimbal_state_t state;
   gimbal_state_t last_state;
-
+	/*目标跟踪*/
+	trace_fdb_t trace_state;
+	
   /*��FLASH�ж�����У׼����λ*/
   int32_t pit_center_offset;
   int32_t yaw_center_offset;
@@ -86,7 +98,6 @@ typedef struct
 
 
 extern gimbal_t gimbal;
-extern uint8_t input_flag;
 extern ramp_t pit_ramp;
 extern ramp_t yaw_ramp;
 
@@ -94,9 +105,9 @@ void gimbal_task(void *parm);
 void gimbal_param_init(void);
 
 static void init_mode_handler(void);
-static void nomarl_handler(void);
-static void separate_handler(void);
-static void dodge_handler(void);
+//static void nomarl_handler(void);
+//static void dodge_handler(void);
+static void nomarl_dodge_handler(void);
 static void track_aimor_handler(void);
 static void shoot_buff_ctrl_handler(void);
 //前馈控制

@@ -20,6 +20,11 @@
 #include "data_packet.h"
 #include "arm_math.h"
 #include "power_control.h"
+
+//外部调试
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 float a1, b1, a2, b2, a3, b3, a4, b4;
 float ob_total_power;
 /*2023赛季规则
@@ -151,6 +156,13 @@ void chassis_task(void *parm)
 							chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
 						#ifdef POWER_NEW
 							ob_total_power = Chassis_Power_Control(&chassis); // 功率控制
+						
+						//vofa_debug
+//						for (int i = 0; i < 4; i++)	
+//						vofa_debug[i] = chassis.wheel_spd_fdb[i];
+//						vofa_debug[4] = ob_total_power;
+//						JustFloat_Send(vofa_debug,5,USART1);
+
 						#endif
 
 						if (!chassis_is_controllable())
@@ -580,30 +592,26 @@ static void chassis_normal_handler(void)
 	
 	if (chassis_mode == CHASSIS_NORMAL_MODE)
 	{
-		if (input_flag == 1)
-		// w轴方向跟着云台动
-		{
-			if(direction_change)//换头中不旋转，只能前后左右移动，等待头甩完才跟头，优化逃跑轨迹
-			{
-				chassis.vw = 0;
-				chassis.vy = -nor_chassis_vy;
-				chassis.vx = -nor_chassis_vx;
-			}
-			else
-			{
-				chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, gimbal.sensor.yaw_total_angle - gimbal.yaw_offset_angle));//底盘禁止时底盘锁住最后一刻陀螺仪方向。						
-				chassis.vy = (nor_chassis_vx * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) + nor_chassis_vy * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
-				chassis.vx = (nor_chassis_vx * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) - nor_chassis_vy * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
-			}
-				
-		}
-		else//打符模式
+		if(direction_change)//换头中不旋转，只能前后左右移动，等待头甩完才跟头，优化逃跑轨迹
 		{
 			chassis.vw = 0;
-			chassis.vy = nor_chassis_vy;
-			chassis.vx = nor_chassis_vx;
-
+			chassis.vy = -nor_chassis_vy;
+			chassis.vx = -nor_chassis_vx;
 		}
+		else
+		{
+			chassis.vw = (-pid_calc(&pid_chassis_angle, gimbal.sensor.yaw_relative_angle, gimbal.sensor.yaw_total_angle - gimbal.yaw_offset_angle));//底盘禁止时底盘锁住最后一刻陀螺仪方向。						
+			chassis.vy = (nor_chassis_vx * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) + nor_chassis_vy * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
+			chassis.vx = (nor_chassis_vx * arm_cos_f32(PI / 180 * gimbal.sensor.yaw_relative_angle) - nor_chassis_vy * arm_sin_f32(PI / 180 * gimbal.sensor.yaw_relative_angle));
+		}
+			
+	}
+	else//打符模式
+	{
+		chassis.vw = 0;
+		chassis.vy = nor_chassis_vy;
+		chassis.vx = nor_chassis_vx;
+
 	}
 }
 
@@ -649,6 +657,7 @@ void chassis_param_init(void)
  * @work	 分析演算公式计算的效率
  */
 int rotation_center_gimbal = 0;
+
 static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]) // 底盘解算，得到底盘获得相应速度需要的四个电机值
 {
 	static float rotate_ratio_fr;

@@ -20,6 +20,10 @@
 #include "math.h"
 #include "remote_ctrl.h"
 
+//外部调试
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 uint16_t shoot_speed = 40;//无裁判系统射频，1000/shoot_speed = 每秒发弹量
 
 float debug1,debug2;
@@ -214,6 +218,7 @@ void shoot_task(void *parm)
 			}
 		}
 		shoot_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+		
 	}
 
 } 
@@ -224,7 +229,6 @@ void get_last_shoot_mode(void)
 {
 	shoot.last_para_mode = shoot.para_mode;
 }
-
 
 /*射击模式选择
 * @ SHOOTBUFF_MODE 神符模式
@@ -283,6 +287,7 @@ void get_last_shoot_mode(void)
 //    TIM_SetCompare3(TIM8,ccr_close);
 //  }
 //}
+
 /**
  * @brief		拨盘角度变换，解决二连发问题，解决使用绝对值卡弹问题
  * @param[in]	state:该参数传入单发或者连发两种之一的状态

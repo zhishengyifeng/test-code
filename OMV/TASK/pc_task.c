@@ -12,6 +12,10 @@
 #include "pc_tx_data.h"
 #include "kalman_filter.h"
 
+//Íâ²¿µ÷ÊÔ
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 extern TaskHandle_t pc_rx_Task_Handle;
 float nowfps;
 UBaseType_t pc_tx_stack_surplus;
@@ -99,6 +103,7 @@ void pc_rx_task(void *parm)
 		}
 #endif
 		pc_rx_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+		
 	}
 }
 

@@ -25,7 +25,7 @@ typedef enum
 } struct_config_e;
 
 /**
- * @brief  PC->鐢垫帶鐨勬暟鎹robot_rx_data (9瀛楄妭) 锛屾暟鎹抚闀匡細5 + 9 + 2 = 16 (瀛楄妭)
+ * @brief
  */
 #pragma pack(1)
 typedef struct
@@ -35,13 +35,12 @@ typedef struct
     uint8_t data_byte;
     struct
     {
-      uint8_t task_mode : 1;    // 妯″紡 ( 0 鑷瀯  / 1 澶у皬绗�)
-      uint8_t visual_valid : 1; // 瑙嗚鏈夋晥浣�
-      uint8_t reserved : 6;     // 淇濈暀浣�
+      uint8_t visual_valid : 1;
+      uint8_t reserved : 7;
     } info;
   } mode_Union;
-  float aim_pitch; // 娆ф媺瑙�(搴�)
-  float aim_yaw;   // 娆ф媺瑙�(搴�)
+  float aim_yaw;
+  float aim_pitch;
 } robot_rx_data;
 #pragma pack()
 

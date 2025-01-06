@@ -11,6 +11,10 @@
 #include "judge_rx_data.h"
 #include "judge_tx_data.h"
 
+//外部调试
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 extern TaskHandle_t judge_rx_Task_Handle;
 
 UBaseType_t judge_tx_stack_surplus;
@@ -54,6 +58,7 @@ void judge_tx_task(void *parm)
 //		}
 
 		judge_tx_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+		
 		vTaskDelayUntil(&judge_wake_time, 100);
 	}
 }

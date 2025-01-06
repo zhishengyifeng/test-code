@@ -7,33 +7,34 @@
 __IO uint32_t uwTick;
 uint8_t timer_flag;
 
+
 /*10-1,8400-1*/
 void TIM_BASE_Init(u16 per, u16 psc)
 {
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); // Ê¹ÄÜTIM4Ê±ÖÓ
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); // ä½¿èƒ½TIM4æ—¶é’Ÿ
 
-	TIM_TimeBaseInitStructure.TIM_Period = per;	   // ×Ô¶¯×°ÔØÖµ
-	TIM_TimeBaseInitStructure.TIM_Prescaler = psc; // ·ÖÆµÏµÊı
+	TIM_TimeBaseInitStructure.TIM_Period = per;	   // è‡ªåŠ¨è£…è½½å€¼
+	TIM_TimeBaseInitStructure.TIM_Prescaler = psc; // åˆ†é¢‘ç³»æ•°
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // ÉèÖÃÏòÉÏ¼ÆÊıÄ£Ê½
+	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  // è®¾ç½®å‘ä¸Šè®¡æ•°æ¨¡å¼
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseInitStructure);
 
-	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); // ¿ªÆô¶¨Ê±Æ÷ÖĞ¶Ï
+	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); // å¼€å¯å®šæ—¶å™¨ä¸­æ–­
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;			  // ¶¨Ê±Æ÷ÖĞ¶ÏÍ¨µÀ
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // ÇÀÕ¼ÓÅÏÈ¼¶
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		  // ×ÓÓÅÏÈ¼¶
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			  // IRQÍ¨µÀÊ¹ÄÜ
+	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;			  // å®šæ—¶å™¨ä¸­æ–­é€šé“
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // æŠ¢å ä¼˜å…ˆçº§
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		  // å­ä¼˜å…ˆçº§
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			  // IRQé€šé“ä½¿èƒ½
 	NVIC_Init(&NVIC_InitStructure);
 
-	TIM_Cmd(TIM4, ENABLE); // Ê¹ÄÜ¶¨Ê±Æ÷
+	TIM_Cmd(TIM4, ENABLE); // ä½¿èƒ½å®šæ—¶å™¨
 }
 
-// Ã¿¹ı1ms£¬uwTickÕâ¸ö±äÁ¿+1
+// æ¯è¿‡1msï¼ŒuwTickè¿™ä¸ªå˜é‡+1
 __weak void HAL_IncTick(void)
 {
 	uwTick++;
@@ -41,21 +42,21 @@ __weak void HAL_IncTick(void)
 		uwTick = 0;
 }
 
-// ·µ»Øµ±Ç°ÏµÍ³¼ÆÊıÖµ
+// è¿”å›å½“å‰ç³»ç»Ÿè®¡æ•°å€¼
 __weak uint32_t HAL_GetTick(void)
 {
 	return uwTick;
 }
 
-/*È·¶¨ÎÒÃÇÊÇ´¦ÓÚÏß³ÌÄ£Ê½»¹ÊÇ´¦Àí³ÌĞòÄ£Ê½¡£*/
+/*ç¡®å®šæˆ‘ä»¬æ˜¯å¤„äºçº¿ç¨‹æ¨¡å¼è¿˜æ˜¯å¤„ç†ç¨‹åºæ¨¡å¼ã€‚*/
 static int inHandlerMode(void)
 {
 	return __get_IPSR() != 0;
 }
 
 /******************************************
-»ñÈ¡ÄÚºËSysTick¼ÆÊ±Æ÷µÄÖµ(²Ù×÷ÏµÍ³ÊÇÓÃµÎ´ğ¶¨Ê±Æ÷×÷ÎªÊ±¼äÔ´)
-osKernelSysTickÓ¦¸ÃÔÚÃ¿¸öCMSIS-RTOSÖĞ±£³ÖÒ»ÖÂ
+è·å–å†…æ ¸SysTickè®¡æ—¶å™¨çš„å€¼(æ“ä½œç³»ç»Ÿæ˜¯ç”¨æ»´ç­”å®šæ—¶å™¨ä½œä¸ºæ—¶é—´æº)
+osKernelSysTickåº”è¯¥åœ¨æ¯ä¸ªCMSIS-RTOSä¸­ä¿æŒä¸€è‡´
 *******************************************/
 uint32_t osKernelSysTick(void)
 {
@@ -77,13 +78,14 @@ uint8_t KEY_GetFlag(void)
 }
 
 
-/*ÓÃ¶¨Ê±Æ÷4¼ÇÂ¼´úÂëÔËĞĞÊ±¼ä*/
+/*ç”¨å®šæ—¶å™¨4è®°å½•ä»£ç è¿è¡Œæ—¶é—´*/
 void TIM4_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update))
 	{
 		HAL_IncTick();
 		timer_flag = 1;
+
 	}
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 }

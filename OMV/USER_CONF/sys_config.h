@@ -72,15 +72,15 @@
 #elif (INFANTRY_CLASS == INFANTRY_OMV)
 /* 遥控模式 云台速度控制 */
 /* pitch 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_PIT 1.4f
+#define GIMBAL_RC_MOVE_RATIO_PIT 2.0f
 /* yaw 轴 速度 */
-#define GIMBAL_RC_MOVE_RATIO_YAW 1.2f
+#define GIMBAL_RC_MOVE_RATIO_YAW 2.0f
 
 /* 键盘模式 云台速度控制 */
 /* pitch 轴 速度 */
-#define GIMBAL_PC_MOVE_RATIO_PIT 0.6f
+#define GIMBAL_PC_MOVE_RATIO_PIT 1.2f
 /* yaw 轴 速度 */
-#define GIMBAL_PC_MOVE_RATIO_YAW 0.6f
+#define GIMBAL_PC_MOVE_RATIO_YAW 1.2f
 
 #endif
 
@@ -95,10 +95,10 @@
 /* 单一 3508 电机的 最大 转速, unit is rpm */
 #define MAX_WHEEL_RPM 8500 // 8347rpm = 3500mm/s
 /* 底盘 最大 平移速度 , unit is mm/s */
-#define MAX_CHASSIS_VX_SPEED 3300 // 8000rpm
-#define MAX_CHASSIS_VY_SPEED 3300
+#define MAX_CHASSIS_VX_SPEED 4000 // 8000rpm
+#define MAX_CHASSIS_VY_SPEED 4000
 /* 底盘 最大 旋转速度 , unit is degree/s */
-#define MAX_CHASSIS_VR_SPEED 236 // 5000rpm
+#define MAX_CHASSIS_VR_SPEED 300//236 // 5000rpm
 /*小陀螺转速*/
 #define LG_SPEED 200
 /*小陀螺或小猫步下最大VW*/

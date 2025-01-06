@@ -8,6 +8,10 @@
 #include "modeswitch_task.h"
 #include "pc_rx_data.h"
 
+//外部调试
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 RCC_ClocksTypeDef RCC_Clocks;
 
 UBaseType_t detect_stack_surplus;
@@ -25,6 +29,7 @@ void detect_task(void *parm)
 		RCC_GetClocksFreq(&RCC_Clocks); // 检测外部晶振是否起振
 
 		detect_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+		
 		vTaskDelayUntil(&detect_wake_time, 50);
 	}
 }

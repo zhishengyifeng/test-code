@@ -26,8 +26,8 @@
 #include "filter.h"
 //外部调试
 #include "bsp_vofa.h"
-
 #include "stdio.h"
+
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
@@ -126,10 +126,10 @@ void imu_task(void const *argu)
 	accel_fliter_1[0] = accel_fliter_2[0] = accel_fliter_3[0] = INS_accel[0];
 	accel_fliter_1[1] = accel_fliter_2[1] = accel_fliter_3[1] = INS_accel[1];
 	accel_fliter_1[2] = accel_fliter_2[2] = accel_fliter_3[2] = INS_accel[2];
-
+	
 	while (1)
 	{	
-		if(i_init < 1000)
+			if(i_init < 1000)
 			i_init++;
 		else
 			INS_Init_Done = 1;
@@ -162,6 +162,7 @@ void imu_task(void const *argu)
 			//陀螺仪低通滤波
 			if(i_filter<ORDER+1)
 			{
+
 				i_filter++;
 				Filter(INS_gyro[0],gyro_filter_input[0],WINDOWS);
 				Filter(INS_gyro[1],gyro_filter_input[1],WINDOWS);
@@ -209,6 +210,7 @@ void imu_task(void const *argu)
 		}
 		
 		yaw_angle_last = gimbal.sensor.yaw_gyro_angle;
+		imu_stack_surplus = uxTaskGetStackHighWaterMark(NULL);	
 		
 		err_detector_hook(IMU_OFFLINE);
 		vTaskDelayUntil(&imu_wake_time, IMU_TASK_PERIOD);

@@ -5,7 +5,7 @@
  * ´úÂë°æ±¾£º µÚÒ»´ú¿ò¼Ü
  * Íê³ÉÈÕÆÚ£º 2022.6.19
  ******************************************************************************
- *                          RM . µç¿ØÖ®¸è
+							RM . µç¿ØÖ®¸è
  *
  *                  Ò»Äê±¸ÈüÁ½Ã£Ã££¬Ð´³ÌÐò£¬µ½ÌìÁÁ¡£
  *                      ÍòÐÐ´úÂë£¬BugºÎ´¦²Ø¡£
@@ -16,7 +16,6 @@
  *                  Ã¿ÍíµÆ»ðÀ»Éº´¦£¬Ò¹ÄÑÃÂ£¬¼ÌÐø¸Î¡£
  ******************************************************************************
  **/
-
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 /*freertos*/
@@ -58,9 +57,6 @@
 void flash_cali(void);
 void Config_SystemClock(uint32_t PLLM, uint32_t PLLN, uint32_t PLLP, uint32_t PLLQ);
 
-
-
-
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_dev __ALIGN_END;
 
 int main(void)
@@ -73,11 +69,10 @@ int main(void)
 	USBD_Init(&USB_OTG_dev, USB_OTG_FS_CORE_ID, &USR_desc, &USBD_CDC_cb, &USR_cb);
 #endif
 
-	TIM_BASE_Init(10 - 1, 8400 - 1); // ÅäÖÃ¶¨Ê±Æ÷4Îª1msÖÐ¶ÏÒ»´Î£¬×öÀ´ÏµÍ³ÔwËÐÐ¼ÆÊý£¬±ãÓÚÖ®ºóÊµÏÖÒ»Ð©ÑÓÊ±²Ù×?
-	GPIO_INIT();					 // °åÔØLED¡¢¹éÖÐ°´¼ü¡¢24VµçÔ´Êä³ö¡¢°åÔØÍÓÂÝÒÇSPIµÈÒý½ÅµÄ³õÊ¼»¯£¬¾ßÌå¿´A°åµÄÔ­ÀíÍ¼
-//	TIM1_DEVICE(2500 - 1, 168 - 1);	 // Ä¦²ÁÂÖ
+	TIM_BASE_Init(10 - 1, 8400 - 1); // ÅäÖÃ¶¨Ê±Æ÷4Îª1msÖÐ¶ÏÒ»´Î
+	GPIO_INIT();					 // °åÔØLED¡¢¹éÖÐ°´¼ü¡¢24VµçÔ´Êä³ö¡¢°åÔØÍÓÂÝÒÇSPIµÈÒý½ÅµÄ³õÊ¼»¯£¬¾ßÌå¿´A°åµÄÔ­ÀíÍ¼¼
 //	TIM12_DEVICE(400-1,90-1);//·äÃùÆ÷£¬PWMÆµÂÊÔÚ2700HZÊ±ÉùÒô×î´ó£¬ÇÒÕ¼¿Õ±ÈÐèÒªÉèÖÃ³É5£¥µÄ¸ßµçÆ½£¬´Ë´¦ÉèÖÃÎª2500HZ
-//	TIM10_DEVICE(5000 - 1, 0);												 // Ìá¹©Ò»Â·PWMÊ¹µÃ¼ÓÈÈµç×èÉýÎÂ£¬ÓÃÓÚºãÎÂ¼ÓÈÈIMU
+//	TIM10_DEVICE(5000 - 1, 0);												  // Ìá¹©Ò»Â·PWMÊ¹µÃ¼ÓÈÈµç×èÉýÎÂ£¬ÓÃÓÚºãÎÂ¼ÓÈÈIMU
 	CAN1_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3); // CAN1ÅäÖÃ
 	CAN2_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3);
 	USART3_DEVICE(); // ÓÃÓÚÒ£¿ØÍ¨ÐÅ£¬²ÉÓÃµÄÊÇDMA¼Ó¿ÕÏÐÖÐ¶ÏµÄ·½Ê½½ÓÊÕÊý¾Ý
@@ -117,13 +112,14 @@ int main(void)
 	}
 	GPIO_ResetBits(GPIOH,GPIO_Pin_12);
 	GPIO_SetBits(GPIOH,GPIO_Pin_11);
-		RCC_ClearFlag();
+	RCC_ClearFlag();
 	
 	
 	TIM8_DEVICE(20000 - 1, 168 - 1); // ¶æ»úPWMÖÜÆÚÐèÒªÅäÖÃ³É20ms£¬¶æ»ú0-180¡ã¶ÔÓ¦Îª¸ßµçÆ½³ÖÐøÊ±¼ä0.5ms-2.5ms
-	IWDG_Config(IWDG_Prescaler_64 ,1250);//1s²»Î¹¹·×Ô¶¯¸´Î»,ÔÚmodeswitchÀï±ßÎ¹
-	TASK_START();		   // ´´½¨¸÷¸öÈÎÎñ£¬Éè¶¨ÓÅÏÈ¼¶ºÍ¶ÑÕ»´óÐ¡
-	vTaskStartScheduler(); // ¿ªÆôÈÎÎñµ÷¶È
+	IWDG_Config(IWDG_Prescaler_64 ,1250);//1s²»Î¹¹·×Ô¶¯¸´Î»,ÔÚmodeswitchÀï±ßÎ¹¹
+	TASK_START();		  // ´´½¨¸÷¸öÈÎÎñ£¬Éè¶¨ÓÅÏÈ¼¶ºÍ¶ÑÕ»´óÐ¡
+
+	vTaskStartScheduler();  // ¿ªÆôÈÎÎñµ÷¶È½
 	while (1)
 	{
 	}

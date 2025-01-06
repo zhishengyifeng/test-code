@@ -20,6 +20,10 @@
 #include "math.h"
 #include "bsp_flash.h"
 
+//Íâ²¿µ÷ÊÔ
+#include "bsp_vofa.h"
+#include "stdio.h"
+
 UBaseType_t info_stack_surplus;
 
 extern TaskHandle_t can_msg_send_Task_Handle;
@@ -78,6 +82,7 @@ void info_get_task(void *parm)
 				}
 
 				info_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
+
 			}
 		}
 	}

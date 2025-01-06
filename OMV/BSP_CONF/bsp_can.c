@@ -181,6 +181,23 @@ void send_gimbal_cur(int16_t pit_iq, int16_t yaw_iq)
 	TxMessage.Data[2] = pit_iq >> 8;
 	TxMessage.Data[3] = pit_iq;	
 	CAN_Transmit(YAW_CAN, &TxMessage);
+	
+	#ifndef DM_MOTOR_PITCH
+	CAN_Transmit(PITCH_CAN, &TxMessage);
+	#endif
+	
+}
+
+void send_dm_cur(int16_t dm)
+{
+	CanTxMsg TxMessage;
+	TxMessage.StdId = 0x3FE; // 标准标识符
+	TxMessage.IDE = CAN_ID_STD;			 // 定义标识符的类型为标准标识符
+	TxMessage.RTR = CAN_RTR_DATA;		 // 数据帧
+	TxMessage.DLC = 0x02;				 // 数据长度为0x02
+	TxMessage.Data[0] = dm >> 8;
+	TxMessage.Data[1] = dm;
+
 	CAN_Transmit(PITCH_CAN, &TxMessage);
 	
 }
