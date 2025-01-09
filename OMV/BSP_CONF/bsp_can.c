@@ -107,6 +107,7 @@ static void STD_CAN_RxCpltCallback(CAN_TypeDef *_hcan, CanRxMsg *message)
 
 		case CAN_PIT_MOTOR_ID: // pitÖá
 		{
+			
 			encoder_data_handler(&moto_pit, message);
 			err_detector_hook(GIMBAL_PIT_OFFLINE);
 		}
@@ -146,9 +147,15 @@ void encoder_data_handler(moto_measure_t *ptr, CanRxMsg *message)
 		ptr->total_angle = ptr->total_ecd / (ENCODER_ANGLE_RATIO * 36.0f);
 	else
 		ptr->total_angle = ptr->total_ecd / ENCODER_ANGLE_RATIO;
-
-	ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
-	ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
+	
+	#ifndef DM_MOTOR_PITCH
+		ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
+		ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
+	#else
+		ptr->speed_rpm = (int16_t)((message->Data[2] << 8 | message->Data[3])/100.0f);
+		ptr->given_current = (int16_t)((message->Data[4] << 8 | message->Data[5])/1000.0f);
+	#endif
+	
 }
 
 /**
