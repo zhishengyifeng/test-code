@@ -35,7 +35,8 @@ typedef enum
 	CAN_FRIC_M2_ID       = 0x202,   
 	CAN_TRIGGER_MOTOR_ID = 0x203,//trigger
 	#ifdef DM_MOTOR_PITCH
-		CAN_PIT_MOTOR_ID     = 0x301,//pitch
+		CAN_PIT_DM_ID 			 = 0x3FE,//达秒电机发送
+		CAN_PIT_MOTOR_ID     = 0x301,//DM_pitch
 	#else
 		CAN_PIT_MOTOR_ID     = 0x206,//pitch
 	#endif

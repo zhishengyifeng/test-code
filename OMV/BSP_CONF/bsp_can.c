@@ -148,14 +148,21 @@ void encoder_data_handler(moto_measure_t *ptr, CanRxMsg *message)
 	else
 		ptr->total_angle = ptr->total_ecd / ENCODER_ANGLE_RATIO;
 	
-	#ifndef DM_MOTOR_PITCH
+	if (ptr == &moto_pit)
+	{
+		#ifndef DM_MOTOR_PITCH
+			ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
+			ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
+		#else
+			ptr->speed_rpm = (int16_t)((message->Data[2] << 8 | message->Data[3])/100.0f);
+			ptr->given_current = (int16_t)((message->Data[4] << 8 | message->Data[5])/1000.0f);
+		#endif
+	}
+	else
+	{
 		ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
 		ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
-	#else
-		ptr->speed_rpm = (int16_t)((message->Data[2] << 8 | message->Data[3])/100.0f);
-		ptr->given_current = (int16_t)((message->Data[4] << 8 | message->Data[5])/1000.0f);
-	#endif
-	
+	}
 }
 
 /**
@@ -198,7 +205,7 @@ void send_gimbal_cur(int16_t pit_iq, int16_t yaw_iq)
 void send_dm_cur(int16_t dm)
 {
 	CanTxMsg TxMessage;
-	TxMessage.StdId = 0x3FE; // 标准标识符
+	TxMessage.StdId = CAN_PIT_DM_ID; // 标准标识符
 	TxMessage.IDE = CAN_ID_STD;			 // 定义标识符的类型为标准标识符
 	TxMessage.RTR = CAN_RTR_DATA;		 // 数据帧
 	TxMessage.DLC = 0x02;				 // 数据长度为0x02
