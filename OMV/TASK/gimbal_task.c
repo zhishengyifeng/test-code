@@ -4,7 +4,7 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "usart.h"
 #include "delay.h"
 #include "bsp_dwt.h"
 #include "modeswitch_task.h"
@@ -42,7 +42,7 @@ ramp_t yaw_ramp;
 
 
 /*调双环PID时先调内环，赋值1可断外环，调内环*/
-uint8_t PID_Inner_Parameters;;
+uint8_t PID_Inner_Parameters;
 
 #if (INFANTRY_CLASS == INFANTRY_MECANNUM)
 {
@@ -75,7 +75,6 @@ float yaw_init_pid[6] = { 0.2f, 0, 0, 15000, 0, 0};//{ 0.8f, 0.0f, 0.5f, 30000, 
 // 普通参数（小陀螺与普通模式共用一套参数）
 float pit_pid[6] = {0.5, 0.01f, 1, 7, 0, 0};//IMU反馈
 float yaw_pid[6] = { 0.2f, 0, 0, 15000, 0, 0};//{ 0.8f, 0.0f, 0.5f, 30000, 0, 0};//{0.25f, 0, 0.5f, 40000, 0, 0};
-
 // 自瞄参数
 float pit_vision_pid[6] = {0.8f, 0.05f, 0.3f, 6, 0, 0};
 float yaw_vision_pid[6] = { 3, 0, 30, 3000, 0, 0};// {0.2f, 0.0f, 0.0f, 20000, 0, 0};
@@ -85,11 +84,11 @@ float pit_buff_pid[6] = {0.8f, 0.05f, 0.3f, 6, 0, 0};
 float yaw_buff_pid[6] = {0.1f, 0.0f, 0.0f, 10000, 0, 0};
 #else
 //  归中参数
-float pit_init_pid[6] = {0.3f, 0.005f, 0, 12000, 0, 0};
-float yaw_init_pid[6] = {0.2f, 0, 0, 15000, 0, 0}; 
+float pit_init_pid[6] = {0.3f, 0, 0, 12000, 0, 0};
+float yaw_init_pid[6] = {0.2f, 0, 0, 15000, 0, 0};  
 
 // 普通参数（小陀螺与普通模式共用一套参数）
-float pit_pid[6] = {0.3f, 0.005f, 0, 15000, 0, 0};//IMU反馈
+float pit_pid[6] = {0.3f, 0.001f, 0.2f, 15000, 0, 0};//IMU反馈
 float yaw_pid[6] = { 0.2f, 0, 0, 15000, 0, 0};//{ 0.8f, 0.0f, 0.5f, 30000, 0, 0};//{0.25f, 0, 0.5f, 40000, 0, 0};
 
 // 自瞄参数
@@ -416,21 +415,29 @@ void gimbal_task(void *parm)
 					memset(glb_cur.gimbal_cur, 0, sizeof(glb_cur.gimbal_cur));
 					gimbal_mode = GIMBAL_RELEASE;
 				} 
-				if (PID_Inner_Parameters)//断外环，调内环,发速度期望
+//				if (PID_Inner_Parameters)//断外环，调内环,发速度期望
+//				{
+//					vofa_gimbal[0] = gimbal.pid.pit_spd_fdb;
+//					vofa_gimbal[1] = rm.pit_v*5;
+//					vofa_gimbal[2] = gimbal.pid.yaw_spd_fdb;
+//					vofa_gimbal[3] = rm.yaw_v*5;
+//				}
+//				else
+//				{
+//					vofa_gimbal[0] = gimbal.pid.pit_angle_fdb;
+//					vofa_gimbal[1] = gimbal.pid.pit_angle_ref;
+//					vofa_gimbal[2] = gimbal.pid.yaw_angle_fdb;
+//					vofa_gimbal[3] = gimbal.pid.yaw_angle_ref;
+//				}
+				
+				/* vofa调试 */
+				Vofa_Get_Info();
+				DMA_Debug_USART_Tx_Data(Tx_Buffer_Num);
+				if(Rx_Flag == 1)//vofa上位机发值控制
 				{
-					vofa_gimbal[0] = gimbal.pid.pit_spd_fdb;
-					vofa_gimbal[1] = rm.pit_v*5;
-					vofa_gimbal[2] = gimbal.pid.yaw_spd_fdb;
-					vofa_gimbal[3] = rm.yaw_v*5;
+					Rx_Flag = 0;
+					Info_Proc();
 				}
-				else
-				{
-					vofa_gimbal[0] = gimbal.pid.pit_angle_fdb;
-					vofa_gimbal[1] = gimbal.pid.pit_angle_ref;
-					vofa_gimbal[2] = gimbal.pid.yaw_angle_fdb;
-					vofa_gimbal[3] = gimbal.pid.yaw_angle_ref;
-				}
-				JustFloat_Send(vofa_gimbal,4,USART1);
 
 				last_gimbal_mode = gimbal_mode; // 获取上一次云台状态
 				xTaskGenericNotify((TaskHandle_t)can_msg_send_Task_Handle,
@@ -528,6 +535,7 @@ uint32_t debug_time = 1000;
 /* creat manual control funtion.  add time:2025.1.5*/   
 static void manual_control_funtion(gimbal_status NOW_MODE)
 {
+	static uint8_t confirm_time;
 	gimbal.state = remote_is_action();												   // 判断yaw轴是否有输入
 
 	if ((NOW_MODE != GIMBAL_TRACK_ARMOR) && (direction_change)) // 检测到鼠标中间的滚轮向下滑动，则进行云台角度的变化
@@ -573,7 +581,7 @@ static void manual_control_funtion(gimbal_status NOW_MODE)
 			}break;
 			case REF_ADD://正转，目标值向上阶跃
 			{
-				if(gimbal.sensor.yaw_palstance<0)
+				if(gimbal.sensor.yaw_palstance < 0.3f)
 				{
 					gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
 					gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴
@@ -582,7 +590,7 @@ static void manual_control_funtion(gimbal_status NOW_MODE)
 			}break;
 			case REF_SUB://反转，目标值向下阶跃
 			{
-				if(gimbal.sensor.yaw_palstance>0)
+				if(gimbal.sensor.yaw_palstance > (-0.3f))
 				{
 					gimbal.pid.yaw_angle_ref = gimbal.pid.yaw_angle_fdb;
 					gimbal.yaw_offset_angle = gimbal.sensor.yaw_total_angle; // 云台停止后刷新底盘0轴

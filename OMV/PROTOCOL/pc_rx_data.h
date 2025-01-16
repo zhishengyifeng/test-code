@@ -36,7 +36,8 @@ typedef struct
     struct
     {
       uint8_t visual_valid : 1;
-      uint8_t reserved : 7;
+			uint8_t fire_control : 1;
+      uint8_t reserved : 6;
     } info;
   } mode_Union;
   float aim_yaw;

@@ -76,7 +76,8 @@ int main(void)
 	CAN1_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3); // CAN1配置
 	CAN2_DEVICE(CAN_Mode_Normal, CAN_SJW_1tq, CAN_BS1_9tq, CAN_BS2_4tq, 3);
 	USART3_DEVICE(); // 用于遥控通信，采用的是DMA加空闲中断的方式接收数据
-	USART1_DEVICE(); // 用于PC通信数据，采用的是DMA加空闲中断的方式接收数据
+	Debug_USART_DMA_Config(); // 用于Debug
+	Debug_USART_Config();
 	USART6_DEVICE(); // 用于裁判系统通信，采用的是DMA加空闲中断的方式接收数据
 //	USART8_DEVICE();
 	SPI_DEVICE(); // 用于读取板载陀螺仪

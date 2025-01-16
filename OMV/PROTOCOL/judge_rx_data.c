@@ -104,9 +104,9 @@ void judgement_data_handler(uint8_t *p_frame)
       memcpy(&judge_recv_mesg.event_data, data_addr, data_length);    
     break; 
 		
-    case SUPPLY_PROJECTILE_ACTION_ID:                                 //102，场地补给站动作标识符，动作发生后发送
-      memcpy(&judge_recv_mesg.supply_projectile_action, data_addr, data_length);
-    break;
+//    case SUPPLY_PROJECTILE_ACTION_ID:                                 //102，场地补给站动作标识符，动作发生后发送
+//      memcpy(&judge_recv_mesg.supply_projectile_action, data_addr, data_length);
+//    break;
 		
 		case REFEREE_WARNING_ID:                                          //104，裁判警告数据，警告后发送
       memcpy(&judge_recv_mesg.referee_warning, data_addr, data_length);
@@ -132,9 +132,9 @@ void judgement_data_handler(uint8_t *p_frame)
 			memcpy(&judge_recv_mesg.buff, data_addr, data_length);
 		break;
 		
-		case AERIAL_ROBOT_ENERGY_ID:                                      //205，空中机器人能量状态数据，10HZ周期发送，只有空中主控发送
-			memcpy(&judge_recv_mesg.aerial_robot_energy, data_addr, data_length);
-		break;
+//		case AERIAL_ROBOT_ENERGY_ID:                                      //205，空中机器人能量状态数据，10HZ周期发送，只有空中主控发送
+//			memcpy(&judge_recv_mesg.aerial_robot_energy, data_addr, data_length);
+//		break;
 		
 		case ROBOT_HURT_ID:                                               //206 伤害状态数据，伤害发生后发送
 			memcpy(&judge_recv_mesg.robot_hurt, data_addr, data_length);

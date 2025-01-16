@@ -1,6 +1,7 @@
 #include "usart.h"
 #include "dma.h"
 #include "stdio.h"
+#include "gimbal_task.h"
 
 USART_InitTypeDef USART_InitStructure3;
 void USART3_DEVICE(void) /*DBUS*/
@@ -117,62 +118,199 @@ void USART6_DEVICE(void) /*JUDGE*/
 	USART6_DMA();
 }
 
-void USART1_DEVICE(void) /*PC*/
+/************************************************************************************
+*****************************					调试串口			***********************************
+************************************************************************************/
+u8 Tx_done = 1;
+u8 Rx_Flag;
+uint8_t Tx_Buffer[Tx_Buffer_Num];
+uint8_t Rx_Buffer[Rx_Buffer_Num];
+
+static void Debug_Usart_NVIC_Configuration(void)
+{
+  NVIC_InitTypeDef NVIC_InitStructure;
+  
+  
+  /* 配置USART为中断源 */
+  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream7_IRQn;
+  /* 抢断优先级 */
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  /* 子优先级 */
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  /* 使能中断 */
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  /* 初始化配置NVIC */
+  NVIC_Init(&NVIC_InitStructure);
+	
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  /* 初始化配置NVIC */
+  NVIC_Init(&NVIC_InitStructure);
+}
+
+void Debug_USART_DMA_Config(void)
+{
+	DMA_InitTypeDef DMA_InitStructure;
+	//串口发送DMA
+	
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+
+	DMA_Cmd(DMA2_Stream7,DISABLE);
+	DMA_DeInit(DMA2_Stream7);
+
+	DMA_InitStructure.DMA_Channel = DMA_Channel_4;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (DEBUG_USART->DR);
+	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)Tx_Buffer;
+	DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+	DMA_InitStructure.DMA_BufferSize = Tx_Buffer_Num;
+	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
+	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+	
+	DMA_Init(DMA2_Stream7, &DMA_InitStructure);
+	DMA_ClearFlag(DMA2_Stream7,DMA_FLAG_TCIF7);
+	DMA_ITConfig(DMA2_Stream7,DMA_IT_TC,ENABLE);
+	
+	//串口接收DMA
+	
+	DMA_Cmd(DMA2_Stream5,DISABLE);
+	DMA_DeInit(DMA2_Stream5);
+
+	DMA_InitStructure.DMA_Channel = DMA_Channel_4;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (DEBUG_USART->DR);
+	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)Rx_Buffer;
+	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
+	DMA_InitStructure.DMA_BufferSize = Rx_Buffer_Num;
+	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
+	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+	
+	DMA_Init(DMA2_Stream5, &DMA_InitStructure);
+	DMA_Cmd(DMA2_Stream5, ENABLE);				//开启DMA接收
+}
+
+
+void Debug_USART_Config(void)
 {
 	/**USART1 GPIO Configuration
 	PB7     ------> USART1_RX
 	PA9     ------> USART1_TX
 	*/
-	GPIO_InitTypeDef GPIO_InitStructure;
-	USART_InitTypeDef USART_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
+	
+  GPIO_InitTypeDef GPIO_InitStructure;
+  USART_InitTypeDef USART_InitStructure;
+		
+  RCC_AHB1PeriphClockCmd(DEBUG_USART_RX_GPIO_CLK|DEBUG_USART_TX_GPIO_CLK,ENABLE);
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+  /* 使能 USART 时钟 */
+  RCC_APB2PeriphClockCmd(DEBUG_USART_CLK, ENABLE);
+  
+  /* GPIO初始化 */
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  
+  /* 配置Tx引脚为复用功能  */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Pin = DEBUG_USART_TX_PIN  ;  
+  GPIO_Init(DEBUG_USART_TX_GPIO_PORT, &GPIO_InitStructure);
 
-	RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, ENABLE);
-	RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, DISABLE);
+  /* 配置Rx引脚为复用功能 */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Pin = DEBUG_USART_RX_PIN;
+  GPIO_Init(DEBUG_USART_RX_GPIO_PORT, &GPIO_InitStructure);
+  
+ /* 连接 PXx 到 USARTx_Tx*/
+  GPIO_PinAFConfig(DEBUG_USART_RX_GPIO_PORT,DEBUG_USART_RX_SOURCE,DEBUG_USART_RX_AF);
 
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-	USART_DeInit(USART1);
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_Init(USART1, &USART_InitStructure);
-
-	USART_ClearFlag(USART1, USART_FLAG_IDLE);
-	USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);
-	USART_Cmd(USART1, ENABLE);
-
-	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-
-	USART1_DMA();
+  /*  连接 PXx 到 USARTx__Rx*/
+  GPIO_PinAFConfig(DEBUG_USART_TX_GPIO_PORT,DEBUG_USART_TX_SOURCE,DEBUG_USART_TX_AF);
+  
+  /* 配置串DEBUG_USART 模式 */
+  /* 波特率设置：DEBUG_USART_BAUDRATE */
+  USART_InitStructure.USART_BaudRate = DEBUG_USART_BAUDRATE;
+  /* 字长(数据位+校验位)：8 */
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  /* 停止位：1个停止位 */
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  /* 校验位选择：不使用校验 */
+  USART_InitStructure.USART_Parity = USART_Parity_No;
+  /* 硬件流控制：不使用硬件流 */
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  /* USART模式控制：同时使能接收和发送 */
+  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  /* 完成USART初始化配置 */
+  USART_Init(DEBUG_USART, &USART_InitStructure); 
+	USART_ClearFlag(DEBUG_USART,USART_FLAG_TC);
+	USART_ClearFlag(DEBUG_USART,USART_FLAG_RXNE);
+	//开启串口空闲中断&DMA
+	USART_ITConfig(DEBUG_USART,USART_IT_IDLE,ENABLE);
+	USART_DMACmd(DEBUG_USART, USART_DMAReq_Tx, ENABLE);
+	USART_DMACmd(DEBUG_USART, USART_DMAReq_Rx, ENABLE);
+	Debug_Usart_NVIC_Configuration();
+  /* 使能串口 */
+  USART_Cmd(DEBUG_USART, ENABLE);
 }
 
+void DMA_Debug_USART_Tx_Data(uint32_t size)
+{
+	if(Tx_done == 0)
+		return;
+	else
+	{
+		Tx_done = 0;
+		DMA_SetCurrDataCounter(DMA2_Stream7,size);
+		DMA_Cmd(DMA2_Stream7, ENABLE);				//开始DMA发送
+	}
+}
+
+void Info_Proc(void)
+{
+	if((Rx_Buffer[0] == 'P')&&(Rx_Buffer[1] == 'O')&&(Rx_Buffer[2] == 'S'))
+	{
+		memcpy((void*)&gimbal.pid.yaw_angle_ref,Rx_Buffer+4,4);
+	}
+}
+
+
+/*USART1 中断函数*/
+void USART1_IRQHandler(void)
+{
+	if(USART_GetITStatus(USART1,USART_IT_IDLE) == SET)
+	{
+		Rx_Flag = 1;		
+		DMA_Cmd(DMA2_Stream5, DISABLE);
+		DMA_SetCurrDataCounter(DMA2_Stream5,Rx_Buffer_Num);
+		USART_ReceiveData(USART1);
+		DMA_Cmd(DMA2_Stream5, ENABLE);
+		USART_ClearITPendingBit(USART1,USART_IT_IDLE);
+	}
+}
+
+//串口发送DMA中断
+void DMA2_Stream7_IRQHandler(void)
+{
+	if(DMA_GetITStatus(DMA2_Stream7,DMA_IT_TCIF7) == SET)
+	{
+		Tx_done = 1;
+		DMA_Cmd(DMA2_Stream7, DISABLE);
+		DMA_ClearITPendingBit(DMA2_Stream7,DMA_IT_TCIF7);
+	}
+}
 ///重定向c库函数printf到串口，重定向后可使用printf函数
 int fputc(int ch, FILE *f)
 {

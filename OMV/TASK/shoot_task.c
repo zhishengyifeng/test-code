@@ -24,7 +24,7 @@
 #include "bsp_vofa.h"
 #include "stdio.h"
 
-uint16_t shoot_speed = 40;//无裁判系统射频，1000/shoot_speed = 每秒发弹量
+uint16_t shoot_speed = 100;//无裁判系统射频，1000/shoot_speed = 每秒发弹量
 
 float debug1,debug2;
 
@@ -302,26 +302,26 @@ static void shoot_delay_hanlder(trig_state_e *state, float shoot_delay)
 	{
 		trig.one_time = HAL_GetTick();
 		/* 卡弹角度锁定不正常则不自增角度 */
-		if (fabs(moto_trigger.total_angle - single_shoot_angle) <= 10)
+		if (fabs(moto_trigger.total_angle - single_shoot_angle) <= 10)//与目标角小于10°认为无卡弹现象
 		{
 			stop_time = 0;
-			if(ngtv_flag)
+			if(ngtv_flag)//卡弹标志位
 			{
 				ngtv_flag = 0;
-				single_shoot_angle += 15; // 发射（single_shoot_angle设为当前角度加上Angle）				
+				single_shoot_angle += (TRI_MOTO_POSITIVE_DIR * 15.0f); // 发射（single_shoot_angle设为当前角度加上Angle）				
 			}
 			else
 				single_shoot_angle += Angle; // 发射（single_shoot_angle设为当前角度加上Angle）
 			*state = TRIG_PRESS_DOWN;	 // 发射按键已按下
 		}
-		else if(stop_time == 300)
+		else if(stop_time == 300)//若到达300ms仍然大于10°则认为卡弹，反转为原来的角度再回退15°
 		{
-			single_shoot_angle -= (Angle + 15);
+			single_shoot_angle -= (TRI_MOTO_POSITIVE_DIR * (Angle + 15.0f));
 			ngtv_flag = 1;
 			stop_time++;
 			CHECK++;
 		}
-		else
+		else//大于十度则开始自增时间进行卡弹判断
 		{
 			if(KEY_GetFlag())
 				stop_time++;
@@ -351,8 +351,8 @@ static void shoot_delay_hanlder(trig_state_e *state, float shoot_delay)
 
 static void shoot_bullet_handler(void)
 {
-
-	if (shoot.shoot_cmd)//单发
+	u8 fire_flag = pc_recv_mesg.mode_Union.info.fire_control;
+	if ((shoot.shoot_cmd)&&(fire_flag))//单发
 	{
 		if(global_err.list[JUDGE_SYS_OFFLINE].err_exist == 1)//没连接裁判系统时
 			single_time = shoot_speed;
@@ -363,7 +363,7 @@ static void shoot_bullet_handler(void)
 		
   }
 	
-	else if (shoot.c_shoot_cmd && !gimbal.big_buff_ctrl && !gimbal.small_buff_ctrl)//连发做多次单发，如果在打符模式不连发
+	else if ((shoot.c_shoot_cmd && !gimbal.big_buff_ctrl && !gimbal.small_buff_ctrl)&&(fire_flag))//连发做多次单发，如果在打符模式不连发
 	{
         //计算延时时间
 		if(global_err.list[JUDGE_SYS_OFFLINE].err_exist == 1)//没连接裁判系统时

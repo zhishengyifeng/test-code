@@ -152,17 +152,14 @@ void encoder_data_handler(moto_measure_t *ptr, CanRxMsg *message)
 	{
 		#ifndef DM_MOTOR_PITCH
 			ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
-			ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
 		#else
-			ptr->speed_rpm = (int16_t)((message->Data[2] << 8 | message->Data[3])/100.0f);
-			ptr->given_current = (int16_t)((message->Data[4] << 8 | message->Data[5])/1000.0f);
+			ptr->speed_rpm = ((int16_t)((message->Data[2] << 8 | message->Data[3]))/100.0f);
 		#endif
 	}
 	else
-	{
-		ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);
-		ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
-	}
+		ptr->speed_rpm = (int16_t)(message->Data[2] << 8 | message->Data[3]);	
+	ptr->given_current = (int16_t)(message->Data[4] << 8 | message->Data[5]);
+	
 }
 
 /**
@@ -209,8 +206,8 @@ void send_dm_cur(int16_t dm)
 	TxMessage.IDE = CAN_ID_STD;			 // 定义标识符的类型为标准标识符
 	TxMessage.RTR = CAN_RTR_DATA;		 // 数据帧
 	TxMessage.DLC = 0x02;				 // 数据长度为0x02
-	TxMessage.Data[0] = dm >> 8;
-	TxMessage.Data[1] = dm;
+	TxMessage.Data[0] = dm;
+	TxMessage.Data[1] = dm >> 8;
 
 	CAN_Transmit(PITCH_CAN, &TxMessage);
 	

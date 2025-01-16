@@ -7,35 +7,27 @@
 
 #define JUDGE_RX_FIFO_BUFLEN 500
 
-/**代码相对于23赛季裁判系统通信缺少模块如下***
-*0x020B -- 地面机器人位置数据 (服务器→己方哨兵机器人)  
-*0x020C -- 雷达标记进度数据 (服务器→己方雷达机器人)   不添加
-*0x020D -- 哨兵自主决策相关信息同步 (服务器→己方哨兵机器人)     
-*0x020E -- 雷达自主决策信息同步 (服务器→己方雷达机器人)  不添加
+/* V1.7.0版本修订记录
+修订命令码：0x0003,0x0101,0x0202,0x0204,0x0209,0x020B
+删除命令码：0x0102,0x0205
+新增：0x0309
+*/
 
-*0x0306 -- 自定义控制器与选手端交互数据 (自定义控制器→选手端)  不添加
-*0x0307 -- 选手端小地图接收哨兵数据 (哨兵/半自动控制机器人→对应操作手选手端) 
-*0x0308 -- 选手端小地图接收机器人消息 (己方机器人→己方选手端) 不添加
-**/
-/**代码相对于23赛季裁判系统通信删除模块如下***
-*0x0004 -- 飞镖发射状态，飞镖发射后发送    已删除
-*0x0005 -- 人工智能挑战赛加成与惩罚状态    已删除
-*0x0103 -- 请求补给站补弹数据，由参赛队发送 已删除
-**/
+
 typedef enum //接收发送的ID号都在里面
 {
 	GAME_STATE_ID                      = 0x0001,  //比赛状态数据
 	GAME_RESULT_ID 	                   = 0x0002,  //比赛结果数据
 	GAME_ROBOT_HP_ID                   = 0x0003,	//比赛机器人血量数据            
 	EVENT_DATA_ID 				             = 0x0101,	//场地事件数据
-	SUPPLY_PROJECTILE_ACTION_ID        = 0x0102,	//场地补给站动作标识数据，动作发生后发送
+	//SUPPLY_PROJECTILE_ACTION_ID        = 0x0102,	//1.7.0版本中已删除
 	REFEREE_WARNING_ID                 = 0x0104,  // 裁判系统警告信息
 	DART_REMAINING_TINME_ID            = 0x0105,  //飞镖发射口倒计时
 	GAME_ROBOT_STATE_ID                = 0x0201,	//机器人状态数据                  
 	POWER_HEAT_DATA_ID                 = 0x0202,	//实时功率热量数据
 	GAME_ROBOT_POS_ID                  = 0x0203,	//机器人位置数据
 	BUFF_ID                            = 0x0204,	//机器人增益数据
-	AERIAL_ROBOT_ENERGY_ID             = 0x0205,	//空中机器人能量状态数据
+	//AERIAL_ROBOT_ENERGY_ID             = 0x0205,	//1.7.0版本中已删除
 	ROBOT_HURT_ID                      = 0x0206,	//伤害状态数据，伤害发生后发送
 	SHOOT_DATA_ID                      = 0x0207,	//实时射击数据，子弹发射后发送
 	BULLET_REMAINING_ID                = 0x0208,  //子弹剩余数量：空中机器人，哨兵机器人以及ICRA机器人
@@ -58,6 +50,7 @@ typedef enum //接收发送的ID号都在里面
 	MAP_DATA_ID                           = 0x0307, //选手端小地图接收哨兵数据
 	CUSTOM_INFO_ID                        = 0x0308, //选手端小地图接收机器人消息
 /* NEW */	
+   CUSTOM_CONTROLLER_RECEIVE_DATA_ID    = 0x0309, //自定义控制器接收机器人数据，频率10Hz,图传链路 
 } judge_data_id_e;
 
 /*裁判系统数据结构体*/
@@ -76,28 +69,29 @@ typedef __packed struct
  uint8_t winner;
 }game_result_t;
 
-/*0003*/
-typedef __packed struct
-{
- uint16_t red_1_robot_HP;
- uint16_t red_2_robot_HP;
- uint16_t red_3_robot_HP;
- uint16_t red_4_robot_HP;
- uint16_t red_5_robot_HP;
- uint16_t red_7_robot_HP;
- uint16_t red_outpost_HP;
- uint16_t red_base_HP;
- uint16_t blue_1_robot_HP;
- uint16_t blue_2_robot_HP;
- uint16_t blue_3_robot_HP;
- uint16_t blue_4_robot_HP;
- uint16_t blue_5_robot_HP;
- uint16_t blue_7_robot_HP;
- uint16_t blue_outpost_HP;
- uint16_t blue_base_HP;
-}game_robot_HP_t;
 
-/*0101*/
+/*0003*/  //1.7.0修改
+typedef __packed struct 
+{ 
+  uint16_t red_1_robot_HP; 
+  uint16_t red_2_robot_HP; 
+  uint16_t red_3_robot_HP; 
+  uint16_t red_4_robot_HP; 
+  uint16_t reserved1; 
+  uint16_t red_7_robot_HP; 
+  uint16_t red_outpost_HP; 
+  uint16_t red_base_HP; 
+  uint16_t blue_1_robot_HP; 
+  uint16_t blue_2_robot_HP; 
+  uint16_t blue_3_robot_HP; 
+  uint16_t blue_4_robot_HP; 
+  uint16_t reserved2; 
+  uint16_t blue_7_robot_HP; 
+  uint16_t blue_outpost_HP; 
+  uint16_t blue_base_HP; 
+}game_robot_HP_t; 
+
+/*0101*/   //1.7.0修改
 typedef __packed struct
 { __packed union
   {
@@ -106,28 +100,32 @@ typedef __packed struct
 	{
 		//0：未占领 1：被已方占领 2：被对方占领
         uint32_t self_supply_station : 3;  
-		/* 	bit 0：我方补给站前 0/1
-				bit 1: 我方补给站内 0/1
-				bit 2: 我方补给区(RMUL) 0/1
+		/* 	bit 0：己方与兑换区不重叠的补给区占领状态，1为已占领
+				bit 1: 己方与兑换区重叠的补给区占领状态，1为已占领 
+				bit 2: 己方补给区的占领状态，1为已占领（仅 RMUL 适用）
 		*/
-        uint32_t bit3_5 : 3;
-		/*	bit 3: 能量机关激活点 0/1
-				bit 4: 小能量机关 0/1
-				bit 5: 大能量机关 0/1
-		*/
-        uint32_t bit6_11 : 6;
-		/*	bit 6-7: 己方环形高地 0/1/2
-				bit 8-9: 已方梯形高地 0/1/2
-				bit 10-11: 己方梯形高地 0/1/2
-		*/
-        uint32_t bit12_18 : 7;
-		//	己方基地虚拟护盾的剩余值百分比 0-6
-        uint32_t bit19_27 : 9;
-		//  飞镖最后一次击中己方前哨站或基地的时间 0-8
-        uint32_t bit28_29 : 2;
-		//	飞镖最后一次击中的位置 0 前哨站/1 基地固定目标/2 基地随机目标
-        uint32_t bit30_31 : 2;
-		//	中心增益点的占领情况 0/1/2 /3 被双方占领
+        uint32_t bit3_4 : 2;
+		/*	bit 3: 己方小能量机关的激活状态，1为已激活 
+				bit 4: 己方大能量机关的激活状态，1为已激活*/
+		
+				uint32_t bit5_6 : 2; 
+		//  bit 5-6：己方中央高地的占领状态，1为被己方占领，2为被对方占领 
+				
+				uint32_t bit7_8 : 2; 
+		//	bit 7-8：己方梯形高地的占领状态，1为已占领 
+		
+				uint32_t bit9_17 : 9;
+		//	bit 9-17：对方飞镖最后一次击中己方前哨站或基地的时间（0-420，开局默认为0）
+				
+        uint32_t bit18_20 : 3;
+		//	bit 18-20：对方飞镖最后一次击中己方前哨站或基地的具体目标，开局默认为0，1为击中前哨站，2为击中基地固定目标，3为击中基地随机固定目标，4为击中基地随机移动目标 
+		
+        uint32_t bit21_22 : 2;
+		//	bit 21-22：中心增益点的占领状态，0为未被占领，1为被己方占领，2为被对方占领，3为被双方占领。（仅RMUL适用）
+		
+        uint32_t bit23_31 : 9;
+		//  bit 23-31：保留位
+        
     } fields;
 	}event_data;
 }event_data_t;
@@ -171,12 +169,12 @@ typedef __packed struct
  uint8_t power_management_shooter_output : 1;
 }robot_status_t;
 
-/*0202*/
+/*0202*/   //1.7.0修改
 typedef __packed struct
 {
- uint16_t chassis_voltage;
- uint16_t chassis_current;
- float chassis_power;
+ uint16_t reserved;
+ uint16_t reserved2;
+ float reserved3;
  uint16_t buffer_energy;
  uint16_t shooter_17mm_1_barrel_heat;
  uint16_t shooter_17mm_2_barrel_heat;
@@ -191,14 +189,15 @@ typedef __packed struct
  float angle;
 }robot_pos_t;
 
-/*0204*/
-typedef __packed struct
-{
- uint8_t recovery_buff;
- uint8_t cooling_buff;
- uint8_t defence_buff;
- uint8_t vulnerability_buff;
- uint16_t attack_buff;
+/*0204*/  //1.7.0修改
+typedef __packed struct 
+{ 
+  uint8_t recovery_buff;  
+  uint8_t cooling_buff;  
+  uint8_t defence_buff;  
+  uint8_t vulnerability_buff; 
+  uint16_t attack_buff; 
+  uint8_t remaining_energy; 
 }buff_t;
 
 /*0205*/
@@ -232,7 +231,7 @@ typedef __packed struct
  uint16_t remaining_gold_coin;
 }projectile_allowance_t;
 
-/*0209*/
+/*0209*/      //1.7.0修改
 typedef __packed struct
 {
 	__packed union
@@ -241,31 +240,33 @@ typedef __packed struct
 	__packed struct 
 	{
 		//0:未检测 1:已检测
-		//0-6
-		uint32_t self_base : 1;  //基地
-		uint32_t self_circular_highland : 1;   //己方环形高地
-		uint32_t enemy_circular_highland : 1;  //敌方环形高地
-		uint32_t self_R3_highland : 1; //己方 R3/B3 梯形高地
-		uint32_t enemy_R3_highland : 1;//敌方 R3/B3 梯形高地
-		uint32_t self_R4_highland : 1; //己方 R4/B4 梯形高地
-		uint32_t enemy_R4_highland : 1;//敌方 R4/B4 梯形高地
-		//7-12
-		uint32_t energy_buff : 1;//己方能量机关激活点
-		uint32_t self_fly_slope_front  : 1;//己方飞坡增益点前
-		uint32_t self_fly_slope_back   : 1;//己方飞坡增益点后
-		uint32_t ememy_fly_slope_front : 1;//敌方飞坡增益点前
-		uint32_t ememy_fly_slope_back  : 1;//敌方飞坡增益点后
-		uint32_t self_outpost : 1;//己方前哨站增益点
-		//13-19
-		uint32_t self_blood_point : 1;//己方补血点
-		uint32_t self_sentry_patrol  : 1;//己方哨兵巡逻区
-		uint32_t ememy_sentry_patrol : 1;//敌方哨兵巡逻区
-		uint32_t self_Resource_Island  : 1;//己方大资源岛
-		uint32_t ememy_Resource_Island : 1;//敌方大资源岛
-		uint32_t self_exchange_area : 1;//己方兑换区
-		uint32_t centry_buff : 1;//中心增益点(RMUL)
-		//20-31
-		uint32_t reserve : 12;//保留位
+		
+		uint32_t self_base : 1;  //基地增益点
+		uint32_t self_central_highland : 1;   //己方中央高地增益点
+		uint32_t enemy_central_highland : 1;  //敌方中央高地增益点
+		uint32_t self_highland : 1; 					//己方梯形高地增益点
+		uint32_t enemy_highland : 1;					//敌方梯形高地增益点
+		uint32_t self_fly_slope_front  : 1;		//己方飞坡增益点前
+		uint32_t self_fly_slope_back   : 1;		//己方飞坡增益点后
+		uint32_t ememy_fly_slope_front : 1;		//敌方飞坡增益点前
+		uint32_t ememy_fly_slope_back  : 1;		//敌方飞坡增益点后
+		uint32_t self_highland_down : 1; 			//己方地形跨越增益点（中央高地下方）
+		uint32_t self_highland_up : 1;				//己方地形跨越增益点（中央高地上方）
+		uint32_t enemy_highland_down : 1; 		//敌方地形跨越增益点（中央高地下方）
+		uint32_t enemy_highland_up : 1;				//敌方地形跨越增益点（中央高地上方）
+		uint32_t self_highway_down : 1;				//己方地形跨越增益点（公路下方）
+		uint32_t self_highway_up : 1;					//己方地形跨越增益点（公路上方）
+		uint32_t enemy_highway_down : 1;				//敌方地形跨越增益点（公路下方）
+		uint32_t enemy_highway_up : 1;					//敌方地形跨越增益点（公路上方）
+		uint32_t fortress_buff : 1;							//己方堡垒增益点 
+		uint32_t self_outpost : 1;							//己方前哨站增益点
+		uint32_t self_blood_point : 1;					//己方与兑换区不重叠的补给区/RMUL补给区 
+		uint32_t self_blood_point2 : 1;					//己方与兑换区重叠的补给区 
+	
+		uint32_t self_Resource_Island  : 1;			//己方大资源岛
+		uint32_t ememy_Resource_Island : 1;			//敌方大资源岛
+		uint32_t centry_buff : 1;								//中心增益点(RMUL)
+		uint32_t reserve : 8;									//保留位
     } fields;
 	}rfid_status;
 }rfid_status_t;
@@ -279,20 +280,20 @@ typedef __packed struct
  uint16_t latest_launch_cmd_time;
 }dart_client_cmd_t;
 
-/*020B*/
-typedef __packed struct
-{
- float hero_x;
- float hero_y;
- float engineer_x;
- float engineer_y;
- float standard_3_x;
- float standard_3_y;
- float standard_4_x;
- float standard_4_y;
- float standard_5_x;
- float standard_5_y;
-}ground_robot_position_t;
+/*020B*/	//1.7.0 修改
+typedef __packed struct 
+{ 
+  float hero_x;  
+  float hero_y;  
+  float engineer_x;  
+  float engineer_y;  
+  float standard_3_x;  
+  float standard_3_y;  
+  float standard_4_x;  
+  float standard_4_y;  
+  float reserved;  
+  float reserved2; 
+}ground_robot_position_t; 
 /*020C*/
 typedef __packed struct
 {
@@ -348,6 +349,8 @@ typedef __packed struct
  uint16_t keyboard_value;
  uint16_t reserved;
 }remote_control_t;
+
+ 
 
 typedef struct
 {
